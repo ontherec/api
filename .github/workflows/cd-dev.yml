@@ -1,0 +1,49 @@
+name: Continuous Deploy to Development Server
+
+on:
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Set up Remote Environment
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USERNAME }}
+          key: ${{ secrets.DEV_SERVER_KEY }}
+          script: |
+            touch db.env
+            {
+              echo MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+              echo MYSQL_USER=${{ secrets.MYSQL_USER }}
+              echo MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+              echo MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            } > db.env
+            touch api.env
+            {
+              echo DATABASE_URL=jdbc:mysql://db:3306/${{ secrets.MYSQL_DATABASE }}
+              echo DATABASE_USERNAME=${{ secrets.MYSQL_USER }}
+              echo DATABASE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+              echo JWK_SET_URI=${{ secrets.JWK_SET_URI }}
+            } > api.env
+
+      - name: Down and Up Containers
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEV_SERVER_HOST }}
+          username: ${{ secrets.DEV_SERVER_USERNAME }}
+          key: ${{ secrets.DEV_SERVER_KEY }}
+          script: |
+            sudo docker compose pull
+            sudo docker compose up -d
+            sudo docker image prune -a -f
+            sudo docker volume prune -a -f
