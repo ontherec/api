@@ -38,5 +38,4 @@ out/
 
 ### Secret ###
 *.env
-*.properties
-*.sql
+*-secret.properties
