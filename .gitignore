@@ -38,4 +38,4 @@ out/
 
 ### Secret ###
 *.env
-*-secret.properties
+*.properties
