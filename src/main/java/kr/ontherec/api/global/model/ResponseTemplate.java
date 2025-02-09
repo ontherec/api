@@ -1,7 +1,4 @@
-package kr.ontherec.backend.global.response;
-
-import kr.ontherec.backend.global.code.ExceptionCode;
-import kr.ontherec.backend.global.code.SuccessCode;
+package kr.ontherec.api.global.model;
 
 public record ResponseTemplate(boolean success, String message, Object data) {
 

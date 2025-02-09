@@ -1,6 +1,6 @@
-package kr.ontherec.backend.global.exception;
+package kr.ontherec.api.global.exception;
 
-import static kr.ontherec.backend.global.code.CommonExceptionCode.*;
+import static kr.ontherec.api.global.exception.CommonExceptionCode.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -16,7 +16,7 @@ import org.springframework.web.method.annotation.HandlerMethodValidationExceptio
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import kr.ontherec.backend.global.response.ResponseTemplate;
+import kr.ontherec.api.global.model.ResponseTemplate;
 import lombok.extern.slf4j.Slf4j;
 
 @ControllerAdvice
