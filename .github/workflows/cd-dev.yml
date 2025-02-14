@@ -34,6 +34,7 @@ jobs:
               echo DATABASE_USERNAME=${{ secrets.MYSQL_USER }}
               echo DATABASE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
               echo JWK_SET_URI=${{ secrets.JWK_SET_URI }}
+              echo API_KEY=${{ secrets.API_KEY }}
             } > api.env
 
       - name: Down and Up Containers

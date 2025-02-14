@@ -17,6 +17,7 @@ jobs:
 
     env:
       JWK_SET_URI: ${{ secrets.JWK_SET_URI }}
+      API_KEY: ${{ secrets.API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
