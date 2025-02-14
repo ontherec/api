@@ -6,6 +6,7 @@ import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import kr.ontherec.api.global.config.MapperConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(
@@ -16,9 +17,13 @@ public interface HostMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(source = "dto", target = ".")
+    @Mapping(target = "contactFrom", ignore = true)
+    @Mapping(target = "contactUntil", ignore = true)
+    @Mapping(target = "averageResponseTime", ignore = true)
     Host registerRequestDtoToEntity(String username, HostRegisterRequestDto dto);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "username", ignore = true)
-    void update(HostUpdateRequestDto dto, Host host);
+    @Mapping(target = "averageResponseTime", ignore = true)
+    void update(HostUpdateRequestDto dto, @MappingTarget Host host);
 }
