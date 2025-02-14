@@ -9,27 +9,25 @@ import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 
-@RestController("/v1")
+@RestController
+@RequestMapping("/v1/hosts")
 @RequiredArgsConstructor
 public class HostController {
     private final HostService hostService;
     private final HostMapper hostMapper = HostMapper.INSTANCE;
 
-    @PostMapping("/members/me/host")
+    @PostMapping
     ResponseEntity<Long> register(Authentication authentication, @Valid @RequestBody HostRegisterRequestDto dto) {
         Host newHost = hostMapper.registerRequestDtoToEntity(authentication.getName(), dto);
         Long id = hostService.register(newHost);
-        return ResponseEntity.created(URI.create("v1/hosts/" + id)).build();
+        return ResponseEntity.created(URI.create("/v1/hosts/me")).body(id);
     }
 
-    @PatchMapping("/hosts/me")
+    @PatchMapping("/me")
     ResponseEntity<Void> update(Authentication authentication, @Valid @RequestBody HostUpdateRequestDto dto) {
         hostService.update(authentication.getName(), dto);
         return ResponseEntity.ok().build();
