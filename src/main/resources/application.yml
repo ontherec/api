@@ -32,3 +32,4 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${JWK_SET_URI}
+    api-key: ${API_KEY}
