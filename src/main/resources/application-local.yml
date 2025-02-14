@@ -1,34 +1,9 @@
 spring:
-
-  config:
-    import:
-      - classpath:application-secret.properties
-
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:db;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:db;mode=mysql;DB_CLOSE_ON_EXIT=FALSE
 
   h2:
     console:
       enabled: true
       path: /h2-console
-
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    defer-datasource-initialization: true
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${JWK_SET_URI}
-
-logging:
-  level:
-    org:
-      springframework: debug

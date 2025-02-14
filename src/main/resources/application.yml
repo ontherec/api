@@ -1,5 +1,7 @@
-spring:
+server:
+  forward-headers-strategy: native
 
+spring:
   application:
     name: api
 
@@ -12,3 +14,16 @@ spring:
 
   jpa:
     open-in-view: false
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${JWK_SET_URI}
+    api-key: ${API_KEY}

@@ -1,36 +1,6 @@
 spring:
-
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
-
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    defer-datasource-initialization: true
-
-  sql:
-    init:
-      mode: always
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${JWK_SET_URI}
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        type: trace
-
-server:
-  forward-headers-strategy: native
