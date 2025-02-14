@@ -11,6 +11,8 @@ import static kr.ontherec.api.domain.host.exception.HostExceptionCode.NOT_FOUND;
 
 @Repository
 public interface HostRepository extends JpaRepository<Host, Long> {
+    boolean existsByUsername(String username);
+
     Optional<Host> findByUsername(String username);
 
     default Host findByUsernameOrThrow(String username) {
