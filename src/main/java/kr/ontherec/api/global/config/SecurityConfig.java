@@ -43,7 +43,9 @@ public class SecurityConfig {
                     config.setMaxAge(3600L);
                     return config;
                 }))
-                .authorizeHttpRequests(arc -> arc.anyRequest().authenticated())
+                .authorizeHttpRequests(arc -> arc
+                        .requestMatchers("/static/**").permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(new ApiKeyAuthenticationFilter(API_KEY), UsernamePasswordAuthenticationFilter.class)
                 .oauth2ResourceServer(orc -> orc.jwt(jc -> jc.jwtAuthenticationConverter(jwtAuthenticationConverter)));
 
