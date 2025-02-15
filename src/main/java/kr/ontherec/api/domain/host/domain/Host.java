@@ -15,6 +15,7 @@ import static jakarta.persistence.EnumType.STRING;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
 public class Host {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +39,25 @@ public class Host {
 
     @Column
     private Duration averageResponseTime;
+
+    public void setContactFrom(LocalTime contactFrom) {
+        this.contactFrom = contactFrom;
+        verifyContactTime();
+    }
+
+    public void setContactUntil(LocalTime contactUntil) {
+        this.contactUntil = contactUntil;
+        verifyContactTime();
+    }
+
+    private void verifyContactTime() {
+        if (contactFrom == null || contactUntil == null) {
+            return;
+        }
+        if (Duration.between(contactFrom, contactUntil).minusMinutes(30).isNegative()) {
+            throw new HostException(HostExceptionCode.NOT_VALID_CONTACT_TIME);
+        }
+    }
 
     public static class HostBuilder {
 

@@ -8,6 +8,7 @@ import kr.ontherec.api.domain.host.domain.Bank;
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
+
 import kr.ontherec.api.domain.host.exception.HostExceptionCode;
 import kr.ontherec.api.infra.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
