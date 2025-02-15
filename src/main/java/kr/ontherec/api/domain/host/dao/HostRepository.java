@@ -19,4 +19,9 @@ public interface HostRepository extends JpaRepository<Host, Long> {
         return findByUsername(username)
                 .orElseThrow(() -> new HostException(NOT_FOUND));
     }
+
+    default Host findByIdOrThrow(Long id) {
+        return findById(id)
+                .orElseThrow(() -> new HostException(NOT_FOUND));
+    }
 }
