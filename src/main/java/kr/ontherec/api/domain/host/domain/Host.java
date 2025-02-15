@@ -1,21 +1,14 @@
 package kr.ontherec.api.domain.host.domain;
 
-import static jakarta.persistence.EnumType.STRING;
+import jakarta.persistence.*;
+import kr.ontherec.api.domain.host.exception.HostException;
+import kr.ontherec.api.domain.host.exception.HostExceptionCode;
+import lombok.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import java.time.Duration;
 import java.time.LocalTime;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import static jakarta.persistence.EnumType.STRING;
 
 @Entity
 @Getter
@@ -46,4 +39,51 @@ public class Host {
 
     @Column
     private Duration averageResponseTime;
+
+    public void setContactFrom(LocalTime contactFrom) {
+        this.contactFrom = contactFrom;
+        verifyContactTime();
+    }
+
+    public void setContactUntil(LocalTime contactUntil) {
+        this.contactUntil = contactUntil;
+        verifyContactTime();
+    }
+
+    private void verifyContactTime() {
+        if (contactFrom == null || contactUntil == null) {
+            return;
+        }
+        if (Duration.between(contactFrom, contactUntil).minusMinutes(30).isNegative()) {
+            throw new HostException(HostExceptionCode.NOT_VALID_CONTACT_TIME);
+        }
+    }
+
+    public static class HostBuilder {
+
+        private LocalTime contactFrom;
+
+        private LocalTime contactUntil;
+
+        public HostBuilder contactFrom(LocalTime contactFrom) {
+            this.contactFrom = contactFrom;
+            verifyContactTime();
+            return this;
+        }
+
+        public HostBuilder contactUntil(LocalTime contactUntil) {
+            this.contactUntil = contactUntil;
+            verifyContactTime();
+            return this;
+        }
+
+        private void verifyContactTime() {
+            if (contactFrom == null || contactUntil == null) {
+                return;
+            }
+            if (Duration.between(contactFrom, contactUntil).minusMinutes(30).isNegative()) {
+                throw new HostException(HostExceptionCode.NOT_VALID_CONTACT_TIME);
+            }
+        }
+    }
 }
