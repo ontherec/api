@@ -1,11 +1,12 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.0'
-    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.springframework.boot' version '3.4.1'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'com.epages.restdocs-api-spec' version '0.19.4'
 }
 
 group = 'kr.ontherec'
-version = '0.0.1-SNAPSHOT'
+version = '0.3.0-SNAPSHOT'
 
 java {
     toolchain {
@@ -31,6 +32,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     // db
     runtimeOnly 'com.h2database:h2'
@@ -52,6 +54,10 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
     testImplementation 'org.testcontainers:mysql'
 
+    // docs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:3.0.3'
+    testImplementation 'com.epages:restdocs-api-spec-restassured:0.19.4'
+
     // logging
     implementation 'org.tinylog:tinylog-api:2.7.0'
     implementation 'org.tinylog:tinylog-impl:2.7.0'
@@ -67,4 +73,19 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+openapi3 {
+    server = 'https://api.ontherec.live'
+    title = 'On The Record API Server'
+    description = '개발 서버에서 제공되는 On The Record API 서버의 문서 입니다. 문서 상단 URL 이 가리키는 서버를 변경하여, 해당 서버의 문서를 확인할 수 있습니다.'
+    version = '0.3.0'
+    format = 'json'
+}
+
+tasks.register('docs', Copy) {
+    dependsOn 'openapi3'
+    delete 'src/main/resources/static/openapi3.json'
+    from file("build/api-spec")
+    into file("src/main/resources/static")
 }
