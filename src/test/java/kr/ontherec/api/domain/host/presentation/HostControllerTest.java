@@ -172,6 +172,14 @@ class HostControllerTest {
                                         fieldWithPath("averageResponseTime") // TODO: 형식 지정
                                                 .type(SimpleType.STRING)
                                                 .description("평균 응답 시간")
+                                                .optional(),
+                                        fieldWithPath("createdAt")
+                                                .type(SimpleType.STRING)
+                                                .description("생성된 시간 (UTC)")
+                                                .optional(),
+                                        fieldWithPath("modifiedAt")
+                                                .type(SimpleType.STRING)
+                                                .description("수정된 시간 (UTC)")
                                                 .optional())
                                 .build())))
         .when()

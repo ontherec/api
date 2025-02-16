@@ -3,20 +3,22 @@ package kr.ontherec.api.domain.host.domain;
 import jakarta.persistence.*;
 import kr.ontherec.api.domain.host.exception.HostException;
 import kr.ontherec.api.domain.host.exception.HostExceptionCode;
-import lombok.*;
+import kr.ontherec.api.global.model.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.Duration;
 import java.time.LocalTime;
 
 import static jakarta.persistence.EnumType.STRING;
+import static lombok.AccessLevel.PROTECTED;
 
-@Entity
+@Entity @NoArgsConstructor(access = PROTECTED)
+@SuperBuilder @AllArgsConstructor(access = PROTECTED)
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@Setter
-public class Host {
+public class Host extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -59,19 +61,19 @@ public class Host {
         }
     }
 
-    public static class HostBuilder {
+    public static abstract class HostBuilder<C extends Host, B extends HostBuilder<C, B>> extends BaseEntityBuilder<C, B> {
 
         private LocalTime contactFrom;
 
         private LocalTime contactUntil;
 
-        public HostBuilder contactFrom(LocalTime contactFrom) {
+        public HostBuilder<C, B> contactFrom(LocalTime contactFrom) {
             this.contactFrom = contactFrom;
             verifyContactTime();
             return this;
         }
 
-        public HostBuilder contactUntil(LocalTime contactUntil) {
+        public HostBuilder<C, B> contactUntil(LocalTime contactUntil) {
             this.contactUntil = contactUntil;
             verifyContactTime();
             return this;
