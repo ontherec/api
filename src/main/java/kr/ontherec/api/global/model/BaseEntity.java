@@ -4,7 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import static lombok.AccessLevel.PROTECTED;
 
 
-@EntityListeners(AuditingEntityListener.class) @NoArgsConstructor(access = PROTECTED)
+@EntityListeners(AuditingEntityListener.class) @RequiredArgsConstructor(access = PROTECTED)
 @MappedSuperclass @SuperBuilder
 @Getter
 public abstract class BaseEntity {
