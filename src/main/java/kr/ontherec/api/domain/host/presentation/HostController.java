@@ -27,6 +27,12 @@ public class HostController {
         return ResponseEntity.created(URI.create("/v1/hosts/me")).body(id);
     }
 
+    @GetMapping("/{id}")
+    ResponseEntity<Host> get(@PathVariable Long id) {
+        Host foundHost = hostService.get(id);
+        return ResponseEntity.ok(foundHost);
+    }
+
     @PatchMapping("/me")
     ResponseEntity<Void> update(Authentication authentication, @Valid @RequestBody HostUpdateRequestDto dto) {
         hostService.update(authentication.getName(), dto);

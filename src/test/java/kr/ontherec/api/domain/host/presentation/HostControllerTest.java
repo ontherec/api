@@ -126,6 +126,76 @@ class HostControllerTest {
     }
 
     @Test
+    @DisplayName("호스트 조회 성공")
+    void get() {
+
+        // given
+        Host newHost = hostMapper.registerRequestDtoToEntity("test", new HostRegisterRequestDto(
+                Bank.KB국민,
+                "00000000000000"
+        ));
+        hostService.register(newHost);
+
+        given(this.spec)
+                .header("X-API-KEY", API_KEY)
+                .contentType(ContentType.JSON)
+                .pathParam("id", 1L)
+                .filter(RestAssuredRestDocumentationWrapper.document(
+                        "get",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("host")
+                                .summary("get")
+                                .description("호스트 조회")
+                                .responseSchema(Schema.schema(Host.class.getSimpleName()))
+                                .responseFields(
+                                        fieldWithPath("id")
+                                                .type(SimpleType.NUMBER)
+                                                .description("고유번호"),
+                                        fieldWithPath("username")
+                                                .type(SimpleType.STRING)
+                                                .description("ID"),
+                                        fieldWithPath("bank")
+                                                .type(SimpleType.STRING)
+                                                .description("은행"),
+                                        fieldWithPath("account")
+                                                .type(SimpleType.STRING)
+                                                .description("계좌번호 (- 제외)")
+                                                .optional(),
+                                        fieldWithPath("contactFrom")
+                                                .type(SimpleType.STRING)
+                                                .description("연락 가능 시작 시간 (HH:mm:ss.SSS)")
+                                                .optional(),
+                                        fieldWithPath("contactUntil")
+                                                .type(SimpleType.STRING)
+                                                .description("연락 가능 종료 시간 (HH:mm:ss.SSS)")
+                                                .optional(),
+                                        fieldWithPath("averageResponseTime") // TODO: 형식 지정
+                                                .type(SimpleType.STRING)
+                                                .description("평균 응답 시간")
+                                                .optional())
+                                .build())))
+        .when()
+                .get("/hosts/{id}")
+        .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("id", equalTo(1));
+    }
+
+    @Test
+    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
+    void updateUnregisteredHost() {
+
+        given()
+                .header("X-API-KEY", API_KEY)
+                .contentType(ContentType.JSON)
+                .pathParam("id", 1L)
+        .when()
+                .get("/hosts/{id}")
+        .then()
+                .statusCode(HostExceptionCode.NOT_FOUND.getStatus().value());
+    }
+
+    @Test
     @DisplayName("호스트 수정 성공")
     void update() {
 

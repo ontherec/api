@@ -5,5 +5,6 @@ import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 
 public interface HostService {
     Long register(Host host);
+    Host get(Long id);
     void update(String username, HostUpdateRequestDto dto);
 }
