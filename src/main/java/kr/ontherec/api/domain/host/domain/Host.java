@@ -29,7 +29,7 @@ public class Host extends BaseEntity {
     private String username;
 
     @Column(nullable = false)
-    @Enumerated(value = STRING)
+    @Enumerated(STRING)
     private Bank bank;
 
     @Column(nullable = false)

@@ -1,0 +1,46 @@
+package kr.ontherec.api.domain.place.domain;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
+
+import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PRIVATE;
+import static lombok.AccessLevel.PROTECTED;
+
+@Entity @RequiredArgsConstructor(access = PROTECTED)
+@Builder @AllArgsConstructor(access = PRIVATE)
+@Getter
+public class Address{
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Long id;
+
+    @Column(updatable = false, nullable = false)
+    private int zipcode;
+
+    @Column(updatable = false, nullable = false)
+    private String state;
+
+    @Column(updatable = false, nullable = false)
+    private String city;
+
+    @Column(updatable = false, nullable = false)
+    private String streetAddress;
+
+    @Column(updatable = false)
+    private String detail;
+
+    @Column(updatable = false, nullable = false)
+    private BigDecimal latitude;
+
+    @Column(updatable = false, nullable = false)
+    private BigDecimal longitude;
+}
