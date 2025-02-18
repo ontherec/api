@@ -1,6 +1,8 @@
 package kr.ontherec.api.domain.place.domain;
 
 import jakarta.persistence.*;
+import kr.ontherec.api.domain.place.exception.PlaceException;
+import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +37,12 @@ public class RefundPolicy {
 
     @Column(updatable = false, nullable = false)
     private BigDecimal value;
+
+    void validateValue() {
+        if(unit == RefundUnit.PERCENTAGE && value.compareTo(BigDecimal.ZERO) < 0 || value.compareTo(new BigDecimal(100)) > 0) {
+            throw new PlaceException(PlaceExceptionCode.NOT_VALID_REFUND_POLICY);
+        }
+    }
 
     private enum RefundUnit {
         PERCENTAGE,
