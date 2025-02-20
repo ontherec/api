@@ -26,14 +26,18 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public Host get(Long id) {
+    public Host getById(Long id) {
         return hostRepository.findByIdOrThrow(id);
     }
 
     @Override
-    public void update(String username, HostUpdateRequestDto dto) {
-        Host foundHost = hostRepository.findByUsernameOrThrow(username);
-        hostMapper.update(dto, foundHost);
-        hostRepository.save(foundHost);
+    public Host getByUsername(String username) {
+        return hostRepository.findByUsernameOrThrow(username);
+    }
+
+    @Override
+    public void update(Host host, HostUpdateRequestDto dto) {
+        hostMapper.update(dto, host);
+        hostRepository.save(host);
     }
 }

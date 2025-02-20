@@ -29,13 +29,14 @@ public class HostController {
 
     @GetMapping("/{id}")
     ResponseEntity<Host> get(@PathVariable Long id) {
-        Host foundHost = hostService.get(id);
+        Host foundHost = hostService.getById(id);
         return ResponseEntity.ok(foundHost);
     }
 
     @PatchMapping("/me")
     ResponseEntity<Void> update(Authentication authentication, @Valid @RequestBody HostUpdateRequestDto dto) {
-        hostService.update(authentication.getName(), dto);
+        Host foundHost = hostService.getByUsername(authentication.getName());
+        hostService.update(foundHost, dto);
         return ResponseEntity.ok().build();
     }
 }
