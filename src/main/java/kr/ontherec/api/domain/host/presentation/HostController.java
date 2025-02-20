@@ -23,8 +23,8 @@ public class HostController {
     @PostMapping
     ResponseEntity<Long> register(Authentication authentication, @Valid @RequestBody HostRegisterRequestDto dto) {
         Host newHost = hostMapper.registerRequestDtoToEntity(authentication.getName(), dto);
-        Long id = hostService.register(newHost);
-        return ResponseEntity.created(URI.create("/v1/hosts/me")).body(id);
+        Host savedHost = hostService.register(newHost);
+        return ResponseEntity.created(URI.create("/v1/hosts/me")).body(savedHost.getId());
     }
 
     @GetMapping("/{id}")

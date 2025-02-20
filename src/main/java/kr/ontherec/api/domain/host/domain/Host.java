@@ -44,7 +44,7 @@ public class Host extends BaseEntity {
     @Column
     private Duration averageResponseTime;
 
-    public void verifyContactTime() {
+    public void validateContactTime() {
         if (contactFrom == null || contactUntil == null) {
             return;
         }

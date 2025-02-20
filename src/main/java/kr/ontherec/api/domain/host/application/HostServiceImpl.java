@@ -18,11 +18,11 @@ public class HostServiceImpl implements HostService {
     private final HostMapper hostMapper = HostMapper.INSTANCE;
 
     @Override
-    public Long register(Host host) {
+    public Host register(Host host) {
         if(hostRepository.existsByUsername(host.getUsername()))
             throw new HostException(EXIST_USERNAME);
 
-        return hostRepository.save(host).getId();
+        return hostRepository.save(host);
     }
 
     @Override

@@ -27,12 +27,12 @@ public interface HostMapper {
     void update(HostUpdateRequestDto dto, @MappingTarget Host host);
 
     @AfterMapping
-    default void verifyContactTime(String username, HostRegisterRequestDto dto, @MappingTarget Host host) {
-        host.verifyContactTime();
+    default void validateContactTime(String username, HostRegisterRequestDto dto, @MappingTarget Host host) {
+        host.validateContactTime();
     }
 
     @AfterMapping
-    default void verifyContactTime(HostUpdateRequestDto dto, @MappingTarget Host host) {
-        host.verifyContactTime();
+    default void validateContactTime(HostUpdateRequestDto dto, @MappingTarget Host host) {
+        host.validateContactTime();
     }
 }
