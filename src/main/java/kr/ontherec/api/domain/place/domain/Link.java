@@ -20,7 +20,7 @@ public class Link {
 
     @ManyToOne
     @JoinColumn(updatable = false, nullable = false)
-    private Place space;
+    private Place place;
 
     @Column(updatable = false, nullable = false)
     private String value;

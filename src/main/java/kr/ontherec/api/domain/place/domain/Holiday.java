@@ -13,15 +13,15 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @Builder @AllArgsConstructor(access = PRIVATE)
 @Getter
-public class Keyword {
+public class Holiday {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    
+
     @ManyToOne
     @JoinColumn(updatable = false, nullable = false)
     private Place place;
 
     @Column(updatable = false, nullable = false)
-    private String value;
+    private HolidayType value;
 }

@@ -22,7 +22,6 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @Setter
 public class Place {
     private static final int BOOKING_PERIOD_MIN = 7;
-    private static final int BOOKING_UNTIL_MAX = 90;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -35,36 +34,40 @@ public class Place {
     @Column(unique = true, updatable = false, nullable = false)
     private String brn;
 
-    @Column(updatable = false, nullable = false)
+    @Column(nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "space", cascade = ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "place", cascade = ALL, orphanRemoval = true)
     @JoinColumn(updatable = false, nullable = false)
     private Address address;
 
     @Column(columnDefinition = "TEXT")
     private String introduction;
 
-    @ManyToMany(mappedBy = "spaces", cascade = ALL)
+    @ManyToMany(mappedBy = "places", cascade = ALL)
+    @JoinColumn
     private Set<Keyword> keywords;
 
-    @OneToMany(mappedBy = "space", cascade = ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "place", cascade = ALL, orphanRemoval = true)
+    @JoinColumn
     private Set<Link> links;
 
-    @OneToMany(mappedBy = "space", cascade = ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "place", cascade = ALL, orphanRemoval = true)
+    @JoinColumn(nullable = false)
     private Set<RefundPolicy> refundPolicies;
 
-    @Column
+    @Column(nullable = false)
     private Duration bookingFrom;
 
-    @Column
+    @Column(nullable = false)
     private Duration bookingUntil;
 
+    @OneToMany(mappedBy = "place", cascade = ALL, orphanRemoval = true)
+    @JoinColumn
+    private Set<Holiday> holidays;
+
     void validateBookingPeriod() {
-        if (bookingFrom == null || bookingUntil == null) {
-            return;
-        }
-        if (bookingUntil.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
+        if (bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
             throw new PlaceException(PlaceExceptionCode.NOT_VALID_BOOKING_PERIOD);
         }
     }
