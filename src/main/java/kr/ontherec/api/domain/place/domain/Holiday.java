@@ -1,10 +1,7 @@
 package kr.ontherec.api.domain.place.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -13,7 +10,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @Builder @AllArgsConstructor(access = PRIVATE)
-@Getter
+@Getter @EqualsAndHashCode(of = "id")
 public class Holiday {
     @Id
     @GeneratedValue(strategy = IDENTITY)

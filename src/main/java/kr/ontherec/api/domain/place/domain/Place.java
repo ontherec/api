@@ -6,10 +6,7 @@ import kr.ontherec.api.domain.keyword.domain.Keyword;
 import kr.ontherec.api.domain.place.exception.PlaceException;
 import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
 import kr.ontherec.api.global.model.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Duration;
@@ -22,7 +19,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @SuperBuilder @AllArgsConstructor(access = PROTECTED)
-@Getter @Setter
+@Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
 public class
 Place extends BaseEntity {
     private static final int BOOKING_PERIOD_MIN = 7;

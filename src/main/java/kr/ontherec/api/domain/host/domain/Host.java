@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import kr.ontherec.api.domain.host.exception.HostException;
 import kr.ontherec.api.domain.host.exception.HostExceptionCode;
 import kr.ontherec.api.global.model.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Duration;
@@ -20,7 +17,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @SuperBuilder @AllArgsConstructor(access = PRIVATE)
-@Getter @Setter
+@Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
 public class Host extends BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
