@@ -1,17 +1,23 @@
 package kr.ontherec.api.domain.place.domain;
 
+/**
+ * <a href="https://namu.wiki/w/공휴일/대한민국">나무위키: 공휴일/대한민국</a>
+ */
 public enum HolidayType {
-    NEW_YEAR_DAY, // 신정
-    SEOLLAL, // 설날
-    INDEPENDENCE_MOVEMENT_DAY, // 삼일절
-    BUDDHA_BIRTHDAY, // 부처님오신날
-    CHILDREN_DAY, // 어린이날
-    MEMORIAL_DAY, // 현충일
-    LIBERATION_DAY, // 광복절
-    CHUSEOK, // 추석
-    GAECHEONJEOL, // 개천절
-    HANDUL_DAY, // 한글날
-    CHRISTMAS, // 성탄절
-    VOTE, // 선거일
-    TEMP // 임시공휴일
+    신정,
+    설날,
+    설연휴,
+    삼일절,
+    부처님오신날,
+    어린이날,
+    현충일,
+    광복절,
+    추석,
+    추석연휴,
+    개천절,
+    한글날,
+    성탄절,
+    공직선거일,
+    임시공휴일,
+    대체공휴일
 }

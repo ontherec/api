@@ -1,6 +1,9 @@
-package kr.ontherec.api.domain.place.domain;
+package kr.ontherec.api.domain.keyword.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,11 +20,7 @@ public class Keyword {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    
-    @ManyToOne
-    @JoinColumn(updatable = false, nullable = false)
-    private Place place;
 
     @Column(updatable = false, nullable = false)
-    private String value;
+    private String title;
 }

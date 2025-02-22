@@ -2,8 +2,10 @@ package kr.ontherec.api.domain.place.domain;
 
 import jakarta.persistence.*;
 import kr.ontherec.api.domain.host.domain.Host;
+import kr.ontherec.api.domain.keyword.domain.Keyword;
 import kr.ontherec.api.domain.place.exception.PlaceException;
 import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
+import kr.ontherec.api.global.model.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,20 +16,22 @@ import java.time.Duration;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @SuperBuilder @AllArgsConstructor(access = PROTECTED)
 @Getter @Setter
-public class Place {
+public class
+Place extends BaseEntity {
     private static final int BOOKING_PERIOD_MIN = 7;
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = EAGER)
     @JoinColumn(updatable = false, nullable = false)
     private Host host;
 
@@ -37,24 +41,19 @@ public class Place {
     @Column(nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "place", cascade = ALL, orphanRemoval = true)
+    @OneToOne(cascade = ALL, orphanRemoval = true)
     @JoinColumn(updatable = false, nullable = false)
     private Address address;
 
     @Column(columnDefinition = "TEXT")
     private String introduction;
 
-    @ManyToMany(mappedBy = "places", cascade = ALL)
-    @JoinColumn
+    @ManyToMany
     private Set<Keyword> keywords;
 
-    @OneToMany(mappedBy = "place", cascade = ALL, orphanRemoval = true)
+    @OneToMany(cascade = ALL, orphanRemoval = true)
     @JoinColumn
     private Set<Link> links;
-
-    @OneToMany(mappedBy = "place", cascade = ALL, orphanRemoval = true)
-    @JoinColumn(nullable = false)
-    private Set<RefundPolicy> refundPolicies;
 
     @Column(nullable = false)
     private Duration bookingFrom;
@@ -62,12 +61,15 @@ public class Place {
     @Column(nullable = false)
     private Duration bookingUntil;
 
-    @OneToMany(mappedBy = "place", cascade = ALL, orphanRemoval = true)
-    @JoinColumn
+    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @JoinColumn(nullable = false)
     private Set<Holiday> holidays;
 
-    void validateBookingPeriod() {
-        if (bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
+    public void validateBookingPeriod() {
+        if(bookingFrom == null || bookingUntil == null)
+            return;
+
+        if(bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
             throw new PlaceException(PlaceExceptionCode.NOT_VALID_BOOKING_PERIOD);
         }
     }
