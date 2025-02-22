@@ -26,11 +26,6 @@ public class HostServiceImpl implements HostService {
     }
 
     @Override
-    public Host getById(Long id) {
-        return hostRepository.findByIdOrThrow(id);
-    }
-
-    @Override
     public Host getByUsername(String username) {
         return hostRepository.findByUsernameOrThrow(username);
     }

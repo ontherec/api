@@ -28,9 +28,8 @@ public class HostController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Host> get(@PathVariable Long id) {
-        Host foundHost = hostService.getById(id);
-        return ResponseEntity.ok(foundHost);
+    ResponseEntity<Host> get(@PathVariable("id") Host host) {
+        return ResponseEntity.ok(host);
     }
 
     @PatchMapping("/me")
