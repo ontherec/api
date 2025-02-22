@@ -28,7 +28,7 @@ Place extends BaseEntity {
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = EAGER)
+    @ManyToOne
     @JoinColumn(updatable = false, nullable = false)
     private Host host;
 
@@ -45,10 +45,10 @@ Place extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String introduction;
 
-    @ManyToMany
+    @ManyToMany(fetch = EAGER)
     private Set<Keyword> keywords;
 
-    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
     private Set<Link> links;
 
@@ -58,7 +58,7 @@ Place extends BaseEntity {
     @Column(nullable = false)
     private Duration bookingUntil;
 
-    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn(nullable = false)
     private Set<Holiday> holidays;
 
