@@ -1,11 +1,6 @@
 package kr.ontherec.api.global.exception;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,6 +13,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Map;
+import java.util.Objects;
 
 @ControllerAdvice
 @Slf4j
@@ -48,12 +48,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationError(MethodArgumentNotValidException ex) {
 
-        List<String> messages = ex.getAllErrors().stream()
-                .map(MessageSourceResolvable::getDefaultMessage)
-                .toList();
-
         return ResponseEntity.status(CommonExceptionCode.NOT_VALID.getStatus())
-                .body(Map.of("code", CommonExceptionCode.NOT_VALID.getCode(), "messages", messages));
+                .body(Map.of("code", CommonExceptionCode.NOT_VALID.getCode(), "message",
+                        Objects.requireNonNull(ex.getAllErrors().get(0).getDefaultMessage())));
     }
 
     @ExceptionHandler(HandlerMethodValidationException.class)
