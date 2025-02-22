@@ -16,12 +16,10 @@ public interface HostRepository extends JpaRepository<Host, Long> {
     Optional<Host> findByUsername(String username);
 
     default Host findByUsernameOrThrow(String username) {
-        return findByUsername(username)
-                .orElseThrow(() -> new HostException(NOT_FOUND));
+        return findByUsername(username).orElseThrow(() -> new HostException(NOT_FOUND));
     }
 
     default Host findByIdOrThrow(Long id) {
-        return findById(id)
-                .orElseThrow(() -> new HostException(NOT_FOUND));
+        return findById(id).orElseThrow(() -> new HostException(NOT_FOUND));
     }
 }

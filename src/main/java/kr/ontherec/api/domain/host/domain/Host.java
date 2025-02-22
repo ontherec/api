@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 
 import static jakarta.persistence.EnumType.STRING;
+import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -22,7 +23,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Getter @Setter
 public class Host extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(unique = true, updatable = false, nullable = false)
