@@ -20,10 +20,11 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
+
 @RequiredArgsConstructor
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String API_KEY_HEADER = "X-API-KEY";
     private final String apiKey;
 
     @Override

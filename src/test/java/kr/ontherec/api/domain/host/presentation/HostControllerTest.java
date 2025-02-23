@@ -8,7 +8,6 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.domain.host.application.HostMapper;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Bank;
 import kr.ontherec.api.domain.host.domain.Host;
@@ -16,6 +15,7 @@ import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import kr.ontherec.api.domain.host.exception.HostExceptionCode;
 import kr.ontherec.api.infra.IntegrationTest;
+import kr.ontherec.api.infra.fixture.HostGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +29,8 @@ import java.time.LocalTime;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static io.restassured.RestAssured.given;
+import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
+import static kr.ontherec.api.global.model.Regex.BANK_ACCOUNT;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -37,8 +39,6 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 
 @IntegrationTest
 class HostControllerTest {
-
-    private final HostMapper hostMapper = HostMapper.INSTANCE;
 
     @Autowired
     private HostService hostService;
@@ -75,7 +75,7 @@ class HostControllerTest {
         );
 
         given(this.spec)
-                .header("X-API-KEY", API_KEY)
+                .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .filter(RestAssuredRestDocumentationWrapper.document(
@@ -91,7 +91,7 @@ class HostControllerTest {
                                                 .description("은행"),
                                         fieldWithPath("account")
                                                 .type(SimpleType.STRING)
-                                                .description("계좌번호 (- 제외)")
+                                                .description("계좌번호 (" + BANK_ACCOUNT + ")")
                                                 .optional())
                                 .build())))
         .when()
@@ -107,16 +107,16 @@ class HostControllerTest {
     void registerExistUsername() {
 
         // given
+        Host newHost = HostGenerator.generate("test");
+        hostService.register(newHost);
+
         HostRegisterRequestDto dto = new HostRegisterRequestDto(
                 Bank.KB국민,
                 "00000000000000"
         );
 
-        Host newHost = hostMapper.registerRequestDtoToEntity("test", dto);
-        hostService.register(newHost);
-
         given()
-                .header("X-API-KEY", API_KEY)
+                .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
                 .body(dto)
         .when()
@@ -130,16 +130,13 @@ class HostControllerTest {
     void get() {
 
         // given
-        Host newHost = hostMapper.registerRequestDtoToEntity("test", new HostRegisterRequestDto(
-                Bank.KB국민,
-                "00000000000000"
-        ));
+        Host newHost = HostGenerator.generate("test");
         hostService.register(newHost);
 
         given(this.spec)
-                .header("X-API-KEY", API_KEY)
+                .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
-                .pathParam("id", 1L)
+                .pathParam("id", 1)
                 .filter(RestAssuredRestDocumentationWrapper.document(
                         "get",
                         resource(ResourceSnippetParameters.builder()
@@ -154,20 +151,13 @@ class HostControllerTest {
                                         fieldWithPath("username")
                                                 .type(SimpleType.STRING)
                                                 .description("ID"),
-                                        fieldWithPath("bank")
-                                                .type(SimpleType.STRING)
-                                                .description("은행"),
-                                        fieldWithPath("account")
-                                                .type(SimpleType.STRING)
-                                                .description("계좌번호 (- 제외)")
-                                                .optional(),
                                         fieldWithPath("contactFrom")
                                                 .type(SimpleType.STRING)
-                                                .description("연락 가능 시작 시간 (HH:mm:ss.SSS)")
+                                                .description("문의 가능 시작 시간 (HH:mm:ss.SSS)")
                                                 .optional(),
                                         fieldWithPath("contactUntil")
                                                 .type(SimpleType.STRING)
-                                                .description("연락 가능 종료 시간 (HH:mm:ss.SSS)")
+                                                .description("문의 가능 종료 시간 (HH:mm:ss.SSS)")
                                                 .optional(),
                                         fieldWithPath("averageResponseTime") // TODO: 형식 지정
                                                 .type(SimpleType.STRING)
@@ -190,28 +180,11 @@ class HostControllerTest {
     }
 
     @Test
-    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
-    void updateUnregisteredHost() {
-
-        given()
-                .header("X-API-KEY", API_KEY)
-                .contentType(ContentType.JSON)
-                .pathParam("id", 1L)
-        .when()
-                .get("/hosts/{id}")
-        .then()
-                .statusCode(HostExceptionCode.NOT_FOUND.getStatus().value());
-    }
-
-    @Test
     @DisplayName("호스트 수정 성공")
     void update() {
 
         // given
-        Host newHost = hostMapper.registerRequestDtoToEntity("test", new HostRegisterRequestDto(
-                Bank.KB국민,
-                "00000000000000"
-        ));
+        Host newHost = HostGenerator.generate("test");
         hostService.register(newHost);
 
         HostUpdateRequestDto dto = new HostUpdateRequestDto(
@@ -222,7 +195,7 @@ class HostControllerTest {
         );
 
         given(this.spec)
-                .header("X-API-KEY", API_KEY)
+                .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .filter(RestAssuredRestDocumentationWrapper.document(
@@ -238,15 +211,15 @@ class HostControllerTest {
                                                 .description("은행"),
                                         fieldWithPath("account")
                                                 .type(SimpleType.STRING)
-                                                .description("계좌번호 (- 제외)")
+                                                .description("계좌번호 (" + BANK_ACCOUNT + ")")
                                                 .optional(),
                                         fieldWithPath("contactFrom")
                                                 .type(SimpleType.STRING)
-                                                .description("연락 가능 시작 시간 (HH:mm:ss.SSS)")
+                                                .description("문의 가능 시작 시간 (HH:mm:ss.SSS)")
                                                 .optional(),
                                         fieldWithPath("contactUntil")
                                                 .type(SimpleType.STRING)
-                                                .description("연락 가능 종료 시간 (HH:mm:ss.SSS)")
+                                                .description("문의 가능 종료 시간 (HH:mm:ss.SSS)")
                                                 .optional())
                                 .build())))
         .when()
@@ -256,14 +229,11 @@ class HostControllerTest {
     }
 
     @Test
-    @DisplayName("호스트 수정 실패 - 유효하지 않은 연락 가능 시간")
+    @DisplayName("호스트 수정 실패 - 유효하지 않은 문의 가능 시간")
     void updateWithInvalidContactTime() {
 
         // given
-        Host newHost = hostMapper.registerRequestDtoToEntity("test", new HostRegisterRequestDto(
-                Bank.KB국민,
-                "00000000000000"
-        ));
+        Host newHost = HostGenerator.generate("test");
         hostService.register(newHost);
 
         HostUpdateRequestDto dto = new HostUpdateRequestDto(
@@ -274,12 +244,26 @@ class HostControllerTest {
         );
 
         given()
-                .header("X-API-KEY", API_KEY)
+                .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
                 .body(dto)
         .when()
                 .patch("/hosts/me")
         .then()
                 .statusCode(HostExceptionCode.NOT_VALID_CONTACT_TIME.getStatus().value());
+    }
+
+    @Test
+    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
+    void updateUnregisteredHost() {
+
+        given()
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(ContentType.JSON)
+                .pathParam("id", 1)
+        .when()
+                .get("/hosts/{id}")
+        .then()
+                .statusCode(HostExceptionCode.NOT_FOUND.getStatus().value());
     }
 }

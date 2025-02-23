@@ -17,6 +17,7 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+    public static final String API_KEY_HEADER = "X-API-KEY";
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
