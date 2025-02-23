@@ -2,6 +2,7 @@ package kr.ontherec.api.domain.host.application;
 
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
+import kr.ontherec.api.domain.host.dto.HostResponseDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import kr.ontherec.api.global.config.MapperConfig;
 import org.mapstruct.AfterMapping;
@@ -25,6 +26,8 @@ public interface HostMapper {
     Host registerRequestDtoToEntity(String username, HostRegisterRequestDto dto);
 
     void update(HostUpdateRequestDto dto, @MappingTarget Host host);
+
+    HostResponseDto entityToResponseDto(Host host);
 
     @AfterMapping
     default void validateContactTime(String username, HostRegisterRequestDto dto, @MappingTarget Host host) {
