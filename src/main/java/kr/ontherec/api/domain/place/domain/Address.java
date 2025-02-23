@@ -21,7 +21,7 @@ public class Address{
     private Long id;
 
     @Column(updatable = false, nullable = false)
-    private int zipcode;
+    private String zipcode;
 
     @Column(updatable = false, nullable = false)
     private String state;

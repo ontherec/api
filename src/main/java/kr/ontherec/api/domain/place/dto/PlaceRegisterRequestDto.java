@@ -1,22 +1,24 @@
 package kr.ontherec.api.domain.place.dto;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import kr.ontherec.api.domain.place.domain.HolidayType;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.time.DurationMax;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Set;
 
+import static kr.ontherec.api.global.model.Regex.BUSINESS_REGISTRATION_NUMBER;
+
 public record PlaceRegisterRequestDto(
         @NotBlank(message = "사업자 등록 번호를 입력해주세요")
+        @Pattern(regexp = BUSINESS_REGISTRATION_NUMBER, message = "유효하지 않은 사업자 등록번호입니다")
         String brn,
-        @NotBlank(message = "공간 이름을 입력해주세요")
+        @NotBlank(message = "이름을 입력해주세요")
         String name,
         @Valid
         @NotNull(message = "주소를 입력해주세요")
@@ -30,26 +32,4 @@ public record PlaceRegisterRequestDto(
         @NotNull(message = "예약 마감 기간을 입력해주세요")
         Duration bookingUntil,
         Set<HolidayType> holidays
-) {
-    /**
-     * <a href="https://namu.wiki/w/대한민국/행정구역">나무위키: 행정구역</a>
-     */
-    public record AddressRegisterRequestDto(
-            @NotNull(message = "우편번호를 입력해주세요")
-            @Digits(integer = 5, fraction = 0, message = "유효하지 않은 우편번호 입니다")
-            int zipcode,
-            @NotBlank(message = "도/시 정보를 입력해주세요")
-            String state,
-            @NotBlank(message = "시/군/구 정보를 입력해주세요")
-            String city,
-            @NotBlank(message = "도로명 주소를 입력해주세요")
-            String streetAddress,
-            String detail,
-            @NotNull(message = "위도를 입력해주세요")
-            @Digits(integer = 3, fraction = 13, message = "유효하지 않은 위도입니다")
-            BigDecimal latitude,
-            @NotNull(message = "경도를 입력해주세요")
-            @Digits(integer = 3, fraction = 13, message = "유효하지 않은 경도입니다")
-            BigDecimal longitude
-    ) { }
-}
+) { }
