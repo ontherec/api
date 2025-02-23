@@ -21,6 +21,9 @@ spring:
       hibernate:
         format_sql: true
 
+  main:
+    lazy-initialization: true
+
   security:
     oauth2:
       resourceserver:
