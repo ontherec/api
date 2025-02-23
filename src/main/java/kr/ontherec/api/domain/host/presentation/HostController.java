@@ -5,6 +5,7 @@ import kr.ontherec.api.domain.host.application.HostMapper;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
+import kr.ontherec.api.domain.host.dto.HostResponseDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,10 @@ public class HostController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Host> get(@PathVariable("id") Host host) {
-        return ResponseEntity.ok(host);
+    ResponseEntity<HostResponseDto> get(@PathVariable Long id) {
+        Host host = hostService.get(id);
+        HostResponseDto dto = hostMapper.entityToResponseDto(host);
+        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/me")

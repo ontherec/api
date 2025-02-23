@@ -4,7 +4,8 @@ import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 
 public interface HostService {
-    Host register(Host host);
+    Host get(Long id);
     Host getByUsername(String username);
+    Host register(Host host);
     void update(Host host, HostUpdateRequestDto dto);
 }
