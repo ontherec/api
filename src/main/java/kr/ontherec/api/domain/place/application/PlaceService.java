@@ -9,8 +9,9 @@ import java.util.Set;
 
 public interface PlaceService {
     List<Place> search(String query);
+    Place get(Long id);
+    Place register(Host host, Place newPlace, Set<Keyword> keywords);
+    void update(Long id, Place newPlace, Set<Keyword> keywords);
+    void delete(Long id);
     boolean isHost(Long id, Host host);
-    Place register(Host host, Place place, Set<Keyword> keywords);
-    void update(Long id, Place place, Set<Keyword> keywords);
-    void remove(Long id);
 }

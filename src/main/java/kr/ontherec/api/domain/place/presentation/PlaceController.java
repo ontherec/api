@@ -33,7 +33,7 @@ public class PlaceController {
     private final KeywordService keywordService;
 
     @GetMapping
-    ResponseEntity<List<PlaceResponseDto>> search(@RequestParam("q") String query) {
+    ResponseEntity<List<PlaceResponseDto>> search(@RequestParam(value = "q", required = false) String query) {
         List<Place> places = placeService.search(query);
         List<PlaceResponseDto> dtos = places.stream().map(placeMapper::EntityToResponseDto).toList();
         return ResponseEntity.ok(dtos);
@@ -54,8 +54,10 @@ public class PlaceController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<PlaceResponseDto> get(@PathVariable("id") Place place) {
-        return ResponseEntity.ok(placeMapper.EntityToResponseDto(place));
+    ResponseEntity<PlaceResponseDto> get(@PathVariable Long id) {
+        Place place = placeService.get(id);
+        PlaceResponseDto dto = placeMapper.EntityToResponseDto(place);
+        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/{id}")
@@ -76,12 +78,12 @@ public class PlaceController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> remove(Authentication authentication, @PathVariable Long id) {
+    ResponseEntity<Void> delete(Authentication authentication, @PathVariable Long id) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!placeService.isHost(id, host))
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
 
-        placeService.remove(id);
+        placeService.delete(id);
         return ResponseEntity.ok().build();
     }
 }

@@ -22,24 +22,24 @@ public class PlaceServiceImpl implements PlaceService {
 
     @Override
     public List<Place> search(String query) {
+        if(query == null) return placeRepository.findAll();
         return placeRepository.search(query);
     }
 
     @Override
-    public boolean isHost(Long id, Host host) {
-        Place place = placeRepository.findByIdOrThrow(id);
-        return place.getHost().equals(host);
+    public Place get(Long id) {
+        return placeRepository.findByIdOrThrow(id);
     }
 
     @Override
-    public Place register(Host host, Place place, Set<Keyword> keywords) {
-        if(placeRepository.existsByBrn(place.getBrn()))
+    public Place register(Host host, Place newPlace, Set<Keyword> keywords) {
+        if(placeRepository.existsByBrn(newPlace.getBrn()))
             throw new PlaceException(PlaceExceptionCode.EXIST_BRN);
 
-        place.setHost(host);
-        place.setKeywords(keywords);
+        newPlace.setHost(host);
+        newPlace.setKeywords(keywords);
 
-        return placeRepository.save(place);
+        return placeRepository.save(newPlace);
     }
 
     @Override
@@ -53,7 +53,13 @@ public class PlaceServiceImpl implements PlaceService {
     }
 
     @Override
-    public void remove(Long id) {
+    public void delete(Long id) {
         placeRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean isHost(Long id, Host host) {
+        Place place = placeRepository.findByIdOrThrow(id);
+        return place.getHost().equals(host);
     }
 }

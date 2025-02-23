@@ -13,7 +13,6 @@ import kr.ontherec.api.domain.host.domain.Bank;
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
-import kr.ontherec.api.domain.host.exception.HostExceptionCode;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostGenerator;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,17 +21,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpStatus;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import java.time.LocalTime;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static io.restassured.RestAssured.given;
+import static kr.ontherec.api.domain.host.exception.HostExceptionCode.*;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.global.model.Regex.BANK_ACCOUNT;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
@@ -97,9 +97,9 @@ class HostControllerTest {
         .when()
                 .post("/hosts")
         .then()
-                .statusCode(HttpStatus.CREATED.value())
+                .statusCode(CREATED.value())
                 .header("Location", equalTo("/v1/hosts/me"))
-                .body(notNullValue());
+                .body(equalTo("1"));
     }
 
     @Test
@@ -122,7 +122,8 @@ class HostControllerTest {
         .when()
                 .post("/hosts")
         .then()
-                .statusCode(HostExceptionCode.EXIST_USERNAME.getStatus().value());
+                .statusCode(EXIST_USERNAME.getStatus().value())
+                .body("message", equalTo(EXIST_USERNAME.getMessage()));
     }
 
     @Test
@@ -175,7 +176,7 @@ class HostControllerTest {
         .when()
                 .get("/hosts/{id}")
         .then()
-                .statusCode(HttpStatus.OK.value())
+                .statusCode(OK.value())
                 .body("id", equalTo(1));
     }
 
@@ -225,7 +226,7 @@ class HostControllerTest {
         .when()
                 .patch("/hosts/me")
         .then()
-                .statusCode(HttpStatus.OK.value());
+                .statusCode(OK.value());
     }
 
     @Test
@@ -250,7 +251,9 @@ class HostControllerTest {
         .when()
                 .patch("/hosts/me")
         .then()
-                .statusCode(HostExceptionCode.NOT_VALID_CONTACT_TIME.getStatus().value());
+                .statusCode(NOT_VALID_CONTACT_TIME.getStatus().value())
+                .body("message", equalTo(NOT_VALID_CONTACT_TIME.getMessage()));
+
     }
 
     @Test
@@ -264,6 +267,7 @@ class HostControllerTest {
         .when()
                 .get("/hosts/{id}")
         .then()
-                .statusCode(HostExceptionCode.NOT_FOUND.getStatus().value());
+                .statusCode(NOT_FOUND.getStatus().value())
+                .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 }
