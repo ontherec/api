@@ -8,6 +8,8 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
+import kr.ontherec.api.domain.keyword.application.KeywordService;
+import kr.ontherec.api.domain.keyword.domain.Keyword;
 import kr.ontherec.api.domain.place.application.PlaceService;
 import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.place.dto.AddressRegisterRequestDto;
@@ -16,6 +18,7 @@ import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
 import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostGenerator;
+import kr.ontherec.api.infra.fixture.KeywordGenerator;
 import kr.ontherec.api.infra.fixture.PlaceGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,12 +31,15 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
-import static javax.management.openmbean.SimpleType.STRING;
+import static kr.ontherec.api.domain.place.domain.HolidayType.설날;
+import static kr.ontherec.api.domain.place.domain.HolidayType.추석;
 import static kr.ontherec.api.domain.place.exception.PlaceExceptionCode.*;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.global.model.Regex.BUSINESS_REGISTRATION_NUMBER;
@@ -44,15 +50,19 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.snippet.Attributes.key;
 
 @IntegrationTest
 class PlaceControllerTest {
 
     @Autowired
+    private HostService hostService;
+
+    @Autowired
     private PlaceService placeService;
 
     @Autowired
-    private HostService hostService;
+    private KeywordService keywordService;
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
@@ -83,7 +93,11 @@ class PlaceControllerTest {
         Host newHost = HostGenerator.generate("test");
         Host host = hostService.register(newHost);
         Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
+        Set<Keyword> keywords = newKeywords.stream()
+                .map(keyword -> keywordService.getOrCreate(keyword))
+                .collect(Collectors.toSet());
+        placeService.register(host, newPlace, keywords);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -160,12 +174,14 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("[].keywords")
+                                        fieldWithPath("[].keywords[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("키워드 목록")
                                                 .optional(),
-                                        fieldWithPath("[].links")
+                                        fieldWithPath("[].links[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
                                                 .optional(),
                                         fieldWithPath("[].bookingFrom")
@@ -176,10 +192,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("예약 마감 기간")
                                                 .optional(),
-                                        fieldWithPath("[].holidays")
+                                        fieldWithPath("[].holidays[]")
                                                 .type(ARRAY)
-                                                .description("공휴일")
-                                                .optional(),
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록"),
                                         fieldWithPath("[].createdAt")
                                                 .type(SimpleType.STRING)
                                                 .description("생성된 시간 (UTC)")
@@ -217,12 +233,12 @@ class PlaceControllerTest {
                 "0000000000",
                 "place",
                 addressDto,
-                "introduction",
+                null,
                 Set.of("keyword"),
                 Set.of("https://ontherec.kr"),
                 Duration.ofDays(30),
                 Duration.ofDays(1),
-                null
+                Set.of(설날)
         );
 
         given(this.spec)
@@ -272,12 +288,14 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords")
+                                        fieldWithPath("keywords[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("키워드 목록")
                                                 .optional(),
-                                        fieldWithPath("links")
+                                        fieldWithPath("links[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
                                                 .optional(),
                                         fieldWithPath("bookingFrom")
@@ -288,9 +306,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("예약 마감 기간")
                                                 .optional(),
-                                        fieldWithPath("holidays")
+                                        fieldWithPath("holidays[]")
                                                 .type(ARRAY)
-                                                .description("공휴일")
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록")
                                                 .optional())
                                 .build())))
         .when()
@@ -393,7 +412,11 @@ class PlaceControllerTest {
         Host newHost = HostGenerator.generate("test");
         Host host = hostService.register(newHost);
         Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
+        Set<Keyword> keywords = newKeywords.stream()
+                .map(keyword -> keywordService.getOrCreate(keyword))
+                .collect(Collectors.toSet());
+        placeService.register(host, newPlace, keywords);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -467,12 +490,14 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords")
+                                        fieldWithPath("keywords[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("키워드 목록")
                                                 .optional(),
-                                        fieldWithPath("links")
+                                        fieldWithPath("links[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
                                                 .optional(),
                                         fieldWithPath("bookingFrom")
@@ -483,9 +508,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("예약 마감 기간")
                                                 .optional(),
-                                        fieldWithPath("holidays")
+                                        fieldWithPath("holidays[]")
                                                 .type(ARRAY)
-                                                .description("공휴일")
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록")
                                                 .optional(),
                                         fieldWithPath("createdAt")
                                                 .type(SimpleType.STRING)
@@ -524,16 +550,20 @@ class PlaceControllerTest {
         Host newHost = HostGenerator.generate("test");
         Host host = hostService.register(newHost);
         Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
+        Set<Keyword> keywords = newKeywords.stream()
+                .map(keyword -> keywordService.getOrCreate(keyword))
+                .collect(Collectors.toSet());
+        placeService.register(host, newPlace, keywords);
 
         PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
-                "place",
-                null,
-                null,
-                null,
-                Duration.ofDays(30),
-                Duration.ofDays(1),
-                null
+                "newPlace",
+                "newIntroduction",
+                Set.of("newKeyword"),
+                Set.of("https://ontherec.live"),
+                Duration.ofDays(90),
+                Duration.ofDays(7),
+                Set.of(추석)
         );
 
         given(this.spec)
@@ -555,12 +585,14 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords")
+                                        fieldWithPath("keywords[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("키워드 목록")
                                                 .optional(),
-                                        fieldWithPath("links")
+                                        fieldWithPath("links[]")
                                                 .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
                                                 .optional(),
                                         fieldWithPath("bookingFrom")
@@ -571,10 +603,12 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("예약 마감 기간")
                                                 .optional(),
-                                        fieldWithPath("holidays")
+                                        fieldWithPath("holidays[]")
                                                 .type(ARRAY)
-                                                .description("공휴일")
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록")
                                                 .optional())
+
                                 .build())))
         .when()
                 .patch("/places/1")

@@ -19,4 +19,9 @@ public interface PlaceRepository extends JpaRepository<Place, Long> {
     default Place findByIdOrThrow(Long id) {
         return findById(id).orElseThrow(() -> new PlaceException(PlaceExceptionCode.NOT_FOUND));
     }
+
+    default void deleteByIdOrThrow(Long id) {
+        findById(id).orElseThrow(() -> new PlaceException(PlaceExceptionCode.NOT_FOUND));
+        deleteById(id);
+    }
 }

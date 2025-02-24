@@ -10,6 +10,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -46,7 +48,7 @@ Place extends BaseEntity {
     private String introduction;
 
     @ManyToMany(fetch = EAGER)
-    private Set<Keyword> keywords;
+    private List<Keyword> keywords;
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
@@ -69,5 +71,9 @@ Place extends BaseEntity {
         if(bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
             throw new PlaceException(PlaceExceptionCode.NOT_VALID_BOOKING_PERIOD);
         }
+    }
+
+    public void setKeywords(Set<Keyword> keywords) {
+        this.keywords = keywords == null ? null : new ArrayList<>(keywords);
     }
 }

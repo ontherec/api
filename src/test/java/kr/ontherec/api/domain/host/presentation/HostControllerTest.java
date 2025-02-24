@@ -3,7 +3,6 @@ package kr.ontherec.api.domain.host.presentation;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper;
 import com.epages.restdocs.apispec.Schema;
-import com.epages.restdocs.apispec.SimpleType;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
@@ -26,6 +25,8 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import java.time.LocalTime;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.epages.restdocs.apispec.SimpleType.NUMBER;
+import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
 import static kr.ontherec.api.domain.host.exception.HostExceptionCode.*;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
@@ -87,10 +88,10 @@ class HostControllerTest {
                                 .requestSchema(Schema.schema(HostRegisterRequestDto.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("bank")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("은행"),
                                         fieldWithPath("account")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("계좌번호 (" + BANK_ACCOUNT + ")")
                                                 .optional())
                                 .build())))
@@ -147,29 +148,29 @@ class HostControllerTest {
                                 .responseSchema(Schema.schema(Host.class.getSimpleName()))
                                 .responseFields(
                                         fieldWithPath("id")
-                                                .type(SimpleType.NUMBER)
+                                                .type(NUMBER)
                                                 .description("고유번호"),
                                         fieldWithPath("username")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("ID"),
                                         fieldWithPath("contactFrom")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("문의 가능 시작 시간 (HH:mm:ss.SSS)")
                                                 .optional(),
                                         fieldWithPath("contactUntil")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("문의 가능 종료 시간 (HH:mm:ss.SSS)")
                                                 .optional(),
-                                        fieldWithPath("averageResponseTime") // TODO: 형식 지정
-                                                .type(SimpleType.STRING)
+                                        fieldWithPath("averageResponseTime")
+                                                .type(NUMBER)
                                                 .description("평균 응답 시간")
                                                 .optional(),
                                         fieldWithPath("createdAt")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("생성된 시간 (UTC)")
                                                 .optional(),
                                         fieldWithPath("modifiedAt")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("수정된 시간 (UTC)")
                                                 .optional())
                                 .build())))
@@ -208,18 +209,18 @@ class HostControllerTest {
                                 .requestSchema(Schema.schema(HostUpdateRequestDto.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("bank")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("은행"),
                                         fieldWithPath("account")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("계좌번호 (" + BANK_ACCOUNT + ")")
                                                 .optional(),
                                         fieldWithPath("contactFrom")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("문의 가능 시작 시간 (HH:mm:ss.SSS)")
                                                 .optional(),
                                         fieldWithPath("contactUntil")
-                                                .type(SimpleType.STRING)
+                                                .type(STRING)
                                                 .description("문의 가능 종료 시간 (HH:mm:ss.SSS)")
                                                 .optional())
                                 .build())))
