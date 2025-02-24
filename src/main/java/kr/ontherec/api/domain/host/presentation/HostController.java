@@ -5,6 +5,7 @@ import kr.ontherec.api.domain.host.application.HostMapper;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
+import kr.ontherec.api.domain.host.dto.HostResponseDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,19 +24,21 @@ public class HostController {
     @PostMapping
     ResponseEntity<Long> register(Authentication authentication, @Valid @RequestBody HostRegisterRequestDto dto) {
         Host newHost = hostMapper.registerRequestDtoToEntity(authentication.getName(), dto);
-        Long id = hostService.register(newHost);
-        return ResponseEntity.created(URI.create("/v1/hosts/me")).body(id);
+        Host savedHost = hostService.register(newHost);
+        return ResponseEntity.created(URI.create("/v1/hosts/me")).body(savedHost.getId());
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<Host> get(@PathVariable Long id) {
-        Host foundHost = hostService.get(id);
-        return ResponseEntity.ok(foundHost);
+    ResponseEntity<HostResponseDto> get(@PathVariable Long id) {
+        Host host = hostService.get(id);
+        HostResponseDto dto = hostMapper.entityToResponseDto(host);
+        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/me")
     ResponseEntity<Void> update(Authentication authentication, @Valid @RequestBody HostUpdateRequestDto dto) {
-        hostService.update(authentication.getName(), dto);
+        Host foundHost = hostService.getByUsername(authentication.getName());
+        hostService.update(foundHost, dto);
         return ResponseEntity.ok().build();
     }
 }
