@@ -34,6 +34,8 @@ Place extends BaseEntity {
     @JoinColumn(updatable = false, nullable = false)
     private Host host;
 
+    // images
+
     @Column(unique = true, updatable = false, nullable = false)
     private String brn;
 
