@@ -138,7 +138,6 @@ class HostControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
-                .pathParam("id", 1)
                 .filter(RestAssuredRestDocumentationWrapper.document(
                         "get",
                         resource(ResourceSnippetParameters.builder()
@@ -175,10 +174,24 @@ class HostControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/hosts/{id}")
+                .get("/hosts/{id}", 1L)
         .then()
                 .statusCode(OK.value())
                 .body("id", equalTo(1));
+    }
+
+    @Test
+    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
+    void updateUnregisteredHost() {
+
+        given()
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/hosts/{id}", 1L)
+                .then()
+                .statusCode(NOT_FOUND.getStatus().value())
+                .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 
     @Test
@@ -255,20 +268,5 @@ class HostControllerTest {
                 .statusCode(NOT_VALID_CONTACT_TIME.getStatus().value())
                 .body("message", equalTo(NOT_VALID_CONTACT_TIME.getMessage()));
 
-    }
-
-    @Test
-    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
-    void updateUnregisteredHost() {
-
-        given()
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(ContentType.JSON)
-                .pathParam("id", 1)
-        .when()
-                .get("/hosts/{id}")
-        .then()
-                .statusCode(NOT_FOUND.getStatus().value())
-                .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 }

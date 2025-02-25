@@ -33,8 +33,10 @@ import java.time.Duration;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.SimpleType.NUMBER;
 import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -47,7 +49,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.snippet.Attributes.key;
@@ -523,9 +526,10 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/places/1")
+                .get("/places/{id}", 1L)
         .then()
-                .statusCode(OK.value());
+                .statusCode(OK.value())
+                .body("id", equalTo(1));
 
     }
 
@@ -536,7 +540,7 @@ class PlaceControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
         .when()
-                .get("/places/1")
+                .get("/places/{id}", 1L)
         .then()
                 .statusCode(NOT_FOUND.getStatus().value())
                 .body("message", equalTo(NOT_FOUND.getMessage()));
@@ -608,10 +612,9 @@ class PlaceControllerTest {
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional())
-
                                 .build())))
         .when()
-                .patch("/places/1")
+                .patch("/places/{id}", 1L)
         .then()
                 .statusCode(OK.value());
     }
@@ -642,7 +645,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(dto)
         .when()
-                .patch("/places/1")
+                .patch("/places/{id}", 1L)
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
@@ -661,8 +664,19 @@ class PlaceControllerTest {
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "delete",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("place")
+                                .summary("delete")
+                                .description("플레이스 삭제")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("삭제할 플레이스 고유번호"))
+                                .build())))
         .when()
-                .delete("/places/1")
+                .delete("/places/{id}", 1L)
         .then()
                 .statusCode(OK.value());
     }
