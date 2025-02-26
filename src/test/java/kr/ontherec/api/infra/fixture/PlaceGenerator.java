@@ -30,7 +30,7 @@ public class PlaceGenerator {
                 .name(name)
                 .address(newAddress)
                 .introduction(name)
-                .keywords(null)
+                .tags(null)
                 .links(Set.of(Link.builder().url("https://ontherec.kr").build()))
                 .bookingFrom(Duration.ofDays(30))
                 .bookingUntil(Duration.ofDays(1))

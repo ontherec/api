@@ -3,8 +3,6 @@ package kr.ontherec.api.domain.place.presentation;
 import jakarta.validation.Valid;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.keyword.application.KeywordService;
-import kr.ontherec.api.domain.keyword.domain.Keyword;
 import kr.ontherec.api.domain.place.application.PlaceMapper;
 import kr.ontherec.api.domain.place.application.PlaceService;
 import kr.ontherec.api.domain.place.domain.Place;
@@ -13,6 +11,8 @@ import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
 import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
 import kr.ontherec.api.domain.place.exception.PlaceException;
 import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
+import kr.ontherec.api.domain.tag.application.TagService;
+import kr.ontherec.api.domain.tag.domain.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,7 +30,7 @@ public class PlaceController {
     private final HostService hostService;
     private final PlaceService placeService;
     private final PlaceMapper placeMapper = PlaceMapper.INSTANCE;
-    private final KeywordService keywordService;
+    private final TagService tagService;
 
     @GetMapping
     ResponseEntity<List<PlaceResponseDto>> search(@RequestParam(value = "q", required = false) String query) {
@@ -43,13 +43,13 @@ public class PlaceController {
     ResponseEntity<Long> register(Authentication authentication, @Valid @RequestBody PlaceRegisterRequestDto dto) {
         Host host = hostService.getByUsername(authentication.getName());
         Place newPlace = placeMapper.registerRequestDtoToEntity(dto);
-        Set<Keyword> keywords = dto.keywords() == null ? null : dto.keywords()
+        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
                 .stream()
-                .map(s -> Keyword.builder().title(s).build())
-                .map(keywordService::getOrCreate)
+                .map(s -> Tag.builder().title(s).build())
+                .map(tagService::getOrCreate)
                 .collect(Collectors.toSet());
 
-        Place place = placeService.register(host, newPlace, keywords);
+        Place place = placeService.register(host, newPlace, tags);
         return ResponseEntity.created(URI.create("/v1/places/" + place.getId())).body(place.getId());
     }
 
@@ -67,13 +67,13 @@ public class PlaceController {
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
 
         Place newPlace = placeMapper.updateRequestDtoToEntity(dto);
-        Set<Keyword> keywords = dto.keywords() == null ? null : dto.keywords()
+        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
                 .stream()
-                .map(s -> Keyword.builder().title(s).build())
-                .map(keywordService::getOrCreate)
+                .map(s -> Tag.builder().title(s).build())
+                .map(tagService::getOrCreate)
                 .collect(Collectors.toSet());
 
-        placeService.update(id, newPlace, keywords);
+        placeService.update(id, newPlace, tags);
         return ResponseEntity.ok().build();
     }
 

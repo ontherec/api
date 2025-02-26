@@ -2,9 +2,9 @@ package kr.ontherec.api.domain.place.domain;
 
 import jakarta.persistence.*;
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.keyword.domain.Keyword;
 import kr.ontherec.api.domain.place.exception.PlaceException;
 import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
+import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.global.model.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -22,8 +22,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @SuperBuilder @AllArgsConstructor(access = PROTECTED)
 @Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
-public class
-Place extends BaseEntity {
+public class Place extends BaseEntity {
     private static final int BOOKING_PERIOD_MIN = 7;
 
     @Id
@@ -50,7 +49,7 @@ Place extends BaseEntity {
     private String introduction;
 
     @ManyToMany(fetch = EAGER)
-    private List<Keyword> keywords;
+    private List<Tag> tags;
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
@@ -75,7 +74,7 @@ Place extends BaseEntity {
         }
     }
 
-    public void setKeywords(Set<Keyword> keywords) {
-        this.keywords = keywords == null ? null : new ArrayList<>(keywords);
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags == null ? null : new ArrayList<>(tags);
     }
 }

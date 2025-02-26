@@ -1,6 +1,5 @@
 package kr.ontherec.api.domain.place.application;
 
-import kr.ontherec.api.domain.keyword.domain.Keyword;
 import kr.ontherec.api.domain.place.domain.Holiday;
 import kr.ontherec.api.domain.place.domain.HolidayType;
 import kr.ontherec.api.domain.place.domain.Link;
@@ -8,6 +7,7 @@ import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.place.dto.PlaceRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
 import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
+import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.global.config.MapperConfig;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -25,14 +25,14 @@ public interface PlaceMapper {
     PlaceMapper INSTANCE = Mappers.getMapper(PlaceMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "keywords", ignore = true)
+    @Mapping(target = "tags", ignore = true)
     @Mapping(target = "links", qualifiedByName = "deserializeLinks")
     @Mapping(target = "holidays", qualifiedByName = "deserializeHolidays")
     @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
     @Mapping(target = "modifiedAt", expression = "java(LocalDateTime.now())")
     Place registerRequestDtoToEntity(PlaceRegisterRequestDto dto);
 
-    @Mapping(target = "keywords", ignore = true)
+    @Mapping(target = "tags", ignore = true)
     @Mapping(target = "links", qualifiedByName = "deserializeLinks")
     @Mapping(target = "holidays", qualifiedByName = "deserializeHolidays")
     Place updateRequestDtoToEntity(PlaceUpdateRequestDto dto);
@@ -63,23 +63,23 @@ public interface PlaceMapper {
                 ).collect(Collectors.toSet());
     }
 
-    default Set<String> serializeKeywords(List<Keyword> keywords) {
-        if(keywords == null) return null;
-        return keywords.stream()
-                .map(Keyword::getTitle)
+    default Set<String> serializetags(List<Tag> tags) {
+        if(tags == null) return null;
+        return tags.stream()
+                .map(Tag::getTitle)
                 .collect(Collectors.toSet());
     }
 
-    default Set<String> serializeLinks(Set<Link> keywords) {
-        if(keywords == null) return null;
-        return keywords.stream()
+    default Set<String> serializeLinks(Set<Link> links) {
+        if(links == null) return null;
+        return links.stream()
                 .map(Link::getUrl)
                 .collect(Collectors.toSet());
     }
 
-    default Set<HolidayType> serializeHolidays(Set<Holiday> keywords) {
-        if(keywords == null) return null;
-        return keywords.stream()
+    default Set<HolidayType> serializeHolidays(Set<Holiday> holidays) {
+        if(holidays == null) return null;
+        return holidays.stream()
                 .map(Holiday::getType)
                 .collect(Collectors.toSet());
     }

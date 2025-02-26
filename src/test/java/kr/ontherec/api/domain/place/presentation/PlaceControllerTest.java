@@ -8,18 +8,18 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.keyword.application.KeywordService;
-import kr.ontherec.api.domain.keyword.domain.Keyword;
 import kr.ontherec.api.domain.place.application.PlaceService;
 import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.place.dto.AddressRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
 import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
+import kr.ontherec.api.domain.tag.application.TagService;
+import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostGenerator;
-import kr.ontherec.api.infra.fixture.KeywordGenerator;
 import kr.ontherec.api.infra.fixture.PlaceGenerator;
+import kr.ontherec.api.infra.fixture.TagGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,7 +65,7 @@ class PlaceControllerTest {
     private PlaceService placeService;
 
     @Autowired
-    private KeywordService keywordService;
+    private TagService tagService;
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
@@ -96,11 +96,11 @@ class PlaceControllerTest {
         Host newHost = HostGenerator.generate("test");
         Host host = hostService.register(newHost);
         Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
-        Set<Keyword> keywords = newKeywords.stream()
-                .map(keyword -> keywordService.getOrCreate(keyword))
+        Set<Tag> newTags = TagGenerator.generate("tag");
+        Set<Tag> tags = newTags.stream()
+                .map(tag -> tagService.getOrCreate(tag))
                 .collect(Collectors.toSet());
-        placeService.register(host, newPlace, keywords);
+        placeService.register(host, newPlace, tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -177,10 +177,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("[].keywords[]")
+                                        fieldWithPath("[].tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
+                                                .description("태그 목록")
                                                 .optional(),
                                         fieldWithPath("[].links[]")
                                                 .type(ARRAY)
@@ -237,7 +237,7 @@ class PlaceControllerTest {
                 "place",
                 addressDto,
                 null,
-                Set.of("keyword"),
+                Set.of("tag"),
                 Set.of("https://ontherec.kr"),
                 Duration.ofDays(30),
                 Duration.ofDays(1),
@@ -291,10 +291,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords[]")
+                                        fieldWithPath("tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
+                                                .description("태그 목록")
                                                 .optional(),
                                         fieldWithPath("links[]")
                                                 .type(ARRAY)
@@ -415,11 +415,11 @@ class PlaceControllerTest {
         Host newHost = HostGenerator.generate("test");
         Host host = hostService.register(newHost);
         Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
-        Set<Keyword> keywords = newKeywords.stream()
-                .map(keyword -> keywordService.getOrCreate(keyword))
+        Set<Tag> newTags = TagGenerator.generate("tag");
+        Set<Tag> tags = newTags.stream()
+                .map(tag -> tagService.getOrCreate(tag))
                 .collect(Collectors.toSet());
-        placeService.register(host, newPlace, keywords);
+        placeService.register(host, newPlace, tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -493,10 +493,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords[]")
+                                        fieldWithPath("tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
+                                                .description("태그 목록")
                                                 .optional(),
                                         fieldWithPath("links[]")
                                                 .type(ARRAY)
@@ -554,16 +554,16 @@ class PlaceControllerTest {
         Host newHost = HostGenerator.generate("test");
         Host host = hostService.register(newHost);
         Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
-        Set<Keyword> keywords = newKeywords.stream()
-                .map(keyword -> keywordService.getOrCreate(keyword))
+        Set<Tag> newTags = TagGenerator.generate("tag");
+        Set<Tag> tags = newTags.stream()
+                .map(tag -> tagService.getOrCreate(tag))
                 .collect(Collectors.toSet());
-        placeService.register(host, newPlace, keywords);
+        placeService.register(host, newPlace, tags);
 
         PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
                 "newPlace",
                 "newIntroduction",
-                Set.of("newKeyword"),
+                Set.of("newtag"),
                 Set.of("https://ontherec.live"),
                 Duration.ofDays(90),
                 Duration.ofDays(7),
@@ -589,10 +589,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords[]")
+                                        fieldWithPath("tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
+                                                .description("태그 목록")
                                                 .optional(),
                                         fieldWithPath("links[]")
                                                 .type(ARRAY)

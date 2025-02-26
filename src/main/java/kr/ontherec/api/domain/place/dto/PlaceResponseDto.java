@@ -15,7 +15,7 @@ public record PlaceResponseDto(
         String name,
         Address address,
         String introduction,
-        Set<String> keywords,
+        Set<String> tags,
         Set<String> links,
         Duration bookingFrom,
         Duration bookingUntil,

@@ -24,7 +24,7 @@ public record PlaceRegisterRequestDto(
         @NotNull(message = "주소를 입력해주세요")
         AddressRegisterRequestDto address,
         String introduction,
-        Set<@Size(max = 10, message = "키워드는 최대 10글자 입니다") String> keywords,
+        Set<@Size(max = 10, message = "태그는 최대 10글자 입니다") String> tags,
         Set<@URL(message = "유효하지 않은 URL 입니다") String> links,
         @NotNull(message = "예약 시작 기간을 입력해주세요")
         @DurationMax(days = 90L, message = "예약 기간은 최대 90일 전까지 설정 가능합니다")
