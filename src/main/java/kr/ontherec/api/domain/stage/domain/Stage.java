@@ -1,20 +1,26 @@
-package kr.ontherec.api.domain.item.domain;
+package kr.ontherec.api.domain.stage.domain;
 
 import jakarta.persistence.*;
+import kr.ontherec.api.domain.item.domain.RefundPolicy;
 import kr.ontherec.api.domain.place.domain.Place;
+import kr.ontherec.api.domain.tag.domain.Tag;
+import kr.ontherec.api.global.model.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.io.File;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @SuperBuilder @AllArgsConstructor(access = PROTECTED)
 @Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
-public class Stage extends Item {
+public class Stage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
@@ -34,6 +40,16 @@ public class Stage extends Item {
     @Column(nullable = false)
     int maxCapacity;
 
+    @Column(nullable = false)
+    int stage_width;
+
+    @Column(nullable = false)
+    int stage_height;
+
+    // TODO: timeblocks
+
+    @OneToMany
+    Set<RefundPolicy> refundPolicies;
 
     // engineering
     @Column(nullable = false)
@@ -63,10 +79,10 @@ public class Stage extends Item {
 
     // documents
     @Column
-    File application;
+    String applicationForm;
 
     @Column(nullable = false)
-    File cueSheet;
+    String cueSheetTemplate;
 
     @Column(nullable = false)
     Duration cueSheetDue;
@@ -74,24 +90,13 @@ public class Stage extends Item {
     // equipments
 
 
-    // info
-    @Column(nullable = false)
-    int area;
-
-    @Column(nullable = false)
-    int stage_width;
-
-    @Column(nullable = false)
-    int stage_height;
-
+    // facilities
     @Column(updatable = false, nullable = false)
     int floor;
 
     @Column(nullable = false)
     boolean havElevator;
 
-
-    // facilities
     @Column(nullable = false)
     int parkingCapacity;
 
@@ -115,6 +120,9 @@ public class Stage extends Item {
 
     @Column(nullable = false)
     boolean hasProjector;
+
+    @Column(nullable = false)
+    boolean hasLocker;
 
 
     // fnb policies
@@ -141,4 +149,16 @@ public class Stage extends Item {
 
     @Column(columnDefinition = "TEXT")
     String introduction;
+
+    @Column(columnDefinition = "TEXT")
+    String caution;
+
+    @ManyToMany(fetch = EAGER)
+    private List<Tag> tags;
+
+    // TODO: booking slots
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags == null ? null : new ArrayList<>(tags);
+    }
 }
