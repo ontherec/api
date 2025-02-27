@@ -39,7 +39,7 @@ public class Place extends BaseEntity {
     private String brn;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
 
     @OneToOne(cascade = ALL, orphanRemoval = true)
     @JoinColumn(updatable = false, nullable = false)

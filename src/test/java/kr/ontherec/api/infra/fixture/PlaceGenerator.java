@@ -14,22 +14,22 @@ import static kr.ontherec.api.domain.place.domain.HolidayType.설날;
 
 public class PlaceGenerator {
 
-    public static Place generate(String name, String brn) {
+    public static Place generate(String title, String brn) {
         Address newAddress = Address.builder()
                 .zipcode("00000")
                 .state("경기도")
                 .city("수원시 장안구")
                 .streetAddress("율전로")
-                .detail(name)
+                .detail(title)
                 .latitude(new BigDecimal("000.0000000000"))
                 .longitude(new BigDecimal("000.0000000000"))
                 .build();
 
         return Place.builder()
                 .brn(brn)
-                .name(name)
+                .title(title)
                 .address(newAddress)
-                .introduction(name)
+                .introduction(title)
                 .tags(null)
                 .links(Set.of(Link.builder().url("https://ontherec.kr").build()))
                 .bookingFrom(Duration.ofDays(30))

@@ -10,8 +10,8 @@ import java.time.Duration;
 import java.util.Set;
 
 public record PlaceUpdateRequestDto(
-        @NotBlank(message = "공간 이름을 입력해주세요")
-        String name,
+        @NotBlank(message = "제목을 입력해주세요")
+        String title,
         String introduction,
         Set<@Size(max = 10, message = "태그는 최대 10글자 입니다") String> tags,
         Set<@URL(message = "유효하지 않은 URL 입니다") String> links,

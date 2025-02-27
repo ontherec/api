@@ -12,7 +12,7 @@ public record PlaceResponseDto(
         Long id,
         HostResponseDto host,
         String brn,
-        String name,
+        String title,
         Address address,
         String introduction,
         Set<String> tags,

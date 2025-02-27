@@ -142,9 +142,9 @@ class PlaceControllerTest {
                                         fieldWithPath("[].brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        fieldWithPath("[].name")
+                                        fieldWithPath("[].title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("제목"),
                                         fieldWithPath("[].address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -259,9 +259,9 @@ class PlaceControllerTest {
                                         fieldWithPath("brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        fieldWithPath("name")
+                                        fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("제목"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -458,9 +458,9 @@ class PlaceControllerTest {
                                         fieldWithPath("brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        fieldWithPath("name")
+                                        fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("제목"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -582,9 +582,9 @@ class PlaceControllerTest {
                                 .description("플레이스 수정")
                                 .requestSchema(Schema.schema(PlaceUpdateRequestDto.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("name")
+                                        fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("제목"),
                                         fieldWithPath("introduction")
                                                 .type(STRING)
                                                 .description("소개")
