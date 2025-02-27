@@ -10,9 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static kr.ontherec.api.domain.host.exception.HostExceptionCode.EXIST_USERNAME;
 
-@Service
+@Service @RequiredArgsConstructor
 @Transactional
-@RequiredArgsConstructor
 public class HostServiceImpl implements HostService {
     private final HostRepository hostRepository;
     private final HostMapper hostMapper = HostMapper.INSTANCE;

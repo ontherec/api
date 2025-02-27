@@ -8,10 +8,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PlaceRepository extends JpaRepository<Place, Long> {
-    List<Place> findAllByTitleContainsOrAddress_StateContainsOrAddress_CityContainsOrAddress_StreetAddressContainsOrderByViewDescAllIgnoreCase(String title, String address_state, String address_city, String address_streetAddress);
+    List<Place> findAllByTitleContainsOrAddress_StateContainsOrAddress_CityContainsOrAddress_StreetAddressContainsAllIgnoreCase(String title, String address_state, String address_city, String address_streetAddress);
 
     default List<Place> search(String query) {
-        return findAllByTitleContainsOrAddress_StateContainsOrAddress_CityContainsOrAddress_StreetAddressContainsOrderByViewDescAllIgnoreCase(query, query, query, query);
+        return findAllByTitleContainsOrAddress_StateContainsOrAddress_CityContainsOrAddress_StreetAddressContainsAllIgnoreCase(query, query, query, query);
     }
 
     boolean existsByBrn(String brn);

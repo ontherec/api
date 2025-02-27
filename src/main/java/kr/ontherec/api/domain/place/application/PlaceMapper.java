@@ -35,6 +35,8 @@ public interface PlaceMapper {
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "links", qualifiedByName = "deserializeLinks")
     @Mapping(target = "holidays", qualifiedByName = "deserializeHolidays")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "modifiedAt", ignore = true)
     Place updateRequestDtoToEntity(PlaceUpdateRequestDto dto);
 
     void update(Place newPlace, @MappingTarget Place place);
@@ -63,7 +65,7 @@ public interface PlaceMapper {
                 ).collect(Collectors.toSet());
     }
 
-    default Set<String> serializetags(List<Tag> tags) {
+    default Set<String> serializeTags(List<Tag> tags) {
         if(tags == null) return null;
         return tags.stream()
                 .map(Tag::getTitle)

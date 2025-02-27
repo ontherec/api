@@ -13,9 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Set;
 
-@Service
+@Service @RequiredArgsConstructor
 @Transactional
-@RequiredArgsConstructor
 public class PlaceServiceImpl implements PlaceService {
     private final PlaceRepository placeRepository;
     private final PlaceMapper placeMapper = PlaceMapper.INSTANCE;
