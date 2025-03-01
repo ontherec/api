@@ -148,7 +148,7 @@ class HostControllerTest {
                                 .responseFields(
                                         fieldWithPath("id")
                                                 .type(NUMBER)
-                                                .description("고유번호"),
+                                                .description("식별자"),
                                         fieldWithPath("username")
                                                 .type(STRING)
                                                 .description("ID"),

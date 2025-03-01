@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +39,7 @@ public class Place extends BaseEntity {
     @Column(unique = true, updatable = false, nullable = false)
     private String brn;
 
+    // location
     @Column(nullable = false)
     private String title;
 
@@ -45,6 +47,7 @@ public class Place extends BaseEntity {
     @JoinColumn(updatable = false, nullable = false)
     private Address address;
 
+    // introduction
     @Column(columnDefinition = "TEXT")
     private String introduction;
 
@@ -55,6 +58,7 @@ public class Place extends BaseEntity {
     @JoinColumn
     private Set<Link> links;
 
+    // business
     @Column(nullable = false)
     private Duration bookingFrom;
 
@@ -72,6 +76,10 @@ public class Place extends BaseEntity {
         if(bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
             throw new PlaceException(PlaceExceptionCode.NOT_VALID_BOOKING_PERIOD);
         }
+    }
+
+    public Set<Tag> getTags() {
+        return new HashSet<>(this.tags);
     }
 
     public void setTags(Set<Tag> tags) {

@@ -117,13 +117,13 @@ class PlaceControllerTest {
                                                 .description("플레이스 배열"),
                                         fieldWithPath("[].id")
                                                 .type(NUMBER)
-                                                .description("플레이스 고유번호"),
+                                                .description("플레이스 식별자"),
                                         fieldWithPath("[].host")
                                                 .type(OBJECT)
                                                 .description("호스트"),
                                         fieldWithPath("[].host.id")
                                                 .type(NUMBER)
-                                                .description("호스트 고유번호"),
+                                                .description("호스트 식별자"),
                                         fieldWithPath("[].host.username")
                                                 .type(STRING)
                                                 .description("호스트 ID"),
@@ -144,13 +144,13 @@ class PlaceControllerTest {
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
                                         fieldWithPath("[].title")
                                                 .type(STRING)
-                                                .description("제목"),
+                                                .description("이름"),
                                         fieldWithPath("[].address")
                                                 .type(OBJECT)
                                                 .description("주소"),
                                         fieldWithPath("[].address.id")
                                                 .type(NUMBER)
-                                                .description("주소 고유번호"),
+                                                .description("주소 식별자"),
                                         fieldWithPath("[].address.zipcode")
                                                 .type(STRING)
                                                 .description("우편번호"),
@@ -261,7 +261,7 @@ class PlaceControllerTest {
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
                                         fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("제목"),
+                                                .description("이름"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -433,13 +433,13 @@ class PlaceControllerTest {
                                 .responseFields(
                                         fieldWithPath("id")
                                                 .type(NUMBER)
-                                                .description("플레이스 고유번호"),
+                                                .description("플레이스 식별자"),
                                         fieldWithPath("host")
                                                 .type(OBJECT)
                                                 .description("호스트"),
                                         fieldWithPath("host.id")
                                                 .type(NUMBER)
-                                                .description("호스트 고유번호"),
+                                                .description("호스트 식별자"),
                                         fieldWithPath("host.username")
                                                 .type(STRING)
                                                 .description("호스트 ID"),
@@ -460,13 +460,13 @@ class PlaceControllerTest {
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
                                         fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("제목"),
+                                                .description("이름"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
                                         fieldWithPath("address.id")
                                                 .type(NUMBER)
-                                                .description("주소 고유번호"),
+                                                .description("주소 식별자"),
                                         fieldWithPath("address.zipcode")
                                                 .type(STRING)
                                                 .description("우편번호"),
@@ -584,7 +584,7 @@ class PlaceControllerTest {
                                 .requestFields(
                                         fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("제목"),
+                                                .description("이름"),
                                         fieldWithPath("introduction")
                                                 .type(STRING)
                                                 .description("소개")
@@ -673,7 +673,7 @@ class PlaceControllerTest {
                                 .pathParameters(
                                         parameterWithName("id")
                                                 .type(NUMBER)
-                                                .description("삭제할 플레이스 고유번호"))
+                                                .description("삭제할 플레이스 식별자"))
                                 .build())))
         .when()
                 .delete("/places/{id}", 1L)

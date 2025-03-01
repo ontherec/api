@@ -13,7 +13,6 @@ import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -65,7 +64,7 @@ public interface PlaceMapper {
                 ).collect(Collectors.toSet());
     }
 
-    default Set<String> serializeTags(List<Tag> tags) {
+    default Set<String> serializeTags(Set<Tag> tags) {
         if(tags == null) return null;
         return tags.stream()
                 .map(Tag::getTitle)

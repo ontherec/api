@@ -39,6 +39,13 @@ public class PlaceController {
         return ResponseEntity.ok(dtos);
     }
 
+    @GetMapping("/{id}")
+    ResponseEntity<PlaceResponseDto> get(@PathVariable Long id) {
+        Place place = placeService.get(id);
+        PlaceResponseDto dto = placeMapper.EntityToResponseDto(place);
+        return ResponseEntity.ok(dto);
+    }
+
     @PostMapping
     ResponseEntity<Long> register(Authentication authentication, @Valid @RequestBody PlaceRegisterRequestDto dto) {
         Host host = hostService.getByUsername(authentication.getName());
@@ -51,13 +58,6 @@ public class PlaceController {
 
         Place place = placeService.register(host, newPlace, tags);
         return ResponseEntity.created(URI.create("/v1/places/" + place.getId())).body(place.getId());
-    }
-
-    @GetMapping("/{id}")
-    ResponseEntity<PlaceResponseDto> get(@PathVariable Long id) {
-        Place place = placeService.get(id);
-        PlaceResponseDto dto = placeMapper.EntityToResponseDto(place);
-        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/{id}")
