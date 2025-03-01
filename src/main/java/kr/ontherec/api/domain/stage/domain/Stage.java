@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -85,7 +86,7 @@ public class Stage extends BaseEntity {
     // TODO: timeblocks
     // TODO: booking slots
 
-    @OneToMany
+    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     private Set<RefundPolicy> refundPolicies;
 
     // engineering
