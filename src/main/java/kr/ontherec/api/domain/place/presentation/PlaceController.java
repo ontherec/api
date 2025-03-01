@@ -78,7 +78,7 @@ public class PlaceController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> delete(Authentication authentication, @PathVariable Long id) {
+    ResponseEntity<Void> remove(Authentication authentication, @PathVariable Long id) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!placeService.isHost(id, host))
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
