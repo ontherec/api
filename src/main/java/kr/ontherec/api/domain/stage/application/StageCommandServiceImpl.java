@@ -3,7 +3,6 @@ package kr.ontherec.api.domain.stage.application;
 import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.stage.dao.StageRepository;
 import kr.ontherec.api.domain.stage.domain.Stage;
-import kr.ontherec.api.domain.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.domain.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.domain.tag.domain.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,7 @@ public class StageCommandServiceImpl implements StageCommandService {
     private final StageMapper stageMapper = StageMapper.INSTANCE;
 
     @Override
-    public Stage register(StageRegisterRequestDto dto, Place place, Set<Tag> tags) {
-        Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
+    public Stage register(Stage newStage, Place place, Set<Tag> tags) {
         newStage.setPlace(place);
         newStage.setTags(tags);
 

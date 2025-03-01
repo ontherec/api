@@ -59,6 +59,7 @@ public class StageController {
         if (!placeService.isHost(dto.placeId(), host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
 
+        Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
         Place place = placeService.get(dto.placeId());
         Set<Tag> tags = dto.tags() == null ? null : dto.tags()
                 .stream()
@@ -66,7 +67,7 @@ public class StageController {
                 .map(tagService::getOrCreate)
                 .collect(Collectors.toSet());
 
-        Stage stage = stageCommandService.register(dto, place, tags);
+        Stage stage = stageCommandService.register(newStage, place, tags);
         return ResponseEntity.created(URI.create("/v1/stages/" + stage.getId())).body(stage.getId());
     }
 

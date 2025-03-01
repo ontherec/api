@@ -2,14 +2,13 @@ package kr.ontherec.api.domain.stage.application;
 
 import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.stage.domain.Stage;
-import kr.ontherec.api.domain.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.domain.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.domain.tag.domain.Tag;
 
 import java.util.Set;
 
 public interface StageCommandService {
-    Stage register(StageRegisterRequestDto dto, Place place, Set<Tag> tags);
+    Stage register(Stage newStage, Place place, Set<Tag> tags);
     void updateLocation(Long id, StageUpdateRequestDto.Location dto);
     void updateArea(Long id, StageUpdateRequestDto.Area dto);
     void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto);
