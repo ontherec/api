@@ -6,20 +6,16 @@ import com.epages.restdocs.apispec.SimpleType;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.place.application.PlaceService;
-import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.place.dto.AddressRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
 import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
-import kr.ontherec.api.domain.tag.application.TagService;
 import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.infra.IntegrationTest;
-import kr.ontherec.api.infra.fixture.HostGenerator;
-import kr.ontherec.api.infra.fixture.PlaceGenerator;
-import kr.ontherec.api.infra.fixture.TagGenerator;
+import kr.ontherec.api.infra.fixture.HostFactory;
+import kr.ontherec.api.infra.fixture.PlaceFactory;
+import kr.ontherec.api.infra.fixture.TagFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +27,6 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -58,14 +53,9 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 @IntegrationTest
 class PlaceControllerTest {
 
-    @Autowired
-    private HostService hostService;
-
-    @Autowired
-    private PlaceService placeService;
-
-    @Autowired
-    private TagService tagService;
+    @Autowired private HostFactory hostFactory;
+    @Autowired private PlaceFactory placeFactory;
+    @Autowired private TagFactory tagFactory;
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
@@ -93,14 +83,9 @@ class PlaceControllerTest {
     void search() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Tag> newTags = TagGenerator.generate("tag");
-        Set<Tag> tags = newTags.stream()
-                .map(tag -> tagService.getOrCreate(tag))
-                .collect(Collectors.toSet());
-        placeService.register(host, newPlace, tags);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -220,8 +205,7 @@ class PlaceControllerTest {
     void register() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        Host host = hostFactory.create("test");
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -329,10 +313,9 @@ class PlaceControllerTest {
     void registerWithDuplicatedBrn() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -371,8 +354,7 @@ class PlaceControllerTest {
     void registerWithInvalidBookingPeriod() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        Host host = hostFactory.create("test");
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -412,14 +394,9 @@ class PlaceControllerTest {
     void get() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Tag> newTags = TagGenerator.generate("tag");
-        Set<Tag> tags = newTags.stream()
-                .map(tag -> tagService.getOrCreate(tag))
-                .collect(Collectors.toSet());
-        placeService.register(host, newPlace, tags);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -551,19 +528,14 @@ class PlaceControllerTest {
     void update() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Tag> newTags = TagGenerator.generate("tag");
-        Set<Tag> tags = newTags.stream()
-                .map(tag -> tagService.getOrCreate(tag))
-                .collect(Collectors.toSet());
-        placeService.register(host, newPlace, tags);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
                 "newPlace",
                 "newIntroduction",
-                Set.of("newtag"),
+                Set.of("newTag"),
                 Set.of("https://ontherec.live"),
                 Duration.ofDays(90),
                 Duration.ofDays(7),
@@ -622,13 +594,10 @@ class PlaceControllerTest {
     @DisplayName("플레이스 수정 실패 - 권한 없음")
     @Test
     void updateWithoutAuthority() {
-        Host me = HostGenerator.generate("test");
-        hostService.register(me);
-
-        Host newHost = HostGenerator.generate("host");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        hostFactory.create("test");
+        Host host = hostFactory.create("host");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
                 "place",
@@ -657,10 +626,9 @@ class PlaceControllerTest {
     void remove() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)

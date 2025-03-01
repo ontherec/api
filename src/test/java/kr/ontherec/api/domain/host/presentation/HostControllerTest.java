@@ -7,13 +7,12 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Bank;
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import kr.ontherec.api.infra.IntegrationTest;
-import kr.ontherec.api.infra.fixture.HostGenerator;
+import kr.ontherec.api.infra.fixture.HostFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,8 +40,7 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 @IntegrationTest
 class HostControllerTest {
 
-    @Autowired
-    private HostService hostService;
+    @Autowired private HostFactory hostFactory;
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
@@ -108,8 +106,7 @@ class HostControllerTest {
     void registerExistUsername() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         HostRegisterRequestDto dto = new HostRegisterRequestDto(
                 Bank.KB국민,
@@ -132,8 +129,7 @@ class HostControllerTest {
     void get() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -199,8 +195,7 @@ class HostControllerTest {
     void update() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         HostUpdateRequestDto dto = new HostUpdateRequestDto(
                 Bank.하나,
@@ -248,8 +243,7 @@ class HostControllerTest {
     void updateWithInvalidContactTime() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         HostUpdateRequestDto dto = new HostUpdateRequestDto(
                 Bank.하나,

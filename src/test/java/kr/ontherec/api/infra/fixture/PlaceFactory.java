@@ -1,9 +1,14 @@
 package kr.ontherec.api.infra.fixture;
 
+import kr.ontherec.api.domain.host.domain.Host;
+import kr.ontherec.api.domain.place.application.PlaceService;
 import kr.ontherec.api.domain.place.domain.Address;
 import kr.ontherec.api.domain.place.domain.Holiday;
 import kr.ontherec.api.domain.place.domain.Link;
 import kr.ontherec.api.domain.place.domain.Place;
+import kr.ontherec.api.domain.tag.domain.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.time.Duration;
@@ -12,9 +17,12 @@ import java.util.Set;
 
 import static kr.ontherec.api.domain.place.domain.HolidayType.설날;
 
-public class PlaceGenerator {
+@Component
+public class PlaceFactory {
 
-    public static Place generate(String title, String brn) {
+    @Autowired private PlaceService placeService;
+
+    public Place create(Host host, String title, String brn, Set<Tag> tags) {
         Address newAddress = Address.builder()
                 .zipcode("00000")
                 .state("경기도")
@@ -25,7 +33,7 @@ public class PlaceGenerator {
                 .longitude(new BigDecimal("000.0000000000"))
                 .build();
 
-        return Place.builder()
+        Place newPlace = Place.builder()
                 .brn(brn)
                 .title(title)
                 .address(newAddress)
@@ -38,5 +46,7 @@ public class PlaceGenerator {
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .build();
+
+        return placeService.register(host, newPlace, tags);
     }
 }
