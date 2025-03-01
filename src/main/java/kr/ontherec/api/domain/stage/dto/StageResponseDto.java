@@ -26,7 +26,7 @@ public record StageResponseDto (
         long viewCount,
         long likeCount,
 
-        // information
+        // Area
         int minCapacity,
         int maxCapacity,
         StageType stageType,

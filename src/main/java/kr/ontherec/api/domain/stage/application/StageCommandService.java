@@ -11,7 +11,7 @@ import java.util.Set;
 public interface StageCommandService {
     Stage register(StageRegisterRequestDto dto, Place place, Set<Tag> tags);
     void updateLocation(Long id, StageUpdateRequestDto.Location dto);
-    void updateInformation(Long id, StageUpdateRequestDto.Information dto);
+    void updateArea(Long id, StageUpdateRequestDto.Area dto);
     void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto);
     void updateBusiness(Long id, StageUpdateRequestDto.Business dto);
     void updateEngineering(Long id, StageUpdateRequestDto.Engineering dto);

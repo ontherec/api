@@ -36,7 +36,7 @@ public interface StageMapper {
 
     void updateLocation(StageUpdateRequestDto.Location dto, @MappingTarget Stage stage);
 
-    void updateInformation(StageUpdateRequestDto.Information dto, @MappingTarget Stage stage);
+    void updateArea(StageUpdateRequestDto.Area dto, @MappingTarget Stage stage);
 
     @Mapping(target = "tags", ignore = true)
     void updateIntroduction(StageUpdateRequestDto.Introduction dto, @MappingTarget Stage stage);

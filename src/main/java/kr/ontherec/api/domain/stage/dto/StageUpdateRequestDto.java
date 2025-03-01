@@ -27,7 +27,7 @@ public class StageUpdateRequestDto {
                 Set<@Size(max = 10, message = "태그는 최대 10글자 입니다") String> tags
         ) {}
 
-        public record Information(
+        public record Area(
                 @NotNull(message = "최소 수용인원(좌석 기준)을 입력해주세요.")
                 @DecimalMax(value = "1000", message = "수용인원은 최대 천명까지 설정 가능합니다.")
                 @Positive(message = "수용인원은 최소 1명까지 설정 가능합니다.")

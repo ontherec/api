@@ -65,7 +65,7 @@ public class Stage extends BaseEntity {
     @Column(nullable = false)
     private int likeCount;
 
-    // information
+    // Area
     @Column(nullable = false)
     private int minCapacity;
 
