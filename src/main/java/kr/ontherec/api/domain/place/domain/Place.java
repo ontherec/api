@@ -79,7 +79,7 @@ public class Place extends BaseEntity {
     }
 
     public Set<Tag> getTags() {
-        return new HashSet<>(this.tags);
+        return this.tags == null ? null : new HashSet<>(this.tags);
     }
 
     public void setTags(Set<Tag> tags) {

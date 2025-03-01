@@ -46,7 +46,7 @@ public class Stage extends BaseEntity {
     private int floor;
 
     @Column(nullable = false)
-    private boolean havElevator;
+    private boolean hasElevator;
 
     // introduction
     @Column(columnDefinition = "TEXT")
@@ -198,7 +198,7 @@ public class Stage extends BaseEntity {
     }
 
     public Set<Tag> getTags() {
-        return new HashSet<>(this.tags);
+        return this.tags == null ? null : new HashSet<>(this.tags);
     }
 
     public void setTags(Set<Tag> tags) {
