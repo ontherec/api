@@ -20,7 +20,7 @@ public record StageRegisterRequestDto (
         @DecimalMax(value = "100", message = "층수는 최대 100층까지 설정 가능합니다.")
         int floor,
         @NotNull(message = "엘리베이터 존재 여부를 입력해주세요.")
-        boolean havElevator,
+        boolean hasElevator,
         
         // introduction
         @Size(max = 1000, message = "공연장 소개는 최대 1000글자까지 입력 가능합니다.")
@@ -51,7 +51,6 @@ public record StageRegisterRequestDto (
 
         // business
         @NotNull(message = "환불 정책을 입력해주세요.")
-        @Size(min = 1, message = "최소 하나 이상의 환불정책을 입력해주세요.")
         Set<RefundPolicyRegisterRequestDto> refundPolicies,
 
         // engineering

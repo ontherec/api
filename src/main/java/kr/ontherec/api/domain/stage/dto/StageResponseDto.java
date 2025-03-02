@@ -15,7 +15,7 @@ public record StageResponseDto (
         // location
         String title,
         int floor,
-        boolean havElevator,
+        boolean hasElevator,
 
         // introduction
         String introduction,

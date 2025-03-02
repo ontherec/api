@@ -79,10 +79,36 @@ public class Place extends BaseEntity {
     }
 
     public Set<Tag> getTags() {
-        return this.tags == null ? null : new HashSet<>(this.tags);
+        return tags == null ? null : new HashSet<>(tags);
     }
 
     public void setTags(Set<Tag> tags) {
-        this.tags = tags == null ? null : new ArrayList<>(tags);
+        this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
+    }
+
+    public void setLinks(Set<Link> links) {
+        this.links = links == null ? new HashSet<>() : new HashSet<>(links);
+    }
+
+    public void setHolidays(Set<Holiday> holidays) {
+        this.holidays = holidays == null ? new HashSet<>() : new HashSet<>(holidays);
+    }
+
+    public static abstract class PlaceBuilder<C extends Place, B extends PlaceBuilder<C, B>> extends BaseEntityBuilder<C, B> {
+
+        public B tags(List<Tag> tags) {
+            this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
+            return self();
+        }
+
+        public B links(Set<Link> links) {
+            this.links = links == null ? new HashSet<>() : new HashSet<>(links);
+            return self();
+        }
+
+        public B holidays(Set<Holiday> holidays) {
+            this.holidays = holidays == null ? new HashSet<>() : new HashSet<>(holidays);
+            return self();
+        }
     }
 }

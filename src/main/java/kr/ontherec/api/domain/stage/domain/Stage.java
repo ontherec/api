@@ -198,10 +198,27 @@ public class Stage extends BaseEntity {
     }
 
     public Set<Tag> getTags() {
-        return this.tags == null ? null : new HashSet<>(this.tags);
+        return tags == null ? null : new HashSet<>(tags);
     }
 
     public void setTags(Set<Tag> tags) {
-        this.tags = tags == null ? null : new ArrayList<>(tags);
+        this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
+    }
+
+    public void setRefundPolicies(Set<RefundPolicy> refundPolicies) {
+        this.refundPolicies = refundPolicies == null ? new HashSet<>() : new HashSet<>(refundPolicies);
+    }
+
+    public static abstract class StageBuilder<C extends Stage, B extends StageBuilder<C, B>> extends BaseEntityBuilder<C, B> {
+
+        public B tags(List<Tag> tags) {
+            this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
+            return self();
+        }
+
+        public B refundPolicies(Set<RefundPolicy> refundPolicies) {
+            this.refundPolicies = refundPolicies == null ? new HashSet<>() : new HashSet<>(refundPolicies);
+            return self();
+        }
     }
 }
