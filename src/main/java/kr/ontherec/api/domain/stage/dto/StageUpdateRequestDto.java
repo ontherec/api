@@ -71,7 +71,7 @@ public class StageUpdateRequestDto {
         public record Documents(
                 @URL(message = "유효하지 않은 URL 입니다.")
                 String applicationForm,
-                @NotNull(message = "큐시트 템플릿 양식을 입력해주세요.")
+                @NotNull(message = "큐시트 양식 URL 을 입력해주세요.")
                 @URL(message = "유효하지 않은 URL 입니다.")
                 String cueSheetTemplate,
                 @NotNull(message = "큐시트 제출 마감 기한을 입력해주세요.")

@@ -1,7 +1,7 @@
 package kr.ontherec.api.domain.stage.dto;
 
 import kr.ontherec.api.domain.item.domain.RefundPolicy;
-import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
+import kr.ontherec.api.domain.place.dto.PlaceSimpleResponseDto;
 import kr.ontherec.api.domain.stage.domain.StageType;
 
 import java.math.BigDecimal;
@@ -10,7 +10,7 @@ import java.util.Set;
 
 public record StageResponseDto (
         Long id,
-        PlaceResponseDto place,
+        PlaceSimpleResponseDto place,
 
         // location
         String title,
@@ -34,27 +34,27 @@ public record StageResponseDto (
         BigDecimal stageHeight,
 
         // business
-        Set<RefundPolicy> refundPolicies,
+        Set<RefundPolicy> refundPolicies, // nullable
 
         // engineering
         boolean stageManagingAvailable,
-        Long stageManagingFee,
+        Long stageManagingFee, // nullable
         boolean soundEngineeringAvailable,
-        Long soundEngineeringFee,
+        Long soundEngineeringFee, // nullable
         boolean lightEngineeringAvailable,
-        Long lightEngineeringFee,
+        Long lightEngineeringFee, // nullable
         boolean photographingAvailable,
-        Long photographingFee,
+        Long photographingFee, // nullable
 
         // documents
-        String applicationForm,
+        String applicationForm, // nullable
         String cueSheetTemplate,
         Duration cueSheetDue,
 
         // facilities
         int parkingCapacity,
-        String parkingLocation,
-        Boolean freeParking,
+        String parkingLocation, // nullable
+        Boolean freeParking, // nullable
         boolean hasRestroom,
         boolean hasWifi,
         boolean hasCameraStanding,

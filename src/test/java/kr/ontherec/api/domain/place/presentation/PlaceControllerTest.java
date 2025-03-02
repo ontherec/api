@@ -54,8 +54,8 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 class PlaceControllerTest {
 
     @Autowired private HostFactory hostFactory;
-    @Autowired private PlaceFactory placeFactory;
     @Autowired private TagFactory tagFactory;
+    @Autowired private PlaceFactory placeFactory;
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
@@ -82,7 +82,6 @@ class PlaceControllerTest {
     @Test
     void search() {
 
-        // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         placeFactory.create(host, "place", "0000000000", tags);
@@ -204,8 +203,7 @@ class PlaceControllerTest {
     @Test
     void register() {
 
-        // given
-        Host host = hostFactory.create("test");
+        hostFactory.create("test");
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -312,7 +310,6 @@ class PlaceControllerTest {
     @DisplayName("플레이스 등록 실패 - 중복된 사업자등록번호")
     void registerWithDuplicatedBrn() {
 
-        // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         placeFactory.create(host, "place", "0000000000", tags);
@@ -353,8 +350,7 @@ class PlaceControllerTest {
     @DisplayName("플레이스 등록 실패 - 유효하지 않은 예약 기간")
     void registerWithInvalidBookingPeriod() {
 
-        // given
-        Host host = hostFactory.create("test");
+        hostFactory.create("test");
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -393,7 +389,6 @@ class PlaceControllerTest {
     @Test
     void get() {
 
-        // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         placeFactory.create(host, "place", "0000000000", tags);
@@ -527,7 +522,6 @@ class PlaceControllerTest {
     @Test
     void update() {
 
-        // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         placeFactory.create(host, "place", "0000000000", tags);
@@ -594,6 +588,7 @@ class PlaceControllerTest {
     @DisplayName("플레이스 수정 실패 - 권한 없음")
     @Test
     void updateWithoutAuthority() {
+
         hostFactory.create("test");
         Host host = hostFactory.create("host");
         Set<Tag> tags = tagFactory.create("tag");
@@ -625,7 +620,6 @@ class PlaceControllerTest {
     @Test
     void remove() {
 
-        // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         placeFactory.create(host, "place", "0000000000", tags);
