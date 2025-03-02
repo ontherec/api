@@ -119,11 +119,7 @@ class StageCommandServiceTest {
         Host host = hostFactory.create("test");
         Place place = placeFactory.create(host, "place", "0000000000", null);
         Stage stage = stageFactory.create(place, "stage", null);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location(
-                "newStage",
-                3,
-                true
-        );
+        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
 
         // when
         stageCommandService.updateLocation(stage.getId(), dto);
@@ -132,8 +128,6 @@ class StageCommandServiceTest {
         Stage foundStage = stageQueryService.get(stage.getId());
 
         assertThat(foundStage.getTitle()).isEqualTo(dto.title());
-        assertThat(foundStage.getFloor()).isEqualTo(dto.floor());
-        assertThat(foundStage.isHasElevator()).isEqualTo(dto.hasElevator());
     }
 
     @DisplayName("공연장 위치 정보 수정 실패 - 등록되지 않은 공연장")
@@ -142,11 +136,7 @@ class StageCommandServiceTest {
         // given
         Host host = hostFactory.create("test");
         placeFactory.create(host, "place", "0000000000", null);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location(
-                "newStage",
-                3,
-                true
-        );
+        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
 
         // when
         Throwable throwable = catchThrowable(() -> stageCommandService.updateLocation(1L, dto));

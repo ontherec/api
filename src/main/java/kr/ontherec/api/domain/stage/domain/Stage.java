@@ -45,7 +45,7 @@ public class Stage extends BaseEntity {
     @Column(updatable = false, nullable = false)
     private int floor;
 
-    @Column(nullable = false)
+    @Column(updatable = false, nullable = false)
     private boolean hasElevator;
 
     // introduction

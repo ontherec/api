@@ -762,17 +762,13 @@ class StageControllerTest {
 
     @DisplayName("공연장 위치 정보 수정 성공")
     @Test
-    void updateLocation() {
+    void updateTitle() {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);
         Stage stage = stageFactory.create(place, "stage", tags);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location(
-                "newStage",
-                3,
-                true
-        );
+        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -788,14 +784,7 @@ class StageControllerTest {
                                 .requestFields(
                                         fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("공연장 이름"),
-                                        fieldWithPath("floor")
-                                                .type(NUMBER)
-                                                .description("층수"),
-                                        fieldWithPath("hasElevator")
-                                                .type(BOOLEAN)
-                                                .description("엘리베이터 존재 여부")
-                                )
+                                                .description("공연장 이름"))
                                 .build())))
         .when()
                 .put("/stages/{id}/location", stage.getId())
@@ -812,11 +801,7 @@ class StageControllerTest {
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);
         Stage stage = stageFactory.create(place, "stage", tags);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location(
-                "newStage",
-                3,
-                true
-        );
+        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)

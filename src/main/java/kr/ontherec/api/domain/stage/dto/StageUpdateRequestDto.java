@@ -11,12 +11,7 @@ import java.util.Set;
 public class StageUpdateRequestDto {
         public record Location(
                 @NotBlank(message = "공연장 이름을 입력해주세요")
-                String title,
-                @NotNull(message = "층수를 입력해주세요.")
-                @DecimalMax(value = "100", message = "층수는 최대 100층까지 설정 가능합니다.")
-                int floor,
-                @NotNull(message = "엘리베이터 존재 여부를 입력해주세요.")
-                boolean hasElevator
+                String title
         ) {}
 
         public record Introduction(
