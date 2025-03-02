@@ -4,7 +4,7 @@ package kr.ontherec.api.domain.stage.presentation;
 import jakarta.validation.Valid;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.place.application.PlaceService;
+import kr.ontherec.api.domain.place.application.PlaceQueryService;
 import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.stage.application.StageCommandService;
 import kr.ontherec.api.domain.stage.application.StageMapper;
@@ -34,7 +34,7 @@ public class StageController {
     private final StageQueryService stageQueryService;
     private final StageCommandService stageCommandService;
     private final StageMapper stageMapper = StageMapper.INSTANCE;
-    private final PlaceService placeService;
+    private final PlaceQueryService placeQueryService;
     private final HostService hostService;
     private final TagService tagService;
 
@@ -56,18 +56,18 @@ public class StageController {
     ResponseEntity<Long> register(Authentication authentication,
                                   @Valid @RequestBody StageRegisterRequestDto dto) {
         Host host = hostService.getByUsername(authentication.getName());
-        if (!placeService.isHost(dto.placeId(), host))
+        if (!placeQueryService.isHost(dto.placeId(), host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
 
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
-        Place place = placeService.get(dto.placeId());
+        Place place = placeQueryService.get(dto.placeId());
         Set<Tag> tags = dto.tags() == null ? null : dto.tags()
                 .stream()
                 .map(s -> Tag.builder().title(s).build())
                 .map(tagService::getOrCreate)
                 .collect(Collectors.toSet());
 
-        Stage stage = stageCommandService.register(newStage, place, tags);
+        Stage stage = stageCommandService.register(place, newStage, tags);
         return ResponseEntity.created(URI.create("/v1/stages/" + stage.getId())).body(stage.getId());
     }
 
@@ -103,7 +103,13 @@ public class StageController {
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
 
-        stageCommandService.updateIntroduction(id, dto);
+        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
+                .stream()
+                .map(s -> Tag.builder().title(s).build())
+                .map(tagService::getOrCreate)
+                .collect(Collectors.toSet());
+
+        stageCommandService.updateIntroduction(id, dto, tags);
         return ResponseEntity.ok().build();
     }
 

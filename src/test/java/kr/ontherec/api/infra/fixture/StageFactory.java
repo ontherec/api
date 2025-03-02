@@ -77,6 +77,6 @@ public class StageFactory {
                 .modifiedAt(LocalDateTime.now())
                 .build();
 
-        return stageCommandService.register(newStage, place, tags);
+        return stageCommandService.register(place, newStage, tags);
     }
 }

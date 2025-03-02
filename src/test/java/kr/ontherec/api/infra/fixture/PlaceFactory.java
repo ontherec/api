@@ -1,7 +1,7 @@
 package kr.ontherec.api.infra.fixture;
 
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.place.application.PlaceService;
+import kr.ontherec.api.domain.place.application.PlaceCommandService;
 import kr.ontherec.api.domain.place.domain.Address;
 import kr.ontherec.api.domain.place.domain.Holiday;
 import kr.ontherec.api.domain.place.domain.Link;
@@ -20,7 +20,7 @@ import static kr.ontherec.api.domain.place.domain.HolidayType.설날;
 @Component
 public class PlaceFactory {
 
-    @Autowired private PlaceService placeService;
+    @Autowired private PlaceCommandService placeCommandService;
 
     public Place create(Host host, String title, String brn, Set<Tag> tags) {
         Address newAddress = Address.builder()
@@ -47,6 +47,6 @@ public class PlaceFactory {
                 .modifiedAt(LocalDateTime.now())
                 .build();
 
-        return placeService.register(host, newPlace, tags);
+        return placeCommandService.register(host, newPlace, tags);
     }
 }

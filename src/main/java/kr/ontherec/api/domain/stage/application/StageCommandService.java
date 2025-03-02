@@ -8,10 +8,10 @@ import kr.ontherec.api.domain.tag.domain.Tag;
 import java.util.Set;
 
 public interface StageCommandService {
-    Stage register(Stage newStage, Place place, Set<Tag> tags);
+    Stage register(Place place, Stage newStage, Set<Tag> tags);
     void updateLocation(Long id, StageUpdateRequestDto.Location dto);
     void updateArea(Long id, StageUpdateRequestDto.Area dto);
-    void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto);
+    void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto, Set<Tag> tags);
     void updateBusiness(Long id, StageUpdateRequestDto.Business dto);
     void updateEngineering(Long id, StageUpdateRequestDto.Engineering dto);
     void updateDocuments(Long id, StageUpdateRequestDto.Documents dto);

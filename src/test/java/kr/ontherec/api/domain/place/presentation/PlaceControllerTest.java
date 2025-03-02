@@ -7,6 +7,7 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import kr.ontherec.api.domain.host.domain.Host;
+import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.place.dto.AddressRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
@@ -40,7 +41,7 @@ import static kr.ontherec.api.domain.place.domain.HolidayType.추석;
 import static kr.ontherec.api.domain.place.exception.PlaceExceptionCode.*;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.global.model.Regex.BUSINESS_REGISTRATION_NUMBER;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -68,7 +69,7 @@ class PlaceControllerTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.baseURI = "http://localhost";
-        RestAssured.basePath = "/v1";
+        RestAssured.basePath = "/v1/places";
         RestAssured.port = port;
 
         this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)
@@ -128,7 +129,7 @@ class PlaceControllerTest {
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
                                         fieldWithPath("[].title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("플레이스 이름"),
                                         fieldWithPath("[].address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -193,7 +194,7 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/places")
+                .get()
         .then()
                 .statusCode(OK.value());
 
@@ -214,6 +215,7 @@ class PlaceControllerTest {
                 new BigDecimal("000.0000000000"),
                 new BigDecimal("000.0000000000")
         );
+
         PlaceRegisterRequestDto placeDto = new PlaceRegisterRequestDto(
                 "0000000000",
                 "place",
@@ -243,7 +245,7 @@ class PlaceControllerTest {
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
                                         fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("플레이스 이름"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -298,11 +300,11 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .post("/places")
+                .post()
         .then()
                 .statusCode(CREATED.value())
-                .header("Location", equalTo("/v1/places/1"))
-                .body(equalTo("1"));
+                .header("Location", startsWith("/v1/places"))
+                .body(notNullValue());
 
     }
 
@@ -340,7 +342,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(placeDto)
         .when()
-                .post("/places")
+                .post()
         .then()
                 .statusCode(EXIST_BRN.getStatus().value())
                 .body("message", equalTo(EXIST_BRN.getMessage()));
@@ -378,7 +380,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(placeDto)
         .when()
-                .post("/places")
+                .post()
         .then()
                 .statusCode(NOT_VALID_BOOKING_PERIOD.getStatus().value())
                 .body("message", equalTo(NOT_VALID_BOOKING_PERIOD.getMessage()));
@@ -391,7 +393,7 @@ class PlaceControllerTest {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        placeFactory.create(host, "place", "0000000000", tags);
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -432,7 +434,7 @@ class PlaceControllerTest {
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
                                         fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("플레이스 이름"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -498,10 +500,10 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/places/{id}", 1L)
+                .get("/{id}", place.getId())
         .then()
                 .statusCode(OK.value())
-                .body("id", equalTo(1));
+                .body("id", equalTo(place.getId().intValue()));
 
     }
 
@@ -512,28 +514,22 @@ class PlaceControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
         .when()
-                .get("/places/{id}", 1L)
+                .get("/{id}", 1L)
         .then()
                 .statusCode(NOT_FOUND.getStatus().value())
                 .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 
-    @DisplayName("플레이스 수정 성공")
+    @DisplayName("플레이스 위치 정보 수정 성공")
     @Test
-    void update() {
+    void updateLocation() {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        placeFactory.create(host, "place", "0000000000", tags);
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
 
-        PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
-                "newPlace",
-                "newIntroduction",
-                Set.of("newTag"),
-                Set.of("https://ontherec.live"),
-                Duration.ofDays(90),
-                Duration.ofDays(7),
-                Set.of(추석)
+        PlaceUpdateRequestDto.Location dto = new PlaceUpdateRequestDto.Location(
+                "newPlace"
         );
 
         given(this.spec)
@@ -541,16 +537,73 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update",
+                        "update location",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("update")
-                                .description("플레이스 수정")
-                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.class.getSimpleName()))
+                                .summary("update location")
+                                .description("플레이스 위치 정보 수정")
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Location.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("플레이스 이름"))
+                                .build())))
+        .when()
+                .put("/{id}/location", place.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("플레이스 위치 정보 수정 실패 - 권한 없음")
+    @Test
+    void updateLocationWithoutAuthority() {
+
+        hostFactory.create("test");
+        Host host = hostFactory.create("host");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Location dto = new PlaceUpdateRequestDto.Location(
+                "newPlace"
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+        .when()
+                .put("/{id}/location", place.getId())
+        .then()
+                .statusCode(FORBIDDEN.getStatus().value())
+                .body("message", equalTo(FORBIDDEN.getMessage()));
+    }
+
+    @DisplayName("플레이스 소개 수정 성공")
+    @Test
+    void updateIntroduction() {
+
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Introduction dto = new PlaceUpdateRequestDto.Introduction(
+                "newIntroduction",
+                Set.of("newTag"),
+                Set.of("https://ontherec.live")
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "update introduction",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("place")
+                                .summary("update introduction")
+                                .description("플레이스 소개 수정")
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Introduction.class.getSimpleName()))
+                                .requestFields(
                                         fieldWithPath("introduction")
                                                 .type(STRING)
                                                 .description("소개")
@@ -564,15 +617,46 @@ class PlaceControllerTest {
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
-                                                .optional(),
+                                                .optional())
+                                .build())))
+        .when()
+                .put("/{id}/introduction", place.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("플레이스 영업 정보 수정 성공")
+    @Test
+    void updateBusiness() {
+
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Business dto = new PlaceUpdateRequestDto.Business(
+                Duration.ofDays(90),
+                Duration.ofDays(7),
+                Set.of(추석)
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "update business",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("place")
+                                .summary("update business")
+                                .description("플레이스 영업 정보 수정")
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Business.class.getSimpleName()))
+                                .requestFields(
                                         fieldWithPath("bookingFrom")
                                                 .type(STRING)
-                                                .description("예약 시작 기간")
-                                                .optional(),
+                                                .description("예약 시작 기간"),
                                         fieldWithPath("bookingUntil")
                                                 .type(STRING)
-                                                .description("예약 마감 기간")
-                                                .optional(),
+                                                .description("예약 마감 기간"),
                                         fieldWithPath("holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
@@ -580,40 +664,9 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .patch("/places/{id}", 1L)
+                .put("/{id}/business", place.getId())
         .then()
                 .statusCode(OK.value());
-    }
-
-    @DisplayName("플레이스 수정 실패 - 권한 없음")
-    @Test
-    void updateWithoutAuthority() {
-
-        hostFactory.create("test");
-        Host host = hostFactory.create("host");
-        Set<Tag> tags = tagFactory.create("tag");
-        placeFactory.create(host, "place", "0000000000", tags);
-
-        PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
-                "place",
-                null,
-                null,
-                null,
-                Duration.ofDays(30),
-                Duration.ofDays(1),
-                null
-        );
-
-        given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(JSON)
-                .body(dto)
-        .when()
-                .patch("/places/{id}", 1L)
-        .then()
-                .statusCode(FORBIDDEN.getStatus().value())
-                .body("message", equalTo(FORBIDDEN.getMessage()));
-
     }
 
     @DisplayName("플레이스 삭제 성공")
@@ -638,7 +691,7 @@ class PlaceControllerTest {
                                                 .description("삭제할 플레이스 식별자"))
                                 .build())))
         .when()
-                .delete("/places/{id}", 1L)
+                .delete("/{id}", 1L)
         .then()
                 .statusCode(OK.value());
     }

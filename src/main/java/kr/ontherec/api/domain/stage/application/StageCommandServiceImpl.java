@@ -18,7 +18,7 @@ public class StageCommandServiceImpl implements StageCommandService {
     private final StageMapper stageMapper = StageMapper.INSTANCE;
 
     @Override
-    public Stage register(Stage newStage, Place place, Set<Tag> tags) {
+    public Stage register(Place place, Stage newStage, Set<Tag> tags) {
         newStage.setPlace(place);
         newStage.setTags(tags);
 
@@ -40,9 +40,10 @@ public class StageCommandServiceImpl implements StageCommandService {
     }
 
     @Override
-    public void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto) {
+    public void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto, Set<Tag> tags) {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
         stageMapper.updateIntroduction(dto, foundStage);
+        foundStage.setTags(tags);
         stageRepository.save(foundStage);
     }
 

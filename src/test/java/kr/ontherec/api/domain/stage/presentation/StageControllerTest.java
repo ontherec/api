@@ -39,8 +39,7 @@ import static kr.ontherec.api.domain.stage.domain.StageType.RECTANGLE;
 import static kr.ontherec.api.domain.stage.domain.StageType.T;
 import static kr.ontherec.api.domain.stage.exception.StageExceptionCode.FORBIDDEN;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -757,6 +756,7 @@ class StageControllerTest {
                 .post("/stages")
         .then()
                 .statusCode(CREATED.value())
+                .header("Location", startsWith("/v1/stages"))
                 .body(notNullValue());
     }
 
@@ -810,7 +810,8 @@ class StageControllerTest {
         .when()
                 .put("/stages/{id}/location", stage.getId())
         .then()
-                .statusCode(FORBIDDEN.getStatus().value());
+                .statusCode(FORBIDDEN.getStatus().value())
+                .body("message", equalTo(FORBIDDEN.getMessage()));
     }
 
     @DisplayName("공연장 소개 수정 성공")

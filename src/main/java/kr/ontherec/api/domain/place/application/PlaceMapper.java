@@ -31,14 +31,14 @@ public interface PlaceMapper {
     @Mapping(target = "modifiedAt", expression = "java(LocalDateTime.now())")
     Place registerRequestDtoToEntity(PlaceRegisterRequestDto dto);
 
+    void updateLocation(PlaceUpdateRequestDto.Location dto, @MappingTarget Place place);
+
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "links", qualifiedByName = "deserializeLinks")
-    @Mapping(target = "holidays", qualifiedByName = "deserializeHolidays")
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "modifiedAt", ignore = true)
-    Place updateRequestDtoToEntity(PlaceUpdateRequestDto dto);
+    void updateIntroduction(PlaceUpdateRequestDto.Introduction dto, @MappingTarget Place place);
 
-    void update(Place newPlace, @MappingTarget Place place);
+    @Mapping(target = "holidays", qualifiedByName = "deserializeHolidays")
+    void updateBusiness(PlaceUpdateRequestDto.Business dto, @MappingTarget Place place);
 
     PlaceResponseDto EntityToResponseDto(Place place);
 
@@ -91,7 +91,7 @@ public interface PlaceMapper {
     }
 
     @AfterMapping
-    default void validateBookingPeriod(PlaceUpdateRequestDto dto, @MappingTarget Place place) {
+    default void validateBookingPeriod(PlaceUpdateRequestDto.Business dto, @MappingTarget Place place) {
         place.validateBookingPeriod();
     }
 }

@@ -10,6 +10,7 @@ import kr.ontherec.api.domain.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.domain.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.domain.stage.exception.StageException;
 import kr.ontherec.api.domain.stage.exception.StageExceptionCode;
+import kr.ontherec.api.domain.tag.application.TagService;
 import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static kr.ontherec.api.domain.stage.domain.StageType.RECTANGLE;
 import static kr.ontherec.api.domain.stage.domain.StageType.T;
@@ -32,11 +34,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 @UnitTest
 class StageCommandServiceTest {
 
-    @Autowired private PlaceFactory placeFactory;
     @Autowired private HostFactory hostFactory;
     @Autowired private TagFactory tagFactory;
+    @Autowired private PlaceFactory placeFactory;
     @Autowired private StageFactory stageFactory;
 
+    @Autowired private TagService tagService;
     @Autowired private StageCommandService stageCommandService;
     @Autowired private StageQueryService stageQueryService;
 
@@ -105,7 +108,7 @@ class StageCommandServiceTest {
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
 
         // when
-        Stage stage = stageCommandService.register(newStage, place, tags);
+        Stage stage = stageCommandService.register(place, newStage, tags);
 
         // then
         assertThat(stage.getTitle()).isEqualTo(newStage.getTitle());
@@ -160,8 +163,14 @@ class StageCommandServiceTest {
                 Set.of("newTag")
         );
 
+        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
+                .stream()
+                .map(s -> Tag.builder().title(s).build())
+                .map(tagService::getOrCreate)
+                .collect(Collectors.toSet());
+
         // when
-        stageCommandService.updateIntroduction(stage.getId(), dto);
+        stageCommandService.updateIntroduction(stage.getId(), dto, tags);
 
         // then
         Stage foundStage = stageQueryService.get(stage.getId());

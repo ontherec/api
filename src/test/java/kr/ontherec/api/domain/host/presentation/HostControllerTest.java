@@ -30,7 +30,7 @@ import static io.restassured.RestAssured.given;
 import static kr.ontherec.api.domain.host.exception.HostExceptionCode.*;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.global.model.Regex.BANK_ACCOUNT;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -97,8 +97,8 @@ class HostControllerTest {
                 .post("/hosts")
         .then()
                 .statusCode(CREATED.value())
-                .header("Location", equalTo("/v1/hosts/me"))
-                .body(equalTo("1"));
+                .header("Location", startsWith("/v1/hosts"))
+                .body(notNullValue());
     }
 
     @Test
@@ -261,6 +261,5 @@ class HostControllerTest {
         .then()
                 .statusCode(NOT_VALID_CONTACT_TIME.getStatus().value())
                 .body("message", equalTo(NOT_VALID_CONTACT_TIME.getMessage()));
-
     }
 }

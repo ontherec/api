@@ -1,8 +1,5 @@
 package kr.ontherec.api.domain.stage.application;
 
-import kr.ontherec.api.domain.place.domain.Holiday;
-import kr.ontherec.api.domain.place.domain.HolidayType;
-import kr.ontherec.api.domain.place.domain.Link;
 import kr.ontherec.api.domain.stage.domain.Stage;
 import kr.ontherec.api.domain.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.domain.stage.dto.StageResponseDto;
@@ -60,33 +57,19 @@ public interface StageMapper {
                 .collect(Collectors.toSet());
     }
 
-    default Set<String> serializeLinks(Set<Link> links) {
-        if(links == null) return null;
-        return links.stream()
-                .map(Link::getUrl)
-                .collect(Collectors.toSet());
-    }
-
-    default Set<HolidayType> serializeHolidays(Set<Holiday> holidays) {
-        if(holidays == null) return null;
-        return holidays.stream()
-                .map(Holiday::getType)
-                .collect(Collectors.toSet());
-    }
-
     @AfterMapping
     default void validateEngineering(StageRegisterRequestDto dto, @MappingTarget Stage stage) {
         stage.validateEngineering();
     }
 
     @AfterMapping
-    default void validateParking(StageRegisterRequestDto dto, @MappingTarget Stage stage) {
-        stage.validateParking();
+    default void validateEngineering(StageUpdateRequestDto.Engineering dto, @MappingTarget Stage stage) {
+        stage.validateEngineering();
     }
 
     @AfterMapping
-    default void validateEngineering(StageUpdateRequestDto.Engineering dto, @MappingTarget Stage stage) {
-        stage.validateEngineering();
+    default void validateParking(StageRegisterRequestDto dto, @MappingTarget Stage stage) {
+        stage.validateParking();
     }
 
     @AfterMapping

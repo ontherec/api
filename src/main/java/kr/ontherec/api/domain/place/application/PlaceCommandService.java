@@ -1,0 +1,16 @@
+package kr.ontherec.api.domain.place.application;
+
+import kr.ontherec.api.domain.host.domain.Host;
+import kr.ontherec.api.domain.place.domain.Place;
+import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
+import kr.ontherec.api.domain.tag.domain.Tag;
+
+import java.util.Set;
+
+public interface PlaceCommandService {
+    Place register(Host host, Place newPlace, Set<Tag> tags);
+    void updateLocation(Long id, PlaceUpdateRequestDto.Location dto);
+    void updateIntroduction(Long id, PlaceUpdateRequestDto.Introduction dto, Set<Tag> tags);
+    void updateBusiness(Long id, PlaceUpdateRequestDto.Business dto);
+    void delete(Long id);
+}
