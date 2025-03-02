@@ -56,7 +56,7 @@ public class Stage extends BaseEntity {
     private String guide;
 
     @ManyToMany(fetch = EAGER)
-    private List<Tag> tags;
+    private List<Tag> tags = new ArrayList<>();
 
     // count
     @Column(nullable = false)
@@ -87,7 +87,8 @@ public class Stage extends BaseEntity {
     // TODO: booking slots
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
-    private Set<RefundPolicy> refundPolicies;
+    @JoinColumn
+    private Set<RefundPolicy> refundPolicies = new HashSet<>();
 
     // engineering
     @Column(nullable = false)
@@ -198,7 +199,7 @@ public class Stage extends BaseEntity {
     }
 
     public Set<Tag> getTags() {
-        return tags == null ? null : new HashSet<>(tags);
+        return tags == null ? new HashSet<>() : new HashSet<>(tags);
     }
 
     public void setTags(Set<Tag> tags) {

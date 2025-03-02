@@ -83,7 +83,7 @@ public class StageController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/{id}/Area")
+    @PutMapping("/{id}/area")
     ResponseEntity<Void> updateArea(Authentication authentication,
                                            @PathVariable Long id,
                                            @Valid @RequestBody StageUpdateRequestDto.Area dto) {

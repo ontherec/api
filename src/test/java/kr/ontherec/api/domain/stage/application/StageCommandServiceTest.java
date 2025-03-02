@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.util.Set;
 
 import static kr.ontherec.api.domain.stage.domain.StageType.RECTANGLE;
+import static kr.ontherec.api.domain.stage.domain.StageType.T;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
@@ -166,7 +167,7 @@ class StageCommandServiceTest {
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
                 "newStage",
-                null
+                Set.of("newTag")
         );
 
         // when
@@ -187,11 +188,11 @@ class StageCommandServiceTest {
         Place place = placeFactory.create(host, "place", "0000000000", null);
         Stage stage = stageFactory.create(place, "stage", null);
         StageUpdateRequestDto.Area dto = new StageUpdateRequestDto.Area(
-                60,
-                120,
-                RECTANGLE,
-                BigDecimal.valueOf(10.5),
-                BigDecimal.valueOf(5)
+                100,
+                200,
+                T,
+                BigDecimal.valueOf(12),
+                BigDecimal.valueOf(6)
         );
 
         // when
