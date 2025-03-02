@@ -1,15 +1,20 @@
 package kr.ontherec.api.infra.fixture;
 
+import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Bank;
 import kr.ontherec.api.domain.host.domain.Host;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-public class HostGenerator {
+@Component
+public class HostFactory {
+    @Autowired private HostService hostService;
 
-    public static Host generate(String name) {
-        return Host.builder()
+    public Host create(String name) {
+        Host newHost = Host.builder()
                 .username(name)
                 .bank(Bank.KB국민)
                 .account("00000000000000")
@@ -18,5 +23,7 @@ public class HostGenerator {
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .build();
+
+        return hostService.register(newHost);
     }
 }

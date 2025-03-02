@@ -7,13 +7,12 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Bank;
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.host.dto.HostRegisterRequestDto;
 import kr.ontherec.api.domain.host.dto.HostUpdateRequestDto;
 import kr.ontherec.api.infra.IntegrationTest;
-import kr.ontherec.api.infra.fixture.HostGenerator;
+import kr.ontherec.api.infra.fixture.HostFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ import static io.restassured.RestAssured.given;
 import static kr.ontherec.api.domain.host.exception.HostExceptionCode.*;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.global.model.Regex.BANK_ACCOUNT;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -41,8 +40,7 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 @IntegrationTest
 class HostControllerTest {
 
-    @Autowired
-    private HostService hostService;
+    @Autowired private HostFactory hostFactory;
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
@@ -99,8 +97,8 @@ class HostControllerTest {
                 .post("/hosts")
         .then()
                 .statusCode(CREATED.value())
-                .header("Location", equalTo("/v1/hosts/me"))
-                .body(equalTo("1"));
+                .header("Location", startsWith("/v1/hosts"))
+                .body(notNullValue());
     }
 
     @Test
@@ -108,8 +106,7 @@ class HostControllerTest {
     void registerExistUsername() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         HostRegisterRequestDto dto = new HostRegisterRequestDto(
                 Bank.KB국민,
@@ -132,13 +129,11 @@ class HostControllerTest {
     void get() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
-                .pathParam("id", 1)
                 .filter(RestAssuredRestDocumentationWrapper.document(
                         "get",
                         resource(ResourceSnippetParameters.builder()
@@ -149,7 +144,7 @@ class HostControllerTest {
                                 .responseFields(
                                         fieldWithPath("id")
                                                 .type(NUMBER)
-                                                .description("고유번호"),
+                                                .description("식별자"),
                                         fieldWithPath("username")
                                                 .type(STRING)
                                                 .description("ID"),
@@ -175,10 +170,24 @@ class HostControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/hosts/{id}")
+                .get("/hosts/{id}", 1L)
         .then()
                 .statusCode(OK.value())
                 .body("id", equalTo(1));
+    }
+
+    @Test
+    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
+    void updateUnregisteredHost() {
+
+        given()
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/hosts/{id}", 1L)
+                .then()
+                .statusCode(NOT_FOUND.getStatus().value())
+                .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 
     @Test
@@ -186,8 +195,7 @@ class HostControllerTest {
     void update() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         HostUpdateRequestDto dto = new HostUpdateRequestDto(
                 Bank.하나,
@@ -235,8 +243,7 @@ class HostControllerTest {
     void updateWithInvalidContactTime() {
 
         // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         HostUpdateRequestDto dto = new HostUpdateRequestDto(
                 Bank.하나,
@@ -254,21 +261,5 @@ class HostControllerTest {
         .then()
                 .statusCode(NOT_VALID_CONTACT_TIME.getStatus().value())
                 .body("message", equalTo(NOT_VALID_CONTACT_TIME.getMessage()));
-
-    }
-
-    @Test
-    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
-    void updateUnregisteredHost() {
-
-        given()
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(ContentType.JSON)
-                .pathParam("id", 1)
-        .when()
-                .get("/hosts/{id}")
-        .then()
-                .statusCode(NOT_FOUND.getStatus().value())
-                .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 }

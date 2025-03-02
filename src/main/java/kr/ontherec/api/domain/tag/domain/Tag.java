@@ -1,4 +1,4 @@
-package kr.ontherec.api.domain.keyword.domain;
+package kr.ontherec.api.domain.tag.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +13,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @Builder @AllArgsConstructor(access = PRIVATE)
 @Getter @EqualsAndHashCode(of = "id")
-public class Keyword {
+public class Tag {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

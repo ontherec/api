@@ -6,20 +6,17 @@ import com.epages.restdocs.apispec.SimpleType;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.keyword.application.KeywordService;
-import kr.ontherec.api.domain.keyword.domain.Keyword;
-import kr.ontherec.api.domain.place.application.PlaceService;
 import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.place.dto.AddressRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
 import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
+import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.infra.IntegrationTest;
-import kr.ontherec.api.infra.fixture.HostGenerator;
-import kr.ontherec.api.infra.fixture.KeywordGenerator;
-import kr.ontherec.api.infra.fixture.PlaceGenerator;
+import kr.ontherec.api.infra.fixture.HostFactory;
+import kr.ontherec.api.infra.fixture.PlaceFactory;
+import kr.ontherec.api.infra.fixture.TagFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,10 +28,11 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.SimpleType.NUMBER;
 import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
@@ -43,11 +41,12 @@ import static kr.ontherec.api.domain.place.domain.HolidayType.추석;
 import static kr.ontherec.api.domain.place.exception.PlaceExceptionCode.*;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.global.model.Regex.BUSINESS_REGISTRATION_NUMBER;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-import static org.springframework.restdocs.payload.JsonFieldType.*;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.JsonFieldType.OBJECT;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.snippet.Attributes.key;
@@ -55,14 +54,9 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 @IntegrationTest
 class PlaceControllerTest {
 
-    @Autowired
-    private HostService hostService;
-
-    @Autowired
-    private PlaceService placeService;
-
-    @Autowired
-    private KeywordService keywordService;
+    @Autowired private HostFactory hostFactory;
+    @Autowired private TagFactory tagFactory;
+    @Autowired private PlaceFactory placeFactory;
 
     @Value("${spring.security.api-key}")
     private String API_KEY;
@@ -75,7 +69,7 @@ class PlaceControllerTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.baseURI = "http://localhost";
-        RestAssured.basePath = "/v1";
+        RestAssured.basePath = "/v1/places";
         RestAssured.port = port;
 
         this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)
@@ -89,15 +83,9 @@ class PlaceControllerTest {
     @Test
     void search() {
 
-        // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
-        Set<Keyword> keywords = newKeywords.stream()
-                .map(keyword -> keywordService.getOrCreate(keyword))
-                .collect(Collectors.toSet());
-        placeService.register(host, newPlace, keywords);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -114,13 +102,13 @@ class PlaceControllerTest {
                                                 .description("플레이스 배열"),
                                         fieldWithPath("[].id")
                                                 .type(NUMBER)
-                                                .description("플레이스 고유번호"),
+                                                .description("플레이스 식별자"),
                                         fieldWithPath("[].host")
                                                 .type(OBJECT)
                                                 .description("호스트"),
                                         fieldWithPath("[].host.id")
                                                 .type(NUMBER)
-                                                .description("호스트 고유번호"),
+                                                .description("호스트 식별자"),
                                         fieldWithPath("[].host.username")
                                                 .type(STRING)
                                                 .description("호스트 ID"),
@@ -139,15 +127,15 @@ class PlaceControllerTest {
                                         fieldWithPath("[].brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        fieldWithPath("[].name")
+                                        fieldWithPath("[].title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("플레이스 이름"),
                                         fieldWithPath("[].address")
                                                 .type(OBJECT)
                                                 .description("주소"),
                                         fieldWithPath("[].address.id")
                                                 .type(NUMBER)
-                                                .description("주소 고유번호"),
+                                                .description("주소 식별자"),
                                         fieldWithPath("[].address.zipcode")
                                                 .type(STRING)
                                                 .description("우편번호"),
@@ -174,10 +162,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("[].keywords[]")
+                                        fieldWithPath("[].tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
+                                                .description("태그 목록")
                                                 .optional(),
                                         fieldWithPath("[].links[]")
                                                 .type(ARRAY)
@@ -206,7 +194,7 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/places")
+                .get()
         .then()
                 .statusCode(OK.value());
 
@@ -216,9 +204,7 @@ class PlaceControllerTest {
     @Test
     void register() {
 
-        // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -229,12 +215,13 @@ class PlaceControllerTest {
                 new BigDecimal("000.0000000000"),
                 new BigDecimal("000.0000000000")
         );
+
         PlaceRegisterRequestDto placeDto = new PlaceRegisterRequestDto(
                 "0000000000",
                 "place",
                 addressDto,
                 null,
-                Set.of("keyword"),
+                Set.of("tag"),
                 Set.of("https://ontherec.kr"),
                 Duration.ofDays(30),
                 Duration.ofDays(1),
@@ -256,9 +243,9 @@ class PlaceControllerTest {
                                         fieldWithPath("brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        fieldWithPath("name")
+                                        fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("플레이스 이름"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -288,10 +275,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords[]")
+                                        fieldWithPath("tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
+                                                .description("태그 목록")
                                                 .optional(),
                                         fieldWithPath("links[]")
                                                 .type(ARRAY)
@@ -313,11 +300,11 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .post("/places")
+                .post()
         .then()
                 .statusCode(CREATED.value())
-                .header("Location", equalTo("/v1/places/1"))
-                .body(equalTo("1"));
+                .header("Location", startsWith("/v1/places"))
+                .body(notNullValue());
 
     }
 
@@ -325,11 +312,9 @@ class PlaceControllerTest {
     @DisplayName("플레이스 등록 실패 - 중복된 사업자등록번호")
     void registerWithDuplicatedBrn() {
 
-        // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -357,7 +342,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(placeDto)
         .when()
-                .post("/places")
+                .post()
         .then()
                 .statusCode(EXIST_BRN.getStatus().value())
                 .body("message", equalTo(EXIST_BRN.getMessage()));
@@ -367,9 +352,7 @@ class PlaceControllerTest {
     @DisplayName("플레이스 등록 실패 - 유효하지 않은 예약 기간")
     void registerWithInvalidBookingPeriod() {
 
-        // given
-        Host newHost = HostGenerator.generate("test");
-        hostService.register(newHost);
+        hostFactory.create("test");
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(
                 "00000",
@@ -397,7 +380,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(placeDto)
         .when()
-                .post("/places")
+                .post()
         .then()
                 .statusCode(NOT_VALID_BOOKING_PERIOD.getStatus().value())
                 .body("message", equalTo(NOT_VALID_BOOKING_PERIOD.getMessage()));
@@ -408,15 +391,9 @@ class PlaceControllerTest {
     @Test
     void get() {
 
-        // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
-        Set<Keyword> keywords = newKeywords.stream()
-                .map(keyword -> keywordService.getOrCreate(keyword))
-                .collect(Collectors.toSet());
-        placeService.register(host, newPlace, keywords);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -430,13 +407,13 @@ class PlaceControllerTest {
                                 .responseFields(
                                         fieldWithPath("id")
                                                 .type(NUMBER)
-                                                .description("플레이스 고유번호"),
+                                                .description("플레이스 식별자"),
                                         fieldWithPath("host")
                                                 .type(OBJECT)
                                                 .description("호스트"),
                                         fieldWithPath("host.id")
                                                 .type(NUMBER)
-                                                .description("호스트 고유번호"),
+                                                .description("호스트 식별자"),
                                         fieldWithPath("host.username")
                                                 .type(STRING)
                                                 .description("호스트 ID"),
@@ -455,15 +432,15 @@ class PlaceControllerTest {
                                         fieldWithPath("brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        fieldWithPath("name")
+                                        fieldWithPath("title")
                                                 .type(STRING)
-                                                .description("이름"),
+                                                .description("플레이스 이름"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
                                         fieldWithPath("address.id")
                                                 .type(NUMBER)
-                                                .description("주소 고유번호"),
+                                                .description("주소 식별자"),
                                         fieldWithPath("address.zipcode")
                                                 .type(STRING)
                                                 .description("우편번호"),
@@ -490,10 +467,10 @@ class PlaceControllerTest {
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("keywords[]")
+                                        fieldWithPath("tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
+                                                .description("태그 목록")
                                                 .optional(),
                                         fieldWithPath("links[]")
                                                 .type(ARRAY)
@@ -523,9 +500,10 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/places/1")
+                .get("/{id}", place.getId())
         .then()
-                .statusCode(OK.value());
+                .statusCode(OK.value())
+                .body("id", equalTo(place.getId().intValue()));
 
     }
 
@@ -536,31 +514,126 @@ class PlaceControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
         .when()
-                .get("/places/1")
+                .get("/{id}", 1L)
         .then()
                 .statusCode(NOT_FOUND.getStatus().value())
                 .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 
-    @DisplayName("플레이스 수정 성공")
+    @DisplayName("플레이스 위치 정보 수정 성공")
     @Test
-    void update() {
+    void updateLocation() {
 
-        // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        Set<Keyword> newKeywords = KeywordGenerator.generate("keyword");
-        Set<Keyword> keywords = newKeywords.stream()
-                .map(keyword -> keywordService.getOrCreate(keyword))
-                .collect(Collectors.toSet());
-        placeService.register(host, newPlace, keywords);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
 
-        PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
-                "newPlace",
+        PlaceUpdateRequestDto.Location dto = new PlaceUpdateRequestDto.Location(
+                "newPlace"
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "update location",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("place")
+                                .summary("update location")
+                                .description("플레이스 위치 정보 수정")
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Location.class.getSimpleName()))
+                                .requestFields(
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("플레이스 이름"))
+                                .build())))
+        .when()
+                .put("/{id}/location", place.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("플레이스 위치 정보 수정 실패 - 권한 없음")
+    @Test
+    void updateLocationWithoutAuthority() {
+
+        hostFactory.create("test");
+        Host host = hostFactory.create("host");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Location dto = new PlaceUpdateRequestDto.Location(
+                "newPlace"
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+        .when()
+                .put("/{id}/location", place.getId())
+        .then()
+                .statusCode(FORBIDDEN.getStatus().value())
+                .body("message", equalTo(FORBIDDEN.getMessage()));
+    }
+
+    @DisplayName("플레이스 소개 수정 성공")
+    @Test
+    void updateIntroduction() {
+
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Introduction dto = new PlaceUpdateRequestDto.Introduction(
                 "newIntroduction",
-                Set.of("newKeyword"),
-                Set.of("https://ontherec.live"),
+                Set.of("newTag"),
+                Set.of("https://ontherec.live")
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "update introduction",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("place")
+                                .summary("update introduction")
+                                .description("플레이스 소개 수정")
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Introduction.class.getSimpleName()))
+                                .requestFields(
+                                        fieldWithPath("introduction")
+                                                .type(STRING)
+                                                .description("소개")
+                                                .optional(),
+                                        fieldWithPath("tags[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("태그 목록")
+                                                .optional(),
+                                        fieldWithPath("links[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("링크 목록")
+                                                .optional())
+                                .build())))
+        .when()
+                .put("/{id}/introduction", place.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("플레이스 영업 정보 수정 성공")
+    @Test
+    void updateBusiness() {
+
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Business dto = new PlaceUpdateRequestDto.Business(
                 Duration.ofDays(90),
                 Duration.ofDays(7),
                 Set.of(추석)
@@ -571,98 +644,54 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update",
+                        "update business",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("update")
-                                .description("플레이스 수정")
-                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.class.getSimpleName()))
+                                .summary("update business")
+                                .description("플레이스 영업 정보 수정")
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Business.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("name")
-                                                .type(STRING)
-                                                .description("이름"),
-                                        fieldWithPath("introduction")
-                                                .type(STRING)
-                                                .description("소개")
-                                                .optional(),
-                                        fieldWithPath("keywords[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("키워드 목록")
-                                                .optional(),
-                                        fieldWithPath("links[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("링크 목록")
-                                                .optional(),
                                         fieldWithPath("bookingFrom")
                                                 .type(STRING)
-                                                .description("예약 시작 기간")
-                                                .optional(),
+                                                .description("예약 시작 기간"),
                                         fieldWithPath("bookingUntil")
                                                 .type(STRING)
-                                                .description("예약 마감 기간")
-                                                .optional(),
+                                                .description("예약 마감 기간"),
                                         fieldWithPath("holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional())
-
                                 .build())))
         .when()
-                .patch("/places/1")
+                .put("/{id}/business", place.getId())
         .then()
                 .statusCode(OK.value());
-    }
-
-    @DisplayName("플레이스 수정 실패 - 권한 없음")
-    @Test
-    void updateWithoutAuthority() {
-        Host me = HostGenerator.generate("test");
-        hostService.register(me);
-
-        Host newHost = HostGenerator.generate("host");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
-
-        PlaceUpdateRequestDto dto = new PlaceUpdateRequestDto(
-                "place",
-                null,
-                null,
-                null,
-                Duration.ofDays(30),
-                Duration.ofDays(1),
-                null
-        );
-
-        given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(JSON)
-                .body(dto)
-        .when()
-                .patch("/places/1")
-        .then()
-                .statusCode(FORBIDDEN.getStatus().value())
-                .body("message", equalTo(FORBIDDEN.getMessage()));
-
     }
 
     @DisplayName("플레이스 삭제 성공")
     @Test
     void remove() {
 
-        // given
-        Host newHost = HostGenerator.generate("test");
-        Host host = hostService.register(newHost);
-        Place newPlace = PlaceGenerator.generate("place", "0000000000");
-        placeService.register(host, newPlace, null);
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "delete",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("place")
+                                .summary("delete")
+                                .description("플레이스 삭제")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("삭제할 플레이스 식별자"))
+                                .build())))
         .when()
-                .delete("/places/1")
+                .delete("/{id}", 1L)
         .then()
                 .statusCode(OK.value());
     }

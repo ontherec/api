@@ -3,16 +3,17 @@ package kr.ontherec.api.domain.place.presentation;
 import jakarta.validation.Valid;
 import kr.ontherec.api.domain.host.application.HostService;
 import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.keyword.application.KeywordService;
-import kr.ontherec.api.domain.keyword.domain.Keyword;
+import kr.ontherec.api.domain.place.application.PlaceCommandService;
 import kr.ontherec.api.domain.place.application.PlaceMapper;
-import kr.ontherec.api.domain.place.application.PlaceService;
+import kr.ontherec.api.domain.place.application.PlaceQueryService;
 import kr.ontherec.api.domain.place.domain.Place;
 import kr.ontherec.api.domain.place.dto.PlaceRegisterRequestDto;
 import kr.ontherec.api.domain.place.dto.PlaceResponseDto;
 import kr.ontherec.api.domain.place.dto.PlaceUpdateRequestDto;
 import kr.ontherec.api.domain.place.exception.PlaceException;
 import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
+import kr.ontherec.api.domain.tag.application.TagService;
+import kr.ontherec.api.domain.tag.domain.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -28,62 +29,88 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlaceController {
     private final HostService hostService;
-    private final PlaceService placeService;
+    private final PlaceQueryService placeQueryService;
+    private final PlaceCommandService placeCommandService;
     private final PlaceMapper placeMapper = PlaceMapper.INSTANCE;
-    private final KeywordService keywordService;
+    private final TagService tagService;
 
     @GetMapping
     ResponseEntity<List<PlaceResponseDto>> search(@RequestParam(value = "q", required = false) String query) {
-        List<Place> places = placeService.search(query);
+        List<Place> places = placeQueryService.search(query);
         List<PlaceResponseDto> dtos = places.stream().map(placeMapper::EntityToResponseDto).toList();
         return ResponseEntity.ok(dtos);
+    }
+
+    @GetMapping("/{id}")
+    ResponseEntity<PlaceResponseDto> get(@PathVariable Long id) {
+        Place place = placeQueryService.get(id);
+        PlaceResponseDto dto = placeMapper.EntityToResponseDto(place);
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
     ResponseEntity<Long> register(Authentication authentication, @Valid @RequestBody PlaceRegisterRequestDto dto) {
         Host host = hostService.getByUsername(authentication.getName());
         Place newPlace = placeMapper.registerRequestDtoToEntity(dto);
-        Set<Keyword> keywords = dto.keywords() == null ? null : dto.keywords()
+        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
                 .stream()
-                .map(s -> Keyword.builder().title(s).build())
-                .map(keywordService::getOrCreate)
+                .map(s -> Tag.builder().title(s).build())
+                .map(tagService::getOrCreate)
                 .collect(Collectors.toSet());
 
-        Place place = placeService.register(host, newPlace, keywords);
+        Place place = placeCommandService.register(host, newPlace, tags);
         return ResponseEntity.created(URI.create("/v1/places/" + place.getId())).body(place.getId());
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<PlaceResponseDto> get(@PathVariable Long id) {
-        Place place = placeService.get(id);
-        PlaceResponseDto dto = placeMapper.EntityToResponseDto(place);
-        return ResponseEntity.ok(dto);
-    }
-
-    @PatchMapping("/{id}")
-    ResponseEntity<Void> update(Authentication authentication, @PathVariable Long id, @Valid @RequestBody PlaceUpdateRequestDto dto) {
+    @PutMapping("/{id}/location")
+    ResponseEntity<Void> updateLocation(Authentication authentication,
+                                        @PathVariable Long id,
+                                        @Valid @RequestBody PlaceUpdateRequestDto.Location dto) {
         Host host = hostService.getByUsername(authentication.getName());
-        if (!placeService.isHost(id, host))
+        if (!placeQueryService.isHost(id, host))
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
 
-        Place newPlace = placeMapper.updateRequestDtoToEntity(dto);
-        Set<Keyword> keywords = dto.keywords() == null ? null : dto.keywords()
+        placeCommandService.updateLocation(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/introduction")
+    ResponseEntity<Void> updateIntroduction(Authentication authentication,
+                                        @PathVariable Long id,
+                                        @Valid @RequestBody PlaceUpdateRequestDto.Introduction dto) {
+        Host host = hostService.getByUsername(authentication.getName());
+        if (!placeQueryService.isHost(id, host))
+            throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
+
+        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
                 .stream()
-                .map(s -> Keyword.builder().title(s).build())
-                .map(keywordService::getOrCreate)
+                .map(s -> Tag.builder().title(s).build())
+                .map(tagService::getOrCreate)
                 .collect(Collectors.toSet());
 
-        placeService.update(id, newPlace, keywords);
+        placeCommandService.updateIntroduction(id, dto, tags);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/business")
+    ResponseEntity<Void> updateBusiness(Authentication authentication,
+                                        @PathVariable Long id,
+                                        @Valid @RequestBody PlaceUpdateRequestDto.Business dto) {
+        Host host = hostService.getByUsername(authentication.getName());
+        if (!placeQueryService.isHost(id, host))
+            throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
+
+        placeCommandService.updateBusiness(id, dto);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> delete(Authentication authentication, @PathVariable Long id) {
+    ResponseEntity<Void> remove(Authentication authentication, @PathVariable Long id) {
         Host host = hostService.getByUsername(authentication.getName());
-        if (!placeService.isHost(id, host))
+        if (!placeQueryService.isHost(id, host))
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
 
-        placeService.delete(id);
+        placeCommandService.delete(id);
         return ResponseEntity.ok().build();
     }
 }
