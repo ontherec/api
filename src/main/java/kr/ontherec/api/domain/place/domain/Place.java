@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.place.exception.PlaceException;
 import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
+import kr.ontherec.api.domain.stage.exception.StageException;
 import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.global.model.BaseEntity;
 import lombok.*;
@@ -18,6 +19,7 @@ import java.util.Set;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static kr.ontherec.api.domain.stage.exception.StageExceptionCode.NOT_VALID_PARKING;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
@@ -69,6 +71,16 @@ public class Place extends BaseEntity {
     @JoinColumn(nullable = false)
     private Set<Holiday> holidays;
 
+    // parking
+    @Column(nullable = false)
+    private int parkingCapacity;
+
+    @Column
+    private String parkingLocation;
+
+    @Column
+    private Boolean freeParking;
+
     public void validateBookingPeriod() {
         if(bookingFrom == null || bookingUntil == null)
             return;
@@ -76,6 +88,13 @@ public class Place extends BaseEntity {
         if(bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
             throw new PlaceException(PlaceExceptionCode.NOT_VALID_BOOKING_PERIOD);
         }
+    }
+
+    public void validateParking() {
+        if (parkingCapacity > 0 && (parkingLocation == null || freeParking == null))
+            throw new StageException(NOT_VALID_PARKING);
+        if (parkingCapacity == 0 && (parkingLocation != null || freeParking != null))
+            throw new StageException(NOT_VALID_PARKING);
     }
 
     public Set<Tag> getTags() {

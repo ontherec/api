@@ -43,6 +43,9 @@ public class PlaceFactory {
                 .bookingFrom(Duration.ofDays(30))
                 .bookingUntil(Duration.ofDays(1))
                 .holidays(Set.of(Holiday.builder().type(설날).build()))
+                .parkingCapacity(2)
+                .parkingLocation("건물 뒤편")
+                .freeParking(true)
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .build();

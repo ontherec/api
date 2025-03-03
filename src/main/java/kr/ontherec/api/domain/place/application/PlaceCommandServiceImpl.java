@@ -31,10 +31,10 @@ public class PlaceCommandServiceImpl implements PlaceCommandService {
     }
 
     @Override
-    public void updateLocation(Long id, PlaceUpdateRequestDto.Title dto) {
+    public void updateTitle(Long id, PlaceUpdateRequestDto.Title dto) {
         Place foundPlace = placeRepository.findByIdOrThrow(id);
 
-        placeMapper.updateLocation(dto, foundPlace);
+        placeMapper.updateTitle(dto, foundPlace);
 
         placeRepository.save(foundPlace);
     }
@@ -54,6 +54,15 @@ public class PlaceCommandServiceImpl implements PlaceCommandService {
         Place foundPlace = placeRepository.findByIdOrThrow(id);
 
         placeMapper.updateBusiness(dto, foundPlace);
+
+        placeRepository.save(foundPlace);
+    }
+
+    @Override
+    public void updateParking(Long id, PlaceUpdateRequestDto.Parking dto) {
+        Place foundPlace = placeRepository.findByIdOrThrow(id);
+
+        placeMapper.updateParking(dto, foundPlace);
 
         placeRepository.save(foundPlace);
     }

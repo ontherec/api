@@ -9,8 +9,9 @@ import java.util.Set;
 
 public interface PlaceCommandService {
     Place register(Host host, Place newPlace, Set<Tag> tags);
-    void updateLocation(Long id, PlaceUpdateRequestDto.Title dto);
+    void updateTitle(Long id, PlaceUpdateRequestDto.Title dto);
     void updateIntroduction(Long id, PlaceUpdateRequestDto.Introduction dto, Set<Tag> tags);
     void updateBusiness(Long id, PlaceUpdateRequestDto.Business dto);
+    void updateParking(Long id, PlaceUpdateRequestDto.Parking dto);
     void delete(Long id);
 }

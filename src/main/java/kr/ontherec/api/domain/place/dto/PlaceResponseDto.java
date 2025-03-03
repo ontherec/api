@@ -23,6 +23,10 @@ public record PlaceResponseDto(
         Duration bookingFrom,
         Duration bookingUntil,
         Set<HolidayType> holidays,
+        // parking
+        int parkingCapacity,
+        String parkingLocation,
+        Boolean freeParking,
         // time
         LocalDateTime createdAt,
         LocalDateTime modifiedAt

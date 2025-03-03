@@ -32,8 +32,7 @@ import java.util.Set;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.SimpleType.NUMBER;
-import static com.epages.restdocs.apispec.SimpleType.STRING;
+import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.domain.place.domain.HolidayType.설날;
@@ -187,6 +186,18 @@ class PlaceControllerTest {
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록"),
+                                        // parking
+                                        fieldWithPath("[].parkingCapacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("[].parkingLocation")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("[].freeParking")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
+                                                .optional(),
                                         // time
                                         fieldWithPath("[].createdAt")
                                                 .type(SimpleType.STRING)
@@ -229,7 +240,10 @@ class PlaceControllerTest {
                 Set.of("https://ontherec.kr"),
                 Duration.ofDays(30),
                 Duration.ofDays(1),
-                Set.of(설날)
+                Set.of(설날),
+                2,
+                "건물 뒤편",
+                true
         );
 
         given(this.spec)
@@ -304,6 +318,18 @@ class PlaceControllerTest {
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
+                                                .optional(),
+                                        // parking
+                                        fieldWithPath("parkingCapacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("parkingLocation")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("freeParking")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
                                                 .optional())
                                 .build())))
         .when()
@@ -342,7 +368,10 @@ class PlaceControllerTest {
                 Set.of("https://ontherec.kr"),
                 Duration.ofDays(30),
                 Duration.ofDays(1),
-                Set.of(설날)
+                Set.of(설날),
+                2,
+                "건물 뒤편",
+                true
         );
 
         given()
@@ -381,7 +410,10 @@ class PlaceControllerTest {
                 Set.of("https://ontherec.kr"),
                 Duration.ofDays(30),
                 Duration.ofDays(30),
-                Set.of(설날)
+                Set.of(설날),
+                2,
+                "건물 뒤편",
+                true
         );
 
         given()
@@ -501,6 +533,18 @@ class PlaceControllerTest {
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional(),
+                                        // parking
+                                        fieldWithPath("parkingCapacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("parkingLocation")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("freeParking")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
+                                                .optional(),
                                         // time
                                         fieldWithPath("createdAt")
                                                 .type(SimpleType.STRING)
@@ -534,7 +578,7 @@ class PlaceControllerTest {
 
     @DisplayName("플레이스 이름 수정 성공")
     @Test
-    void updateLocation() {
+    void updateTitle() {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
@@ -568,7 +612,7 @@ class PlaceControllerTest {
 
     @DisplayName("플레이스 이름 수정 실패 - 권한 없음")
     @Test
-    void updateLocationWithoutAuthority() {
+    void updateTitleWithoutAuthority() {
 
         hostFactory.create("test");
         Host host = hostFactory.create("host");
@@ -677,6 +721,50 @@ class PlaceControllerTest {
                                 .build())))
         .when()
                 .put("/{id}/business", place.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("플레이스 주차 정보 수정 성공")
+    @Test
+    void updateParking() {
+
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Parking dto = new PlaceUpdateRequestDto.Parking(
+                30,
+                "건물 건너편 주차장",
+                false
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "update parking",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("place")
+                                .summary("update parking")
+                                .description("플레이스 주차 정보 수정")
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Business.class.getSimpleName()))
+                                .requestFields(
+                                        fieldWithPath("parkingCapacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("parkingLocation")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("freeParking")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
+                                                .optional())
+                                .build())))
+        .when()
+                .put("/{id}/parking", place.getId())
         .then()
                 .statusCode(OK.value());
     }

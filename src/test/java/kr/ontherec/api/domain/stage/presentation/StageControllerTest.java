@@ -39,6 +39,7 @@ import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.domain.stage.domain.StageType.RECTANGLE;
 import static kr.ontherec.api.domain.stage.domain.StageType.T;
 import static kr.ontherec.api.domain.stage.exception.StageExceptionCode.FORBIDDEN;
+import static kr.ontherec.api.domain.stage.exception.StageExceptionCode.NOT_VALID_ENGINEERING_FEE;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -249,17 +250,6 @@ class StageControllerTest {
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한"),
                                         // facilities
-                                        fieldWithPath("[].parkingCapacity")
-                                                .type(NUMBER)
-                                                .description("주차 대수"),
-                                        fieldWithPath("[].parkingLocation")
-                                                .type(STRING)
-                                                .description("주차장 위치 정보")
-                                                .optional(),
-                                        fieldWithPath("[].freeParking")
-                                                .type(BOOLEAN)
-                                                .description("주차 무료 여부")
-                                                .optional(),
                                         fieldWithPath("[].hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -482,17 +472,6 @@ class StageControllerTest {
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한"),
                                         // facilities
-                                        fieldWithPath("parkingCapacity")
-                                                .type(NUMBER)
-                                                .description("주차 대수"),
-                                        fieldWithPath("parkingLocation")
-                                                .type(STRING)
-                                                .description("주차장 위치 정보")
-                                                .optional(),
-                                        fieldWithPath("freeParking")
-                                                .type(BOOLEAN)
-                                                .description("주차 무료 여부")
-                                                .optional(),
                                         fieldWithPath("hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -591,9 +570,6 @@ class StageControllerTest {
                 "https://docs.google.com/document",
                 Duration.ofDays(3),
                 // facilities
-                2,
-                "건물 뒤편",
-                true,
                 true,
                 true,
                 true,
@@ -717,17 +693,6 @@ class StageControllerTest {
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한"),
                                         // facilities
-                                        fieldWithPath("parkingCapacity")
-                                                .type(NUMBER)
-                                                .description("주차 대수"),
-                                        fieldWithPath("parkingLocation")
-                                                .type(STRING)
-                                                .description("주차장 위치 정보")
-                                                .optional(),
-                                        fieldWithPath("freeParking")
-                                                .type(BOOLEAN)
-                                                .description("주차 무료 여부")
-                                                .optional(),
                                         fieldWithPath("hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -777,6 +742,75 @@ class StageControllerTest {
                 .body(notNullValue());
     }
 
+    @DisplayName("공연장 등록 실패 - 유효하지 않은 엔지니어링 정보")
+    @Test
+    void registerWithInvalidEngineeringFee() {
+
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+        StageRegisterRequestDto dto = new StageRegisterRequestDto(
+                place.getId(),
+                // location
+                "stage",
+                -1,
+                false,
+                // introduction
+                "stage",
+                "stage",
+                Set.of("tag"),
+                // area
+                60,
+                120,
+                RECTANGLE,
+                BigDecimal.valueOf(10.5),
+                BigDecimal.valueOf(5),
+                // business
+                Set.of(new RefundPolicyRegisterRequestDto(
+                        Duration.ofDays(30),
+                        BigDecimal.valueOf(33.3)
+                )),
+                // engineering
+                false,
+                50000L,
+                false,
+                null,
+                false,
+                null,
+                false,
+                null,
+                // documents
+                null,
+                "https://docs.google.com/document",
+                Duration.ofDays(3),
+                // facilities
+                true,
+                true,
+                true,
+                false,
+                true,
+                false,
+                // fnb policies
+                true,
+                false,
+                false,
+                false,
+                false,
+                true,
+                false
+        );
+
+        given()
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+        .when()
+                .post("/stages")
+        .then()
+                .statusCode(NOT_VALID_ENGINEERING_FEE.getStatus().value())
+                .body("message", equalTo(NOT_VALID_ENGINEERING_FEE.getMessage()));
+    }
+
     @DisplayName("공연장 이름 수정 성공")
     @Test
     void updateTitle() {
@@ -811,7 +845,7 @@ class StageControllerTest {
 
     @DisplayName("공연장 이름 수정 실패 - 권한 없음")
     @Test
-    void updateLocationWithoutAuthority() {
+    void updateTitleWithoutAuthority() {
 
         hostFactory.create("test");
         Host host = hostFactory.create("host");
@@ -1094,9 +1128,6 @@ class StageControllerTest {
         Place place = placeFactory.create(host, "place", "0000000000", tags);
         Stage stage = stageFactory.create(place, "stage", tags);
         StageUpdateRequestDto.Facilities dto = new StageUpdateRequestDto.Facilities(
-                30,
-                "건물 건너편 주차장",
-                false,
                 true,
                 true,
                 true,
@@ -1117,17 +1148,6 @@ class StageControllerTest {
                                 .description("공연장 편의시설 정보 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Facilities.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("parkingCapacity")
-                                                .type(NUMBER)
-                                                .description("주차 대수"),
-                                        fieldWithPath("parkingLocation")
-                                                .type(STRING)
-                                                .description("주차장 위치 정보")
-                                                .optional(),
-                                        fieldWithPath("freeParking")
-                                                .type(BOOLEAN)
-                                                .description("주차 무료 여부")
-                                                .optional(),
                                         fieldWithPath("hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),

@@ -35,27 +35,24 @@ public record StageResponseDto (
         BigDecimal stageHeight,
 
         // business
-        Set<RefundPolicy> refundPolicies, // nullable
+        Set<RefundPolicy> refundPolicies,
 
         // engineering
         boolean stageManagingAvailable,
-        Long stageManagingFee, // nullable
+        Long stageManagingFee,
         boolean soundEngineeringAvailable,
-        Long soundEngineeringFee, // nullable
+        Long soundEngineeringFee,
         boolean lightEngineeringAvailable,
-        Long lightEngineeringFee, // nullable
+        Long lightEngineeringFee,
         boolean photographingAvailable,
-        Long photographingFee, // nullable
+        Long photographingFee,
 
         // documents
-        String applicationForm, // nullable
+        String applicationForm,
         String cueSheetTemplate,
         Duration cueSheetDue,
 
         // facilities
-        int parkingCapacity,
-        String parkingLocation, // nullable
-        Boolean freeParking, // nullable
         boolean hasRestroom,
         boolean hasWifi,
         boolean hasCameraStanding,
