@@ -10,14 +10,11 @@ import java.time.Duration;
 import java.util.Set;
 
 public class StageUpdateRequestDto {
-        public record Title(
-                @NotBlank(message = "공연장 이름을 입력해주세요")
-                String title
-        ) {}
-
         public record Introduction(
+                @NotBlank(message = "공연장 이름을 입력해주세요")
+                String title,
                 @Size(max = 1000, message = "공연장 소개는 최대 1000글자까지 입력 가능합니다.")
-                String introduction,
+                String content,
                 @Size(max = 1000, message = "공연장 이용안내는 최대 1000글자까지 입력 가능합니다.")
                 String guide,
                 Set<@Size(max = 10, message = "태그는 최대 10글자 입니다") String> tags

@@ -37,7 +37,7 @@ public class PlaceFactory {
                 .brn(brn)
                 .title(title)
                 .address(newAddress)
-                .introduction(title)
+                .content(title)
                 .tags(null)
                 .links(Set.of(Link.builder().url("https://ontherec.kr").build()))
                 .bookingFrom(Duration.ofDays(30))

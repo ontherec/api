@@ -26,7 +26,7 @@ public class StageFactory {
                 .floor(-1)
                 .hasElevator(false)
                 // introduction
-                .introduction(title)
+                .content(title)
                 .guide(title)
                 .tags(null)
                 // area

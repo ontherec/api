@@ -12,22 +12,29 @@ public record PlaceResponseDto(
         Long id,
         HostResponseDto host,
         String brn,
-        // location
-        String title,
         Address address,
-        // introduction
-        String introduction,
-        Set<String> tags,
-        Set<String> links,
-        // business
-        Duration bookingFrom,
-        Duration bookingUntil,
-        Set<HolidayType> holidays,
-        // parking
-        int parkingCapacity,
-        String parkingLocation,
-        Boolean freeParking,
-        // time
+        Introduction introduction,
+        Business business,
+        Parking parking,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
-) { }
+) {
+    public record Introduction (
+            String title,
+            String content,
+            Set<String> tags,
+            Set<String> links
+    ) {}
+
+    public record Business (
+            Duration bookingFrom,
+            Duration bookingUntil,
+            Set<HolidayType> holidays
+    ) {}
+
+    public record Parking (
+            int capacity,
+            String location,
+            Boolean free
+    ) {}
+}

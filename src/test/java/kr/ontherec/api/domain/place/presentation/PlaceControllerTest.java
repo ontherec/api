@@ -89,10 +89,10 @@ class PlaceControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
-                        "search",
+                        "place search",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("search")
+                                .summary("place search")
                                 .description("플레이스 검색")
                                 .responseSchema(Schema.schema(PlaceResponseDto.class.getSimpleName() + "[]"))
                                 .responseFields(
@@ -126,10 +126,6 @@ class PlaceControllerTest {
                                         fieldWithPath("[].brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        // location
-                                        fieldWithPath("[].title")
-                                                .type(STRING)
-                                                .description("플레이스 이름"),
                                         fieldWithPath("[].address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -160,41 +156,54 @@ class PlaceControllerTest {
                                                 .description("경도 (정수 3자리 이하, 소수 13자리 이하)"),
                                         // introduction
                                         fieldWithPath("[].introduction")
+                                                .type(OBJECT)
+                                                .description("플레이스 소개"),
+                                        fieldWithPath("[].introduction.title")
                                                 .type(STRING)
-                                                .description("소개")
+                                                .description("플레이스 이름"),
+                                        fieldWithPath("[].introduction.content")
+                                                .type(STRING)
+                                                .description("소개 글")
                                                 .optional(),
-                                        fieldWithPath("[].tags[]")
+                                        fieldWithPath("[].introduction.tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("태그 목록")
                                                 .optional(),
-                                        fieldWithPath("[].links[]")
+                                        fieldWithPath("[].introduction.links[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
                                                 .optional(),
                                         // business
-                                        fieldWithPath("[].bookingFrom")
+                                        fieldWithPath("[].business")
+                                                .type(OBJECT)
+                                                .description("플레이스 영업 정보")
+                                                .optional(),
+                                        fieldWithPath("[].business.bookingFrom")
                                                 .type(STRING)
                                                 .description("예약 시작 기간")
                                                 .optional(),
-                                        fieldWithPath("[].bookingUntil")
+                                        fieldWithPath("[].business.bookingUntil")
                                                 .type(STRING)
                                                 .description("예약 마감 기간")
                                                 .optional(),
-                                        fieldWithPath("[].holidays[]")
+                                        fieldWithPath("[].business.holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록"),
                                         // parking
-                                        fieldWithPath("[].parkingCapacity")
+                                        fieldWithPath("[].parking")
+                                                .type(OBJECT)
+                                                .description("플레이스 주차 정보"),
+                                        fieldWithPath("[].parking.capacity")
                                                 .type(NUMBER)
                                                 .description("주차 대수"),
-                                        fieldWithPath("[].parkingLocation")
+                                        fieldWithPath("[].parking.location")
                                                 .type(STRING)
                                                 .description("주차장 위치 정보")
                                                 .optional(),
-                                        fieldWithPath("[].freeParking")
+                                        fieldWithPath("[].parking.free")
                                                 .type(BOOLEAN)
                                                 .description("주차 무료 여부")
                                                 .optional(),
@@ -233,17 +242,23 @@ class PlaceControllerTest {
 
         PlaceRegisterRequestDto placeDto = new PlaceRegisterRequestDto(
                 "0000000000",
-                "place",
                 addressDto,
-                "place",
-                Set.of("tag"),
-                Set.of("https://ontherec.kr"),
-                Duration.ofDays(30),
-                Duration.ofDays(1),
-                Set.of(설날),
-                2,
-                "건물 뒤편",
-                true
+                new PlaceRegisterRequestDto.Introduction(
+                        "place",
+                        "place",
+                        Set.of("tag"),
+                        Set.of("https://ontherec.kr")
+                ),
+                new PlaceRegisterRequestDto.Business(
+                        Duration.ofDays(30),
+                        Duration.ofDays(1),
+                        Set.of(설날)
+                ),
+                new PlaceRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                )
         );
 
         given(this.spec)
@@ -251,20 +266,16 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(placeDto)
                 .filter(document(
-                        "register",
+                        "place register",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("register")
+                                .summary("place register")
                                 .description("플레이스 등록")
                                 .requestSchema(Schema.schema(PlaceRegisterRequestDto.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        // location
-                                        fieldWithPath("title")
-                                                .type(STRING)
-                                                .description("플레이스 이름"),
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -292,42 +303,54 @@ class PlaceControllerTest {
                                                 .description("경도 (정수 3자리 이하, 소수 13자리 이하)"),
                                         // introduction
                                         fieldWithPath("introduction")
+                                                .type(OBJECT)
+                                                .description("플레이스 소개 정보"),
+                                        fieldWithPath("introduction.title")
+                                                .type(STRING)
+                                                .description("플레이스 이름"),
+                                        fieldWithPath("introduction.content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("tags[]")
+                                        fieldWithPath("introduction.tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("태그 목록")
                                                 .optional(),
-                                        fieldWithPath("links[]")
+                                        fieldWithPath("introduction.links[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
                                                 .optional(),
                                         // business
-                                        fieldWithPath("bookingFrom")
+                                        fieldWithPath("business")
+                                                .type(OBJECT)
+                                                .description("플레이스 영업 정보"),
+                                        fieldWithPath("business.bookingFrom")
                                                 .type(STRING)
                                                 .description("예약 시작 기간")
                                                 .optional(),
-                                        fieldWithPath("bookingUntil")
+                                        fieldWithPath("business.bookingUntil")
                                                 .type(STRING)
                                                 .description("예약 마감 기간")
                                                 .optional(),
-                                        fieldWithPath("holidays[]")
+                                        fieldWithPath("business.holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional(),
                                         // parking
-                                        fieldWithPath("parkingCapacity")
+                                        fieldWithPath("parking")
+                                                .type(OBJECT)
+                                                .description("플레이스 주차 정보"),
+                                        fieldWithPath("parking.capacity")
                                                 .type(NUMBER)
                                                 .description("주차 대수"),
-                                        fieldWithPath("parkingLocation")
+                                        fieldWithPath("parking.location")
                                                 .type(STRING)
                                                 .description("주차장 위치 정보")
                                                 .optional(),
-                                        fieldWithPath("freeParking")
+                                        fieldWithPath("parking.free")
                                                 .type(BOOLEAN)
                                                 .description("주차 무료 여부")
                                                 .optional())
@@ -361,17 +384,23 @@ class PlaceControllerTest {
 
         PlaceRegisterRequestDto placeDto = new PlaceRegisterRequestDto(
                 "0000000000",
-                "place",
                 addressDto,
-                "place",
-                Set.of("tag"),
-                Set.of("https://ontherec.kr"),
-                Duration.ofDays(30),
-                Duration.ofDays(1),
-                Set.of(설날),
-                2,
-                "건물 뒤편",
-                true
+                new PlaceRegisterRequestDto.Introduction(
+                        "place",
+                        "place",
+                        Set.of("tag"),
+                        Set.of("https://ontherec.kr")
+                ),
+                new PlaceRegisterRequestDto.Business(
+                        Duration.ofDays(30),
+                        Duration.ofDays(1),
+                        Set.of(설날)
+                ),
+                new PlaceRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                )
         );
 
         given()
@@ -403,17 +432,23 @@ class PlaceControllerTest {
 
         PlaceRegisterRequestDto placeDto = new PlaceRegisterRequestDto(
                 "0000000000",
-                "place",
                 addressDto,
-                "place",
-                Set.of("tag"),
-                Set.of("https://ontherec.kr"),
-                Duration.ofDays(30),
-                Duration.ofDays(30),
-                Set.of(설날),
-                2,
-                "건물 뒤편",
-                true
+                new PlaceRegisterRequestDto.Introduction(
+                        "place",
+                        "place",
+                        Set.of("tag"),
+                        Set.of("https://ontherec.kr")
+                ),
+                new PlaceRegisterRequestDto.Business(
+                        Duration.ofDays(30),
+                        Duration.ofDays(30),
+                        Set.of(설날)
+                ),
+                new PlaceRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                )
         );
 
         given()
@@ -438,10 +473,10 @@ class PlaceControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
-                        "get",
+                        "place get",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("get")
+                                .summary("place get")
                                 .description("플레이스 조회")
                                 .responseSchema(Schema.schema(PlaceResponseDto.class.getSimpleName()))
                                 .responseFields(
@@ -472,10 +507,7 @@ class PlaceControllerTest {
                                         fieldWithPath("brn")
                                                 .type(STRING)
                                                 .description("사업자 등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
-                                        // location
-                                        fieldWithPath("title")
-                                                .type(STRING)
-                                                .description("플레이스 이름"),
+                                        // address
                                         fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
@@ -506,42 +538,54 @@ class PlaceControllerTest {
                                                 .description("경도 (정수 3자리 이하, 소수 13자리 이하)"),
                                         // introduction
                                         fieldWithPath("introduction")
+                                                .type(OBJECT)
+                                                .description("플레이스 소개 정보"),
+                                        fieldWithPath("introduction.title")
+                                                .type(STRING)
+                                                .description("플레이스 이름"),
+                                        fieldWithPath("introduction.content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("tags[]")
+                                        fieldWithPath("introduction.tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("태그 목록")
                                                 .optional(),
-                                        fieldWithPath("links[]")
+                                        fieldWithPath("introduction.links[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("링크 목록")
                                                 .optional(),
                                         // business
-                                        fieldWithPath("bookingFrom")
+                                        fieldWithPath("business")
+                                                .type(OBJECT)
+                                                .description("플레이스 영업 정보"),
+                                        fieldWithPath("business.bookingFrom")
                                                 .type(STRING)
                                                 .description("예약 시작 기간")
                                                 .optional(),
-                                        fieldWithPath("bookingUntil")
+                                        fieldWithPath("business.bookingUntil")
                                                 .type(STRING)
                                                 .description("예약 마감 기간")
                                                 .optional(),
-                                        fieldWithPath("holidays[]")
+                                        fieldWithPath("business.holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional(),
                                         // parking
-                                        fieldWithPath("parkingCapacity")
+                                        fieldWithPath("parking")
+                                                .type(OBJECT)
+                                                .description("플레이스 주차 정보"),
+                                        fieldWithPath("parking.capacity")
                                                 .type(NUMBER)
                                                 .description("주차 대수"),
-                                        fieldWithPath("parkingLocation")
+                                        fieldWithPath("parking.location")
                                                 .type(STRING)
                                                 .description("주차장 위치 정보")
                                                 .optional(),
-                                        fieldWithPath("freeParking")
+                                        fieldWithPath("parking.free")
                                                 .type(BOOLEAN)
                                                 .description("주차 무료 여부")
                                                 .optional(),
@@ -576,64 +620,6 @@ class PlaceControllerTest {
                 .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 
-    @DisplayName("플레이스 이름 수정 성공")
-    @Test
-    void updateTitle() {
-
-        Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-
-        PlaceUpdateRequestDto.Title dto = new PlaceUpdateRequestDto.Title(
-                "newPlace"
-        );
-
-        given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(JSON)
-                .body(dto)
-                .filter(document(
-                        "update title",
-                        resource(ResourceSnippetParameters.builder()
-                                .tag("place")
-                                .summary("update title")
-                                .description("플레이스 이름 수정")
-                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Title.class.getSimpleName()))
-                                .requestFields(
-                                        fieldWithPath("title")
-                                                .type(STRING)
-                                                .description("플레이스 이름"))
-                                .build())))
-        .when()
-                .put("/{id}/title", place.getId())
-        .then()
-                .statusCode(OK.value());
-    }
-
-    @DisplayName("플레이스 이름 수정 실패 - 권한 없음")
-    @Test
-    void updateTitleWithoutAuthority() {
-
-        hostFactory.create("test");
-        Host host = hostFactory.create("host");
-        Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-
-        PlaceUpdateRequestDto.Title dto = new PlaceUpdateRequestDto.Title(
-                "newPlace"
-        );
-
-        given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(JSON)
-                .body(dto)
-        .when()
-                .put("/{id}/title", place.getId())
-        .then()
-                .statusCode(FORBIDDEN.getStatus().value())
-                .body("message", equalTo(FORBIDDEN.getMessage()));
-    }
-
     @DisplayName("플레이스 소개 수정 성공")
     @Test
     void updateIntroduction() {
@@ -643,7 +629,8 @@ class PlaceControllerTest {
         Place place = placeFactory.create(host, "place", "0000000000", tags);
 
         PlaceUpdateRequestDto.Introduction dto = new PlaceUpdateRequestDto.Introduction(
-                "newIntroduction",
+                "newPlace",
+                "newPlace",
                 Set.of("newTag"),
                 Set.of("https://ontherec.live")
         );
@@ -653,14 +640,17 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update introduction",
+                        "place update introduction",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("update introduction")
+                                .summary("place update introduction")
                                 .description("플레이스 소개 수정")
                                 .requestSchema(Schema.schema(PlaceUpdateRequestDto.Introduction.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("introduction")
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("플레이스 이름"),
+                                        fieldWithPath("content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
@@ -679,6 +669,33 @@ class PlaceControllerTest {
                 .put("/{id}/introduction", place.getId())
         .then()
                 .statusCode(OK.value());
+    }
+
+    @DisplayName("플레이스 소개 실패 - 권한 없음")
+    @Test
+    void updateIntroductionWithoutAuthority() {
+
+        hostFactory.create("test");
+        Host host = hostFactory.create("host");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
+        PlaceUpdateRequestDto.Introduction dto = new PlaceUpdateRequestDto.Introduction(
+                "newPlace",
+                "newPlace",
+                Set.of("newTag"),
+                Set.of("https://ontherec.live")
+        );
+
+        given()
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+        .when()
+                .put("/{id}/introduction", place.getId())
+        .then()
+                .statusCode(FORBIDDEN.getStatus().value())
+                .body("message", equalTo(FORBIDDEN.getMessage()));
     }
 
     @DisplayName("플레이스 영업 정보 수정 성공")
@@ -700,10 +717,10 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update business",
+                        "place update business",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("update business")
+                                .summary("place update business")
                                 .description("플레이스 영업 정보 수정")
                                 .requestSchema(Schema.schema(PlaceUpdateRequestDto.Business.class.getSimpleName()))
                                 .requestFields(
@@ -744,21 +761,21 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update parking",
+                        "place update parking",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("update parking")
+                                .summary("place update parking")
                                 .description("플레이스 주차 정보 수정")
                                 .requestSchema(Schema.schema(PlaceUpdateRequestDto.Business.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("parkingCapacity")
+                                        fieldWithPath("capacity")
                                                 .type(NUMBER)
                                                 .description("주차 대수"),
-                                        fieldWithPath("parkingLocation")
+                                        fieldWithPath("location")
                                                 .type(STRING)
                                                 .description("주차장 위치 정보")
                                                 .optional(),
-                                        fieldWithPath("freeParking")
+                                        fieldWithPath("free")
                                                 .type(BOOLEAN)
                                                 .description("주차 무료 여부")
                                                 .optional())
@@ -780,10 +797,10 @@ class PlaceControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
-                        "delete",
+                        "place delete",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("place")
-                                .summary("delete")
+                                .summary("place delete")
                                 .description("플레이스 삭제")
                                 .pathParameters(
                                         parameterWithName("id")

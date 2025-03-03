@@ -61,7 +61,7 @@ public class StageController {
 
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
         Place place = placeQueryService.get(dto.placeId());
-        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
+        Set<Tag> tags = dto.introduction().tags() == null ? null : dto.introduction().tags()
                 .stream()
                 .map(s -> Tag.builder().title(s).build())
                 .map(tagService::getOrCreate)
@@ -69,18 +69,6 @@ public class StageController {
 
         Stage stage = stageCommandService.register(place, newStage, tags);
         return ResponseEntity.created(URI.create("/v1/stages/" + stage.getId())).body(stage.getId());
-    }
-
-    @PutMapping("/{id}/title")
-    ResponseEntity<Void> updateTitle(Authentication authentication,
-                                        @PathVariable Long id,
-                                        @Valid @RequestBody StageUpdateRequestDto.Title dto) {
-        Host host = hostService.getByUsername(authentication.getName());
-        if (!stageQueryService.isHost(id, host))
-            throw new StageException(StageExceptionCode.FORBIDDEN);
-
-        stageCommandService.updateTitle(id, dto);
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/area")

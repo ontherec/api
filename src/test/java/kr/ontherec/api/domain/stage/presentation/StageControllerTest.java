@@ -92,10 +92,10 @@ class StageControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
-                        "search",
+                        "stage search",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("search")
+                                .summary("stage search")
                                 .description("공연장 검색")
                                 .responseSchema(Schema.schema(StageResponseDto.class.getSimpleName() + "[]"))
                                 .responseFields(
@@ -148,30 +148,30 @@ class StageControllerTest {
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("플레이스 태그 목록")
                                                 .optional(),
-                                        // location
-                                        fieldWithPath("[].title")
+                                        // introduction
+                                        fieldWithPath("[].introduction.title")
                                                 .type(STRING)
                                                 .description("공연장 이름"),
-                                        fieldWithPath("[].floor")
-                                                .type(NUMBER)
-                                                .description("층수"),
-                                        fieldWithPath("[].hasElevator")
-                                                .type(BOOLEAN)
-                                                .description("엘리베이터 존재 여부"),
-                                        // introduction
-                                        fieldWithPath("[].introduction")
+                                        fieldWithPath("[].introduction.content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("[].guide")
+                                        fieldWithPath("[].introduction.guide")
                                                 .type(STRING)
                                                 .description("이용 안내")
                                                 .optional(),
-                                        fieldWithPath("[].tags[]")
+                                        fieldWithPath("[].introduction.tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("공연장 태그 목록")
                                                 .optional(),
+                                        // location
+                                        fieldWithPath("[].location.floor")
+                                                .type(NUMBER)
+                                                .description("층수"),
+                                        fieldWithPath("[].location.hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부"),
                                         // count
                                         fieldWithPath("[].viewCount")
                                                 .type(NUMBER)
@@ -180,114 +180,114 @@ class StageControllerTest {
                                                 .type(STRING)
                                                 .description("좋아요 수"),
                                         // area
-                                        fieldWithPath("[].minCapacity")
+                                        fieldWithPath("[].area.minCapacity")
                                                 .type(NUMBER)
                                                 .description("최소 수용인원 (좌석 기준)"),
-                                        fieldWithPath("[].maxCapacity")
+                                        fieldWithPath("[].area.maxCapacity")
                                                 .type(NUMBER)
                                                 .description("최대 수용인원 (스탠딩 기준)"),
-                                        fieldWithPath("[].stageType")
+                                        fieldWithPath("[].area.stageType")
                                                 .type(STRING)
                                                 .description("무대 타입 - " + Arrays.toString(StageType.values())),
-                                        fieldWithPath("[].stageWidth")
+                                        fieldWithPath("[].area.stageWidth")
                                                 .type(NUMBER)
                                                 .description("무대 가로 길이"),
-                                        fieldWithPath("[].stageHeight")
+                                        fieldWithPath("[].area.stageHeight")
                                                 .type(NUMBER)
                                                 .description("무대 세로 길이"),
                                         // business
-                                        fieldWithPath("[].refundPolicies[]")
+                                        fieldWithPath("[].business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
                                                 .optional(),
-                                        fieldWithPath("[].refundPolicies[].id")
+                                        fieldWithPath("[].business.refundPolicies[].id")
                                                 .type(NUMBER)
                                                 .description("환불 정책 식별자"),
-                                        fieldWithPath("[].refundPolicies[].dayBefore")
+                                        fieldWithPath("[].business.refundPolicies[].dayBefore")
                                                 .type(STRING)
                                                 .description("환불 기한"),
-                                        fieldWithPath("[].refundPolicies[].percent")
+                                        fieldWithPath("[].business.refundPolicies[].percent")
                                                 .type(NUMBER)
                                                 .description("환불 비율"),
                                         // engineering
-                                        fieldWithPath("[].stageManagingAvailable")
+                                        fieldWithPath("[].engineering.stageManagingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("스테이지 매니징 제공 여부"),
-                                        fieldWithPath("[].stageManagingFee")
+                                        fieldWithPath("[].engineering.stageManagingFee")
                                                 .type(NUMBER)
                                                 .description("스테이지 매니징 비용")
                                                 .optional(),
-                                        fieldWithPath("[].soundEngineeringAvailable")
+                                        fieldWithPath("[].engineering.soundEngineeringAvailable")
                                                 .type(BOOLEAN)
                                                 .description("사운드 엔지니어링 제공 여부"),
-                                        fieldWithPath("[].soundEngineeringFee")
+                                        fieldWithPath("[].engineering.soundEngineeringFee")
                                                 .type(NUMBER)
                                                 .description("사운드 엔지니어링 비용")
                                                 .optional(),
-                                        fieldWithPath("[].lightEngineeringAvailable")
+                                        fieldWithPath("[].engineering.lightEngineeringAvailable")
                                                 .type(BOOLEAN)
                                                 .description("조명 엔지니어링 제공 여부"),
-                                        fieldWithPath("[].lightEngineeringFee")
+                                        fieldWithPath("[].engineering.lightEngineeringFee")
                                                 .type(NUMBER)
                                                 .description("조명 엔지니어링 비용")
                                                 .optional(),
-                                        fieldWithPath("[].photographingAvailable")
+                                        fieldWithPath("[].engineering.photographingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("촬영 제공 여부"),
-                                        fieldWithPath("[].photographingFee")
+                                        fieldWithPath("[].engineering.photographingFee")
                                                 .type(NUMBER)
                                                 .description("촬영 비용")
                                                 .optional(),
                                         // documents
-                                        fieldWithPath("[].applicationForm")
+                                        fieldWithPath("[].documents.applicationForm")
                                                 .type(STRING)
                                                 .description("대관 신청서 양식 URL")
                                                 .optional(),
-                                        fieldWithPath("[].cueSheetTemplate")
+                                        fieldWithPath("[].documents.cueSheetTemplate")
                                                 .type(STRING)
                                                 .description("큐시트 양식 URL"),
-                                        fieldWithPath("[].cueSheetDue")
+                                        fieldWithPath("[].documents.cueSheetDue")
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한"),
                                         // facilities
-                                        fieldWithPath("[].hasRestroom")
+                                        fieldWithPath("[].facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
-                                        fieldWithPath("[].hasWifi")
+                                        fieldWithPath("[].facilities.hasWifi")
                                                 .type(BOOLEAN)
                                                 .description("와이파이 제공 여부"),
-                                        fieldWithPath("[].hasCameraStanding")
+                                        fieldWithPath("[].facilities.hasCameraStanding")
                                                 .type(BOOLEAN)
                                                 .description("카메라 스탠드 제공 여부"),
-                                        fieldWithPath("[].hasWaitingRoom")
+                                        fieldWithPath("[].facilities.hasWaitingRoom")
                                                 .type(BOOLEAN)
                                                 .description("대기실 존재 여부"),
-                                        fieldWithPath("[].hasProjector")
+                                        fieldWithPath("[].facilities.hasProjector")
                                                 .type(BOOLEAN)
                                                 .description("프로젝터 존재 여부"),
-                                        fieldWithPath("[].hasLocker")
+                                        fieldWithPath("[].facilities.hasLocker")
                                                 .type(BOOLEAN)
                                                 .description("물품보관함 존재 여부"),
                                         // fnb policies
-                                        fieldWithPath("[].allowsWater")
+                                        fieldWithPath("[].fnbPolicies.allowsWater")
                                                 .type(BOOLEAN)
                                                 .description("물 반입 허용 여부"),
-                                        fieldWithPath("[].allowsDrink")
+                                        fieldWithPath("[].fnbPolicies.allowsDrink")
                                                 .type(BOOLEAN)
                                                 .description("음료 반입 허용 여부"),
-                                        fieldWithPath("[].allowsFood")
+                                        fieldWithPath("[].fnbPolicies.allowsFood")
                                                 .type(BOOLEAN)
                                                 .description("음식 반입 허용 여부"),
-                                        fieldWithPath("[].allowsFoodDelivery")
+                                        fieldWithPath("[].fnbPolicies.allowsFoodDelivery")
                                                 .type(BOOLEAN)
                                                 .description("음식 배달 허용 여부"),
-                                        fieldWithPath("[].allowsAlcohol")
+                                        fieldWithPath("[].fnbPolicies.allowsAlcohol")
                                                 .type(BOOLEAN)
                                                 .description("주류 반입 여부"),
-                                        fieldWithPath("[].sellDrink")
+                                        fieldWithPath("[].fnbPolicies.sellDrink")
                                                 .type(BOOLEAN)
                                                 .description("음료 판매 여부"),
-                                        fieldWithPath("[].sellAlcohol")
+                                        fieldWithPath("[].fnbPolicies.sellAlcohol")
                                                 .type(BOOLEAN)
                                                 .description("주류 판매 여부"),
                                         fieldWithPath("[].createdAt")
@@ -317,10 +317,10 @@ class StageControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
-                        "get",
+                        "stage get",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("get")
+                                .summary("stage get")
                                 .description("공연장 조회")
                                 .responseSchema(Schema.schema(StageResponseDto.class.getSimpleName()))
                                 .responseFields(
@@ -370,30 +370,30 @@ class StageControllerTest {
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("플레이스 태그 목록")
                                                 .optional(),
-                                        // location
-                                        fieldWithPath("title")
+                                        // introduction
+                                        fieldWithPath("introduction.title")
                                                 .type(STRING)
                                                 .description("공연장 이름"),
-                                        fieldWithPath("floor")
-                                                .type(NUMBER)
-                                                .description("층수"),
-                                        fieldWithPath("hasElevator")
-                                                .type(BOOLEAN)
-                                                .description("엘리베이터 존재 여부"),
-                                        // introduction
-                                        fieldWithPath("introduction")
+                                        fieldWithPath("introduction.content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("guide")
+                                        fieldWithPath("introduction.guide")
                                                 .type(STRING)
                                                 .description("이용 안내")
                                                 .optional(),
-                                        fieldWithPath("tags[]")
+                                        fieldWithPath("introduction.tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("공연장 태그 목록")
                                                 .optional(),
+                                        // location
+                                        fieldWithPath("location.floor")
+                                                .type(NUMBER)
+                                                .description("층수"),
+                                        fieldWithPath("location.hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부"),
                                         // count
                                         fieldWithPath("viewCount")
                                                 .type(NUMBER)
@@ -402,114 +402,114 @@ class StageControllerTest {
                                                 .type(STRING)
                                                 .description("좋아요 수"),
                                         // area
-                                        fieldWithPath("minCapacity")
+                                        fieldWithPath("area.minCapacity")
                                                 .type(NUMBER)
                                                 .description("최소 수용인원 (좌석 기준)"),
-                                        fieldWithPath("maxCapacity")
+                                        fieldWithPath("area.maxCapacity")
                                                 .type(NUMBER)
                                                 .description("최대 수용인원 (스탠딩 기준)"),
-                                        fieldWithPath("stageType")
+                                        fieldWithPath("area.stageType")
                                                 .type(STRING)
                                                 .description("무대 타입 - " + Arrays.toString(StageType.values())),
-                                        fieldWithPath("stageWidth")
+                                        fieldWithPath("area.stageWidth")
                                                 .type(NUMBER)
                                                 .description("무대 가로 길이"),
-                                        fieldWithPath("stageHeight")
+                                        fieldWithPath("area.stageHeight")
                                                 .type(NUMBER)
                                                 .description("무대 세로 길이"),
                                         // business
-                                        fieldWithPath("refundPolicies[]")
+                                        fieldWithPath("business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
                                                 .optional(),
-                                        fieldWithPath("refundPolicies[].id")
+                                        fieldWithPath("business.refundPolicies[].id")
                                                 .type(NUMBER)
                                                 .description("환불 정책 식별자"),
-                                        fieldWithPath("refundPolicies[].dayBefore")
+                                        fieldWithPath("business.refundPolicies[].dayBefore")
                                                 .type(STRING)
                                                 .description("환불 기한"),
-                                        fieldWithPath("refundPolicies[].percent")
+                                        fieldWithPath("business.refundPolicies[].percent")
                                                 .type(NUMBER)
                                                 .description("환불 비율"),
                                         // engineering
-                                        fieldWithPath("stageManagingAvailable")
+                                        fieldWithPath("engineering.stageManagingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("스테이지 매니징 제공 여부"),
-                                        fieldWithPath("stageManagingFee")
+                                        fieldWithPath("engineering.stageManagingFee")
                                                 .type(NUMBER)
                                                 .description("스테이지 매니징 비용")
                                                 .optional(),
-                                        fieldWithPath("soundEngineeringAvailable")
+                                        fieldWithPath("engineering.soundEngineeringAvailable")
                                                 .type(BOOLEAN)
                                                 .description("사운드 엔지니어링 제공 여부"),
-                                        fieldWithPath("soundEngineeringFee")
+                                        fieldWithPath("engineering.soundEngineeringFee")
                                                 .type(NUMBER)
                                                 .description("사운드 엔지니어링 비용")
                                                 .optional(),
-                                        fieldWithPath("lightEngineeringAvailable")
+                                        fieldWithPath("engineering.lightEngineeringAvailable")
                                                 .type(BOOLEAN)
                                                 .description("조명 엔지니어링 제공 여부"),
-                                        fieldWithPath("lightEngineeringFee")
+                                        fieldWithPath("engineering.lightEngineeringFee")
                                                 .type(NUMBER)
                                                 .description("조명 엔지니어링 비용")
                                                 .optional(),
-                                        fieldWithPath("photographingAvailable")
+                                        fieldWithPath("engineering.photographingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("촬영 제공 여부"),
-                                        fieldWithPath("photographingFee")
+                                        fieldWithPath("engineering.photographingFee")
                                                 .type(NUMBER)
                                                 .description("촬영 비용")
                                                 .optional(),
                                         // documents
-                                        fieldWithPath("applicationForm")
+                                        fieldWithPath("documents.applicationForm")
                                                 .type(STRING)
                                                 .description("대관 신청서 양식 URL")
                                                 .optional(),
-                                        fieldWithPath("cueSheetTemplate")
+                                        fieldWithPath("documents.cueSheetTemplate")
                                                 .type(STRING)
                                                 .description("큐시트 양식 URL"),
-                                        fieldWithPath("cueSheetDue")
+                                        fieldWithPath("documents.cueSheetDue")
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한"),
                                         // facilities
-                                        fieldWithPath("hasRestroom")
+                                        fieldWithPath("facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
-                                        fieldWithPath("hasWifi")
+                                        fieldWithPath("facilities.hasWifi")
                                                 .type(BOOLEAN)
                                                 .description("와이파이 제공 여부"),
-                                        fieldWithPath("hasCameraStanding")
+                                        fieldWithPath("facilities.hasCameraStanding")
                                                 .type(BOOLEAN)
                                                 .description("카메라 스탠드 제공 여부"),
-                                        fieldWithPath("hasWaitingRoom")
+                                        fieldWithPath("facilities.hasWaitingRoom")
                                                 .type(BOOLEAN)
                                                 .description("대기실 존재 여부"),
-                                        fieldWithPath("hasProjector")
+                                        fieldWithPath("facilities.hasProjector")
                                                 .type(BOOLEAN)
                                                 .description("프로젝터 존재 여부"),
-                                        fieldWithPath("hasLocker")
+                                        fieldWithPath("facilities.hasLocker")
                                                 .type(BOOLEAN)
                                                 .description("물품보관함 존재 여부"),
                                         // fnb policies
-                                        fieldWithPath("allowsWater")
+                                        fieldWithPath("fnbPolicies.allowsWater")
                                                 .type(BOOLEAN)
                                                 .description("물 반입 허용 여부"),
-                                        fieldWithPath("allowsDrink")
+                                        fieldWithPath("fnbPolicies.allowsDrink")
                                                 .type(BOOLEAN)
                                                 .description("음료 반입 허용 여부"),
-                                        fieldWithPath("allowsFood")
+                                        fieldWithPath("fnbPolicies.allowsFood")
                                                 .type(BOOLEAN)
                                                 .description("음식 반입 허용 여부"),
-                                        fieldWithPath("allowsFoodDelivery")
+                                        fieldWithPath("fnbPolicies.allowsFoodDelivery")
                                                 .type(BOOLEAN)
                                                 .description("음식 배달 허용 여부"),
-                                        fieldWithPath("allowsAlcohol")
+                                        fieldWithPath("fnbPolicies.allowsAlcohol")
                                                 .type(BOOLEAN)
                                                 .description("주류 반입 여부"),
-                                        fieldWithPath("sellDrink")
+                                        fieldWithPath("fnbPolicies.sellDrink")
                                                 .type(BOOLEAN)
                                                 .description("음료 판매 여부"),
-                                        fieldWithPath("sellAlcohol")
+                                        fieldWithPath("fnbPolicies.sellAlcohol")
                                                 .type(BOOLEAN)
                                                 .description("주류 판매 여부"),
                                         fieldWithPath("createdAt")
@@ -537,53 +537,61 @@ class StageControllerTest {
         Place place = placeFactory.create(host, "place", "0000000000", tags);
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
                 place.getId(),
-                // location
-                "stage",
-                -1,
-                false,
-                // introduction
-                "stage",
-                "stage",
-                Set.of("tag"),
-                // area
-                60,
-                120,
-                RECTANGLE,
-                BigDecimal.valueOf(10.5),
-                BigDecimal.valueOf(5),
-                // business
-                Set.of(new RefundPolicyRegisterRequestDto(
-                        Duration.ofDays(30),
-                        BigDecimal.valueOf(33.3)
-                )),
-                // engineering
-                false,
-                null,
-                true,
-                100000L,
-                false,
-                null,
-                true,
-                100000L,
-                // documents
-                null,
-                "https://docs.google.com/document",
-                Duration.ofDays(3),
-                // facilities
-                true,
-                true,
-                true,
-                false,
-                true,
-                false,
-                // fnb policies
-                true,
-                false,
-                false,
-                false,
-                false,
-                true,
-                false
+                new StageRegisterRequestDto.Introduction(
+                        "stage",
+                        "stage",
+                        "stage",
+                        Set.of("tag")
+                ),
+                new StageRegisterRequestDto.Location(
+                        -1,
+                        false
+                ),
+                new StageRegisterRequestDto.Area(
+                        60,
+                        120,
+                        RECTANGLE,
+                        BigDecimal.valueOf(10.5),
+                        BigDecimal.valueOf(5)
+                ),
+                new StageRegisterRequestDto.Business(
+                        Set.of(new RefundPolicyRegisterRequestDto(
+                                Duration.ofDays(30),
+                                BigDecimal.valueOf(33.3)
+                        ))
+                ),
+                new StageRegisterRequestDto.Engineering(
+                        false,
+                        null,
+                        true,
+                        100000L,
+                        false,
+                        null,
+                        true,
+                        100000L
+                ),
+                new StageRegisterRequestDto.Documents(
+                        "https://docs.google.com/document",
+                        "https://docs.google.com/document",
+                        Duration.ofDays(3)
+                ),
+                new StageRegisterRequestDto.Facilities(
+                        true,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false
+                ),
+                new StageRegisterRequestDto.FnbPolicies(
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        false
+                )
         );
 
         given(this.spec)
@@ -591,10 +599,10 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "register",
+                        "stage register",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("register")
+                                .summary("stage register")
                                 .description("공연장 등록")
                                 .requestSchema(Schema.schema(StageRegisterRequestDto.class.getSimpleName()))
                                 .requestFields(
@@ -602,135 +610,135 @@ class StageControllerTest {
                                                 .type(NUMBER)
                                                 .description("공연장을 등록할 플레이스 식별자"),
                                         // location
-                                        fieldWithPath("title")
-                                                .type(STRING)
-                                                .description("공연장 이름"),
-                                        fieldWithPath("floor")
+                                        fieldWithPath("location.floor")
                                                 .type(NUMBER)
                                                 .description("층수"),
-                                        fieldWithPath("hasElevator")
+                                        fieldWithPath("location.hasElevator")
                                                 .type(BOOLEAN)
                                                 .description("엘리베이터 존재 여부"),
                                         // introduction
-                                        fieldWithPath("introduction")
+                                        fieldWithPath("introduction.title")
+                                                .type(STRING)
+                                                .description("공연장 이름"),
+                                        fieldWithPath("introduction.content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("guide")
+                                        fieldWithPath("introduction.guide")
                                                 .type(STRING)
                                                 .description("이용 안내")
                                                 .optional(),
-                                        fieldWithPath("tags[]")
+                                        fieldWithPath("introduction.tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("공연장 태그 목록")
                                                 .optional(),
                                         // area
-                                        fieldWithPath("minCapacity")
+                                        fieldWithPath("area.minCapacity")
                                                 .type(NUMBER)
                                                 .description("최소 수용인원 (좌석 기준)"),
-                                        fieldWithPath("maxCapacity")
+                                        fieldWithPath("area.maxCapacity")
                                                 .type(NUMBER)
                                                 .description("최대 수용인원 (스탠딩 기준)"),
-                                        fieldWithPath("stageType")
+                                        fieldWithPath("area.stageType")
                                                 .type(STRING)
                                                 .description("무대 타입 - " + Arrays.toString(StageType.values())),
-                                        fieldWithPath("stageWidth")
+                                        fieldWithPath("area.stageWidth")
                                                 .type(NUMBER)
                                                 .description("무대 가로 길이"),
-                                        fieldWithPath("stageHeight")
+                                        fieldWithPath("area.stageHeight")
                                                 .type(NUMBER)
                                                 .description("무대 세로 길이"),
                                         // business
-                                        fieldWithPath("refundPolicies[]")
+                                        fieldWithPath("business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
                                                 .optional(),
-                                        fieldWithPath("refundPolicies[].dayBefore")
+                                        fieldWithPath("business.refundPolicies[].dayBefore")
                                                 .type(STRING)
                                                 .description("환불 기한"),
-                                        fieldWithPath("refundPolicies[].percent")
+                                        fieldWithPath("business.refundPolicies[].percent")
                                                 .type(NUMBER)
                                                 .description("환불 비율"),
                                         // engineering
-                                        fieldWithPath("stageManagingAvailable")
+                                        fieldWithPath("engineering.stageManagingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("스테이지 매니징 제공 여부"),
-                                        fieldWithPath("stageManagingFee")
+                                        fieldWithPath("engineering.stageManagingFee")
                                                 .type(NUMBER)
                                                 .description("스테이지 매니징 비용")
                                                 .optional(),
-                                        fieldWithPath("soundEngineeringAvailable")
+                                        fieldWithPath("engineering.soundEngineeringAvailable")
                                                 .type(BOOLEAN)
                                                 .description("사운드 엔지니어링 제공 여부"),
-                                        fieldWithPath("soundEngineeringFee")
+                                        fieldWithPath("engineering.soundEngineeringFee")
                                                 .type(NUMBER)
                                                 .description("사운드 엔지니어링 비용")
                                                 .optional(),
-                                        fieldWithPath("lightEngineeringAvailable")
+                                        fieldWithPath("engineering.lightEngineeringAvailable")
                                                 .type(BOOLEAN)
                                                 .description("조명 엔지니어링 제공 여부"),
-                                        fieldWithPath("lightEngineeringFee")
+                                        fieldWithPath("engineering.lightEngineeringFee")
                                                 .type(NUMBER)
                                                 .description("조명 엔지니어링 비용")
                                                 .optional(),
-                                        fieldWithPath("photographingAvailable")
+                                        fieldWithPath("engineering.photographingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("촬영 제공 여부"),
-                                        fieldWithPath("photographingFee")
+                                        fieldWithPath("engineering.photographingFee")
                                                 .type(NUMBER)
                                                 .description("촬영 비용")
                                                 .optional(),
                                         // documents
-                                        fieldWithPath("applicationForm")
+                                        fieldWithPath("documents.applicationForm")
                                                 .type(STRING)
                                                 .description("대관 신청서 양식 URL")
                                                 .optional(),
-                                        fieldWithPath("cueSheetTemplate")
+                                        fieldWithPath("documents.cueSheetTemplate")
                                                 .type(STRING)
                                                 .description("큐시트 양식 URL"),
-                                        fieldWithPath("cueSheetDue")
+                                        fieldWithPath("documents.cueSheetDue")
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한"),
                                         // facilities
-                                        fieldWithPath("hasRestroom")
+                                        fieldWithPath("facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
-                                        fieldWithPath("hasWifi")
+                                        fieldWithPath("facilities.hasWifi")
                                                 .type(BOOLEAN)
                                                 .description("와이파이 제공 여부"),
-                                        fieldWithPath("hasCameraStanding")
+                                        fieldWithPath("facilities.hasCameraStanding")
                                                 .type(BOOLEAN)
                                                 .description("카메라 스탠드 제공 여부"),
-                                        fieldWithPath("hasWaitingRoom")
+                                        fieldWithPath("facilities.hasWaitingRoom")
                                                 .type(BOOLEAN)
                                                 .description("대기실 존재 여부"),
-                                        fieldWithPath("hasProjector")
+                                        fieldWithPath("facilities.hasProjector")
                                                 .type(BOOLEAN)
                                                 .description("프로젝터 존재 여부"),
-                                        fieldWithPath("hasLocker")
+                                        fieldWithPath("facilities.hasLocker")
                                                 .type(BOOLEAN)
                                                 .description("물품보관함 존재 여부"),
                                         // fnb policies
-                                        fieldWithPath("allowsWater")
+                                        fieldWithPath("fnbPolicies.allowsWater")
                                                 .type(BOOLEAN)
                                                 .description("물 반입 허용 여부"),
-                                        fieldWithPath("allowsDrink")
+                                        fieldWithPath("fnbPolicies.allowsDrink")
                                                 .type(BOOLEAN)
                                                 .description("음료 반입 허용 여부"),
-                                        fieldWithPath("allowsFood")
+                                        fieldWithPath("fnbPolicies.allowsFood")
                                                 .type(BOOLEAN)
                                                 .description("음식 반입 허용 여부"),
-                                        fieldWithPath("allowsFoodDelivery")
+                                        fieldWithPath("fnbPolicies.allowsFoodDelivery")
                                                 .type(BOOLEAN)
                                                 .description("음식 배달 허용 여부"),
-                                        fieldWithPath("allowsAlcohol")
+                                        fieldWithPath("fnbPolicies.allowsAlcohol")
                                                 .type(BOOLEAN)
                                                 .description("주류 반입 여부"),
-                                        fieldWithPath("sellDrink")
+                                        fieldWithPath("fnbPolicies.sellDrink")
                                                 .type(BOOLEAN)
                                                 .description("음료 판매 여부"),
-                                        fieldWithPath("sellAlcohol")
+                                        fieldWithPath("fnbPolicies.sellAlcohol")
                                                 .type(BOOLEAN)
                                                 .description("주류 판매 여부"))
                                 .build())))
@@ -748,56 +756,63 @@ class StageControllerTest {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        StageRegisterRequestDto dto = new StageRegisterRequestDto(
+        Place place = placeFactory.create(host, "place", "0000000000", tags);StageRegisterRequestDto dto = new StageRegisterRequestDto(
                 place.getId(),
-                // location
-                "stage",
-                -1,
-                false,
-                // introduction
-                "stage",
-                "stage",
-                Set.of("tag"),
-                // area
-                60,
-                120,
-                RECTANGLE,
-                BigDecimal.valueOf(10.5),
-                BigDecimal.valueOf(5),
-                // business
-                Set.of(new RefundPolicyRegisterRequestDto(
-                        Duration.ofDays(30),
-                        BigDecimal.valueOf(33.3)
-                )),
-                // engineering
-                false,
-                50000L,
-                false,
-                null,
-                false,
-                null,
-                false,
-                null,
-                // documents
-                null,
-                "https://docs.google.com/document",
-                Duration.ofDays(3),
-                // facilities
-                true,
-                true,
-                true,
-                false,
-                true,
-                false,
-                // fnb policies
-                true,
-                false,
-                false,
-                false,
-                false,
-                true,
-                false
+                new StageRegisterRequestDto.Introduction(
+                        "stage",
+                        "stage",
+                        "stage",
+                        null
+                ),
+                new StageRegisterRequestDto.Location(
+                        -1,
+                        false
+                ),
+                new StageRegisterRequestDto.Area(
+                        60,
+                        120,
+                        RECTANGLE,
+                        BigDecimal.valueOf(10.5),
+                        BigDecimal.valueOf(5)
+                ),
+                new StageRegisterRequestDto.Business(
+                        Set.of(new RefundPolicyRegisterRequestDto(
+                                Duration.ofDays(30),
+                                BigDecimal.valueOf(33.3)
+                        ))
+                ),
+                new StageRegisterRequestDto.Engineering(
+                        false,
+                        50000L,
+                        true,
+                        null,
+                        false,
+                        null,
+                        true,
+                        100000L
+                ),
+                new StageRegisterRequestDto.Documents(
+                        "https://docs.google.com/document",
+                        "https://docs.google.com/document",
+                        Duration.ofDays(3)
+                ),
+                new StageRegisterRequestDto.Facilities(
+                        true,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false
+                ),
+                new StageRegisterRequestDto.FnbPolicies(
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        false
+                )
         );
 
         given()
@@ -811,60 +826,6 @@ class StageControllerTest {
                 .body("message", equalTo(NOT_VALID_ENGINEERING_FEE.getMessage()));
     }
 
-    @DisplayName("공연장 이름 수정 성공")
-    @Test
-    void updateTitle() {
-
-        Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
-        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
-
-        given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(JSON)
-                .body(dto)
-                .filter(document(
-                        "update title",
-                        resource(ResourceSnippetParameters.builder()
-                                .tag("stage")
-                                .summary("update title")
-                                .description("공연장 이름 수정")
-                                .requestSchema(Schema.schema(StageUpdateRequestDto.Title.class.getSimpleName()))
-                                .requestFields(
-                                        fieldWithPath("title")
-                                                .type(STRING)
-                                                .description("공연장 이름"))
-                                .build())))
-        .when()
-                .put("/stages/{id}/title", stage.getId())
-        .then()
-                .statusCode(OK.value());
-    }
-
-    @DisplayName("공연장 이름 수정 실패 - 권한 없음")
-    @Test
-    void updateTitleWithoutAuthority() {
-
-        hostFactory.create("test");
-        Host host = hostFactory.create("host");
-        Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
-        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
-
-        given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(JSON)
-                .body(dto)
-        .when()
-                .put("/stages/{id}/title", stage.getId())
-        .then()
-                .statusCode(FORBIDDEN.getStatus().value())
-                .body("message", equalTo(FORBIDDEN.getMessage()));
-    }
-
     @DisplayName("공연장 소개 수정 성공")
     @Test
     void updateIntroduction() {
@@ -876,6 +837,7 @@ class StageControllerTest {
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
                 "newStage",
+                "newStage",
                 Set.of("newTag")
         );
 
@@ -884,14 +846,17 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update introduction",
+                        "stage update introduction",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update introduction")
+                                .summary("stage update introduction")
                                 .description("공연장 소개 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Introduction.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("introduction")
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("공연장 이름"),
+                                        fieldWithPath("content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
@@ -910,6 +875,33 @@ class StageControllerTest {
                 .put("/stages/{id}/introduction", stage.getId())
         .then()
                 .statusCode(OK.value());
+    }
+
+    @DisplayName("공연장 소개 수정 실패 - 권한 없음")
+    @Test
+    void updateIntroductionWithoutAuthority() {
+
+        hostFactory.create("test");
+        Host host = hostFactory.create("host");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
+        Stage stage = stageFactory.create(place, "stage", tags);
+        StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
+                "newStage",
+                "newStage",
+                "newStage",
+                Set.of("newTag")
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+        .when()
+                .put("/stages/{id}/introduction", stage.getId())
+        .then()
+                .statusCode(FORBIDDEN.getStatus().value())
+                .body("message", equalTo(FORBIDDEN.getMessage()));
     }
 
     @DisplayName("공연장 면적 정보 수정 성공")
@@ -933,10 +925,10 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update area",
+                        "stage update area",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update area")
+                                .summary("stage update area")
                                 .description("공연장 면적 정보 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Area.class.getSimpleName()))
                                 .requestFields(
@@ -983,10 +975,10 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update business",
+                        "stage update business",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update business")
+                                .summary("stage update business")
                                 .description("공연장 영업 정보 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Business.class.getSimpleName()))
                                 .requestFields(
@@ -1034,10 +1026,10 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update engineering",
+                        "stage update engineering",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update engineering")
+                                .summary("stage update engineering")
                                 .description("공연장 엔지니어링 정보 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Engineering.class.getSimpleName()))
                                 .requestFields(
@@ -1095,10 +1087,10 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update documents",
+                        "stage update documents",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update documents")
+                                .summary("stage update documents")
                                 .description("공연장 문서 정보 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Documents.class.getSimpleName()))
                                 .requestFields(
@@ -1141,10 +1133,10 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update facilities",
+                        "stage update facilities",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update facilities")
+                                .summary("stage update facilities")
                                 .description("공연장 편의시설 정보 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Facilities.class.getSimpleName()))
                                 .requestFields(
@@ -1196,12 +1188,12 @@ class StageControllerTest {
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update fnb policies",
+                        "stage update fnb policies",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update fnb policies")
+                                .summary("stage update fnb policies")
                                 .description("공연장 식음료 정책 수정")
-                                .requestSchema(Schema.schema(StageUpdateRequestDto.Title.class.getSimpleName()))
+                                .requestSchema(Schema.schema(StageUpdateRequestDto.FnbPolicies.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("allowsWater")
                                                 .type(BOOLEAN)
@@ -1243,10 +1235,10 @@ class StageControllerTest {
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
-                        "delete",
+                        "stage delete",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("delete")
+                                .summary("stage delete")
                                 .description("공연장 삭제")
                                 .pathParameters(
                                         parameterWithName("id")

@@ -13,98 +13,122 @@ import java.util.Set;
 public record StageRegisterRequestDto (
         @NotNull(message = "플레이스 식별자를 입력해주세요.")
         Long placeId,
+        @Valid @NotNull(message = "플레이스 소개를 입력해주세요.")
+        Introduction introduction,
+        @Valid @NotNull(message = "플레이스 위치 정보를 입력해주세요.")
+        Location location,
+        @Valid @NotNull(message = "플레이스 면적 정보를 입력해주세요.")
+        Area area,
+        @Valid @NotNull(message = "플레이스 영업 정보를 입력해주세요.")
+        Business business,
+        @Valid @NotNull(message = "플레이스 엔지니어링 정보를 입력해주세요.")
+        Engineering engineering,
+        @Valid @NotNull(message = "플레이스 문서 정보를 입력해주세요.")
+        Documents documents,
+        @Valid @NotNull(message = "플레이스 편의시설 정보를 입력해주세요.")
+        Facilities facilities,
+        @Valid @NotNull(message = "플레이스 식음료 정책을 입력해주세요.")
+        FnbPolicies fnbPolicies
+) {
+        public record Introduction (
+                @NotBlank(message = "공연장 이름을 입력해주세요.")
+                String title,
+                @Size(max = 1000, message = "공연장 소개는 최대 1000글자까지 입력 가능합니다.")
+                String content,
+                @Size(max = 1000, message = "공연장 이용안내는 최대 1000글자까지 입력 가능합니다.")
+                String guide,
+                Set<@Size(max = 10, message = "태그는 최대 10글자 입니다") String> tags
+        ) {}
 
-        // location
-        @NotBlank(message = "공연장 이름을 입력해주세요.")
-        String title,
-        @NotNull(message = "층수를 입력해주세요.")
-        @DecimalMax(value = "100", message = "층수는 최대 100층까지 설정 가능합니다.")
-        int floor,
-        @NotNull(message = "엘리베이터 존재 여부를 입력해주세요.")
-        boolean hasElevator,
-        
-        // introduction
-        @Size(max = 1000, message = "공연장 소개는 최대 1000글자까지 입력 가능합니다.")
-        String introduction,
-        @Size(max = 1000, message = "공연장 이용안내는 최대 1000글자까지 입력 가능합니다.")
-        String guide,
-        Set<@Size(max = 10, message = "태그는 최대 10글자 입니다") String> tags,
+        public record Location (
+                @NotNull(message = "층수를 입력해주세요.")
+                @DecimalMax(value = "100", message = "층수는 최대 100층까지 설정 가능합니다.")
+                int floor,
+                @NotNull(message = "엘리베이터 존재 여부를 입력해주세요.")
+                boolean hasElevator
+        ) {}
 
-        // Area
-        @NotNull(message = "최소 수용인원(좌석 기준)을 입력해주세요.")
-        @DecimalMax(value = "1000", message = "수용인원은 최대 천명까지 설정 가능합니다.")
-        @Positive(message = "수용인원은 최소 1명까지 설정 가능합니다.")
-        int minCapacity,
-        @NotNull(message = "최대 수용인원(스탠딩 기준)을 입력해주세요.")
-        @DecimalMax(value = "1000", message = "수용인원은 최대 천명까지 설정 가능합니다.")
-        @Positive(message = "수용인원은 최소 1명까지 설정 가능합니다.")
-        int maxCapacity,
-        @NotNull(message = "무대 타입을 입력해주세요.")
-        StageType stageType,
-        @NotNull(message = "무대 가로 길이를 입력해주세요.")
-        @DecimalMax(value = "1000", message = "무대 길이는 최대 1000m까지 설정 가능합니다.")
-        @Digits(integer = 4, fraction = 1, message = "무대 길이는 소수점 첫 번째 자리까지 입력 가능합니다.")
-        BigDecimal stageWidth,
-        @NotNull(message = "무대 세로 길이를 입력해주세요.")
-        @DecimalMax(value = "1000", message = "무대 길이는 최대 1000m까지 설정 가능합니다.")
-        @Digits(integer = 4, fraction = 1, message = "무대 길이는 소수점 첫 번째 자리까지 입력 가능합니다.")
-        BigDecimal stageHeight,
+        public record Area (
+                @NotNull(message = "최소 수용인원(좌석 기준)을 입력해주세요.")
+                @DecimalMax(value = "1000", message = "수용인원은 최대 천명까지 설정 가능합니다.")
+                @Positive(message = "수용인원은 최소 1명까지 설정 가능합니다.")
+                int minCapacity,
+                @NotNull(message = "최대 수용인원(스탠딩 기준)을 입력해주세요.")
+                @DecimalMax(value = "1000", message = "수용인원은 최대 천명까지 설정 가능합니다.")
+                @Positive(message = "수용인원은 최소 1명까지 설정 가능합니다.")
+                int maxCapacity,
+                @NotNull(message = "무대 타입을 입력해주세요.")
+                StageType stageType,
+                @NotNull(message = "무대 가로 길이를 입력해주세요.")
+                @DecimalMax(value = "1000", message = "무대 길이는 최대 1000m까지 설정 가능합니다.")
+                @Digits(integer = 4, fraction = 1, message = "무대 길이는 소수점 첫 번째 자리까지 입력 가능합니다.")
+                BigDecimal stageWidth,
+                @NotNull(message = "무대 세로 길이를 입력해주세요.")
+                @DecimalMax(value = "1000", message = "무대 길이는 최대 1000m까지 설정 가능합니다.")
+                @Digits(integer = 4, fraction = 1, message = "무대 길이는 소수점 첫 번째 자리까지 입력 가능합니다.")
+                BigDecimal stageHeight
+        ) {}
 
-        // business
-        @Valid
-        @NotNull(message = "환불 정책을 입력해주세요.")
-        Set<RefundPolicyRegisterRequestDto> refundPolicies,
+        public record Business (
+                @Valid
+                @NotNull(message = "환불 정책을 입력해주세요.")
+                Set<RefundPolicyRegisterRequestDto> refundPolicies
+        ) {}
 
-        // engineering
-        @NotNull(message = "스테이지 매니징 제공 여부를 입력해주세요.")
-        boolean stageManagingAvailable,
-        Long stageManagingFee,
-        @NotNull(message = "사운드 엔지니어링 제공 여부를 입력해주세요.")
-        boolean soundEngineeringAvailable,
-        Long soundEngineeringFee,
-        @NotNull(message = "조명 엔지니어링 제공 여부를 입력해주세요.")
-        boolean lightEngineeringAvailable,
-        Long lightEngineeringFee,
-        @NotNull(message = "촬영 제공 여부를 입력해주세요.")
-        boolean photographingAvailable,
-        Long photographingFee,
+        public record Engineering (
+                @NotNull(message = "스테이지 매니징 제공 여부를 입력해주세요.")
+                boolean stageManagingAvailable,
+                Long stageManagingFee,
+                @NotNull(message = "사운드 엔지니어링 제공 여부를 입력해주세요.")
+                boolean soundEngineeringAvailable,
+                Long soundEngineeringFee,
+                @NotNull(message = "조명 엔지니어링 제공 여부를 입력해주세요.")
+                boolean lightEngineeringAvailable,
+                Long lightEngineeringFee,
+                @NotNull(message = "촬영 제공 여부를 입력해주세요.")
+                boolean photographingAvailable,
+                Long photographingFee
+        ) {}
 
-        // documents
-        @URL(message = "유효하지 않은 URL 입니다.")
-        String applicationForm,
-        @NotNull(message = "큐시트 템플릿 양식을 입력해주세요.")
-        @URL(message = "유효하지 않은 URL 입니다.")
-        String cueSheetTemplate,
-        @NotNull(message = "큐시트 제출 마감 기한을 입력해주세요.")
-        Duration cueSheetDue,
+        public record Documents (
+                @URL(message = "유효하지 않은 URL 입니다.")
+                String applicationForm,
+                @NotNull(message = "큐시트 템플릿 양식을 입력해주세요.")
+                @URL(message = "유효하지 않은 URL 입니다.")
+                String cueSheetTemplate,
+                @NotNull(message = "큐시트 제출 마감 기한을 입력해주세요.")
+                Duration cueSheetDue
+        ) {}
 
-        // facilities
-        @NotNull(message = "화장실 존재 여부를 입력해주세요.")
-        boolean hasRestroom,
-        @NotNull(message = "와이파이 제공 여부를 입력해주세요.")
-        boolean hasWifi,
-        @NotNull(message = "카메라 스탠드 제공 여부를 입력해주세요.")
-        boolean hasCameraStanding,
-        @NotNull(message = "대기실 존재 여부를 입력해주세요.")
-        boolean hasWaitingRoom,
-        @NotNull(message = "프로젝터 존재 여부를 입력해주세요.")
-        boolean hasProjector,
-        @NotNull(message = "물품보관함 존재 여부를 입력해주세요.")
-        boolean hasLocker,
+        public record Facilities (
+                @NotNull(message = "화장실 존재 여부를 입력해주세요.")
+                boolean hasRestroom,
+                @NotNull(message = "와이파이 제공 여부를 입력해주세요.")
+                boolean hasWifi,
+                @NotNull(message = "카메라 스탠드 제공 여부를 입력해주세요.")
+                boolean hasCameraStanding,
+                @NotNull(message = "대기실 존재 여부를 입력해주세요.")
+                boolean hasWaitingRoom,
+                @NotNull(message = "프로젝터 존재 여부를 입력해주세요.")
+                boolean hasProjector,
+                @NotNull(message = "물품보관함 존재 여부를 입력해주세요.")
+                boolean hasLocker
+        ) {}
 
-        // fnb policies
-        @NotNull(message = "물 반입 허용 여부를 입력해주세요.")
-        boolean allowsWater,
-        @NotNull(message = "음료 반입 허용 여부를 입력해주세요.")
-        boolean allowsDrink,
-        @NotNull(message = "음식 반입 허용 여부를 입력해주세요.")
-        boolean allowsFood,
-        @NotNull(message = "음식 배달 허용 여부를 입력해주세요.")
-        boolean allowsFoodDelivery,
-        @NotNull(message = "주류 반입 허용 여부를 입력해주세요.")
-        boolean allowsAlcohol,
-        @NotNull(message = "음료 판매 여부를 입력해주세요.")
-        boolean sellDrink,
-        @NotNull(message = "주류 판매 여부를 입력해주세요.")
-        boolean sellAlcohol
-) { }
+        public record FnbPolicies (
+                @NotNull(message = "물 반입 허용 여부를 입력해주세요.")
+                boolean allowsWater,
+                @NotNull(message = "음료 반입 허용 여부를 입력해주세요.")
+                boolean allowsDrink,
+                @NotNull(message = "음식 반입 허용 여부를 입력해주세요.")
+                boolean allowsFood,
+                @NotNull(message = "음식 배달 허용 여부를 입력해주세요.")
+                boolean allowsFoodDelivery,
+                @NotNull(message = "주류 반입 허용 여부를 입력해주세요.")
+                boolean allowsAlcohol,
+                @NotNull(message = "음료 판매 여부를 입력해주세요.")
+                boolean sellDrink,
+                @NotNull(message = "주류 판매 여부를 입력해주세요.")
+                boolean sellAlcohol
+        ) {}
+}

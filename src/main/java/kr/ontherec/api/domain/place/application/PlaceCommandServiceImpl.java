@@ -31,15 +31,6 @@ public class PlaceCommandServiceImpl implements PlaceCommandService {
     }
 
     @Override
-    public void updateTitle(Long id, PlaceUpdateRequestDto.Title dto) {
-        Place foundPlace = placeRepository.findByIdOrThrow(id);
-
-        placeMapper.updateTitle(dto, foundPlace);
-
-        placeRepository.save(foundPlace);
-    }
-
-    @Override
     public void updateIntroduction(Long id, PlaceUpdateRequestDto.Introduction dto, Set<Tag> tags) {
         Place foundPlace = placeRepository.findByIdOrThrow(id);
 

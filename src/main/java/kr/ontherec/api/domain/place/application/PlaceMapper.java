@@ -25,13 +25,16 @@ public interface PlaceMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tags", ignore = true)
-    @Mapping(target = "links", qualifiedByName = "deserializeLinks")
-    @Mapping(target = "holidays", qualifiedByName = "deserializeHolidays")
+    @Mapping(source = "introduction", target = ".")
+    @Mapping(source = "business", target = ".")
+    @Mapping(source = "parking.capacity", target = "parkingCapacity")
+    @Mapping(source = "parking.location", target = "parkingLocation")
+    @Mapping(source = "parking.free", target = "freeParking")
+    @Mapping(source = "introduction.links", target = "links", qualifiedByName = "deserializeLinks")
+    @Mapping(source = "business.holidays", target = "holidays", qualifiedByName = "deserializeHolidays")
     @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
     @Mapping(target = "modifiedAt", expression = "java(LocalDateTime.now())")
     Place registerRequestDtoToEntity(PlaceRegisterRequestDto dto);
-
-    void updateTitle(PlaceUpdateRequestDto.Title dto, @MappingTarget Place place);
 
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "links", qualifiedByName = "deserializeLinks")
@@ -42,6 +45,16 @@ public interface PlaceMapper {
 
     void updateParking(PlaceUpdateRequestDto.Parking dto, @MappingTarget Place place);
 
+    @Mapping(source = "title", target = "introduction.title")
+    @Mapping(source = "content", target = "introduction.content")
+    @Mapping(source = "tags", target = "introduction.tags")
+    @Mapping(source = "links", target = "introduction.links")
+    @Mapping(source = "bookingFrom", target = "business.bookingFrom")
+    @Mapping(source = "bookingUntil", target = "business.bookingUntil")
+    @Mapping(source = "holidays", target = "business.holidays")
+    @Mapping(source = "parkingCapacity", target = "parking.capacity")
+    @Mapping(source = "parkingLocation", target = "parking.location")
+    @Mapping(source = "freeParking", target = "parking.free")
     PlaceResponseDto EntityToResponseDto(Place place);
 
     @Named("deserializeLinks")

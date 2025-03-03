@@ -78,10 +78,10 @@ class HostControllerTest {
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .filter(RestAssuredRestDocumentationWrapper.document(
-                        "register",
+                        "host register",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("host")
-                                .summary("register")
+                                .summary("host register")
                                 .description("호스트 등록")
                                 .requestSchema(Schema.schema(HostRegisterRequestDto.class.getSimpleName()))
                                 .requestFields(
@@ -135,10 +135,10 @@ class HostControllerTest {
                 .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
                 .filter(RestAssuredRestDocumentationWrapper.document(
-                        "get",
+                        "host get",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("host")
-                                .summary("get")
+                                .summary("host get")
                                 .description("호스트 조회")
                                 .responseSchema(Schema.schema(Host.class.getSimpleName()))
                                 .responseFields(
@@ -209,10 +209,10 @@ class HostControllerTest {
                 .contentType(ContentType.JSON)
                 .body(dto)
                 .filter(RestAssuredRestDocumentationWrapper.document(
-                        "update",
+                        "host update",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("host")
-                                .summary("update")
+                                .summary("host update")
                                 .description("호스트 정보 수정")
                                 .requestSchema(Schema.schema(HostUpdateRequestDto.class.getSimpleName()))
                                 .requestFields(

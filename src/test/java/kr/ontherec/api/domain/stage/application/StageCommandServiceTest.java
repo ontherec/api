@@ -54,53 +54,61 @@ class StageCommandServiceTest {
         Place place = placeFactory.create(host, "place", "0000000000", tags);
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
                 place.getId(),
-                // location
-                "stage",
-                -1,
-                false,
-                // introduction
-                "stage",
-                "stage",
-                null,
-                // area
-                60,
-                120,
-                RECTANGLE,
-                BigDecimal.valueOf(10.5),
-                BigDecimal.valueOf(5),
-                // business
-                Set.of(new RefundPolicyRegisterRequestDto(
-                        Duration.ofDays(30),
-                        BigDecimal.valueOf(33.3)
-                )),
-                // engineering
-                false,
-                null,
-                true,
-                100000L,
-                false,
-                null,
-                true,
-                100000L,
-                // documents
-                null,
-                "https://docs.google.com/document",
-                Duration.ofDays(3),
-                // facilities
-                true,
-                true,
-                true,
-                false,
-                true,
-                false,
-                // fnb policies
-                true,
-                false,
-                false,
-                false,
-                false,
-                true,
-                false
+                new StageRegisterRequestDto.Introduction(
+                        "stage",
+                        "stage",
+                        "stage",
+                        null
+                ),
+                new StageRegisterRequestDto.Location(
+                        -1,
+                        false
+                ),
+                new StageRegisterRequestDto.Area(
+                        60,
+                        120,
+                        RECTANGLE,
+                        BigDecimal.valueOf(10.5),
+                        BigDecimal.valueOf(5)
+                ),
+                new StageRegisterRequestDto.Business(
+                        Set.of(new RefundPolicyRegisterRequestDto(
+                                Duration.ofDays(30),
+                                BigDecimal.valueOf(33.3)
+                        ))
+                ),
+                new StageRegisterRequestDto.Engineering(
+                        false,
+                        null,
+                        true,
+                        100000L,
+                        false,
+                        null,
+                        true,
+                        100000L
+                ),
+                new StageRegisterRequestDto.Documents(
+                        "https://docs.google.com/document",
+                        "https://docs.google.com/document",
+                        Duration.ofDays(3)
+                ),
+                new StageRegisterRequestDto.Facilities(
+                        true,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false
+                ),
+                new StageRegisterRequestDto.FnbPolicies(
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        false
+                )
         );
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
 
@@ -112,41 +120,6 @@ class StageCommandServiceTest {
         assertThat(stage.getFloor()).isEqualTo(newStage.getFloor());
     }
 
-    @DisplayName("공연장 이름 수정 성공")
-    @Test
-    void updateTitle() {
-        // given
-        Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
-        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
-
-        // when
-        stageCommandService.updateTitle(stage.getId(), dto);
-
-        // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-
-        assertThat(foundStage.getTitle()).isEqualTo(dto.title());
-    }
-
-    @DisplayName("공연장 이름 수정 실패 - 등록되지 않은 공연장")
-    @Test
-    void updateTitleWithUnregisteredId() {
-        // given
-        Host host = hostFactory.create("test");
-        placeFactory.create(host, "place", "0000000000", null);
-        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
-
-        // when
-        Throwable throwable = catchThrowable(() -> stageCommandService.updateTitle(1L, dto));
-
-        // then
-        assertThat(throwable)
-                .isInstanceOf(StageException.class)
-                .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
-    }
-
     @DisplayName("공연장 소개 수정 성공")
     @Test
     void updateIntroduction() {
@@ -155,6 +128,7 @@ class StageCommandServiceTest {
         Place place = placeFactory.create(host, "place", "0000000000", null);
         Stage stage = stageFactory.create(place, "stage", null);
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
+                "newStage",
                 "newStage",
                 "newStage",
                 Set.of("newTag")
@@ -172,8 +146,31 @@ class StageCommandServiceTest {
         // then
         Stage foundStage = stageQueryService.get(stage.getId());
 
-        assertThat(foundStage.getIntroduction()).isEqualTo(dto.introduction());
+        assertThat(foundStage.getTitle()).isEqualTo(dto.title());
+        assertThat(foundStage.getContent()).isEqualTo(dto.content());
         assertThat(foundStage.getGuide()).isEqualTo(dto.guide());
+    }
+
+    @DisplayName("공연장 소개 수정 실패 - 등록되지 않은 공연장")
+    @Test
+    void updateIntroductionWithUnregisteredId() {
+        // given
+        Host host = hostFactory.create("test");
+        placeFactory.create(host, "place", "0000000000", null);
+        StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
+                "newStage",
+                "newStage",
+                "newStage",
+                Set.of("newTag")
+        );
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageCommandService.updateIntroduction(1L, dto, null));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
     }
 
     @DisplayName("공연장 면적 정보 수정 성공")

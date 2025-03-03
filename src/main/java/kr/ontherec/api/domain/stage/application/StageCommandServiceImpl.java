@@ -26,13 +26,6 @@ public class StageCommandServiceImpl implements StageCommandService {
     }
 
     @Override
-    public void updateTitle(Long id, StageUpdateRequestDto.Title dto) {
-        Stage foundStage = stageRepository.findByIdOrThrow(id);
-        stageMapper.updateTitle(dto, foundStage);
-        stageRepository.save(foundStage);
-    }
-
-    @Override
     public void updateArea(Long id, StageUpdateRequestDto.Area dto) {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
         stageMapper.updateArea(dto, foundStage);

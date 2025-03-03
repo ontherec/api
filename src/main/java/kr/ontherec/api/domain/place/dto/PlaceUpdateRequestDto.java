@@ -9,13 +9,10 @@ import java.time.Duration;
 import java.util.Set;
 
 public class PlaceUpdateRequestDto {
-        public record Title (
-                @NotBlank(message = "플레이스 이름을 입력해주세요.")
-                String title
-        ) {}
-
         public record Introduction (
-                String introduction,
+                @NotBlank(message = "플레이스 이름을 입력해주세요.")
+                String title,
+                String content,
                 Set<@Size(max = 10, message = "태그는 최대 10글자 입니다.") String> tags,
                 Set<@URL(message = "유효하지 않은 URL 입니다.") String> links
         ) {}
@@ -33,9 +30,9 @@ public class PlaceUpdateRequestDto {
                 @NotNull(message = "주차대수를 입력해주세요.")
                 @DecimalMax(value = "100", message = "주차대수는 최대 100대까지 설정 가능합니다.")
                 @PositiveOrZero(message = "주차대수는 최소 0대까지 설정 가능합니다.")
-                int parkingCapacity,
+                int capacity,
                 @Size(max = 50, message = "주차장 위치 정보는 최대 50글자까지 작성할 수 있습니다.")
-                String parkingLocation,
-                Boolean freeParking
+                String location,
+                Boolean free
         ) {}
 }

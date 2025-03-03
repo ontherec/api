@@ -41,17 +41,16 @@ public class Place extends BaseEntity {
     @Column(unique = true, updatable = false, nullable = false)
     private String brn;
 
-    // location
-    @Column(nullable = false)
-    private String title;
-
     @OneToOne(cascade = ALL, orphanRemoval = true)
     @JoinColumn(updatable = false, nullable = false)
     private Address address;
 
     // introduction
+    @Column(nullable = false)
+    private String title;
+
     @Column(columnDefinition = "TEXT")
-    private String introduction;
+    private String content;
 
     @ManyToMany(fetch = EAGER)
     private List<Tag> tags;

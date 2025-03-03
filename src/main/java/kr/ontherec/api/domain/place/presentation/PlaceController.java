@@ -52,7 +52,7 @@ public class PlaceController {
     ResponseEntity<Long> register(Authentication authentication, @Valid @RequestBody PlaceRegisterRequestDto dto) {
         Host host = hostService.getByUsername(authentication.getName());
         Place newPlace = placeMapper.registerRequestDtoToEntity(dto);
-        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
+        Set<Tag> tags = dto.introduction().tags() == null ? null : dto.introduction().tags()
                 .stream()
                 .map(s -> Tag.builder().title(s).build())
                 .map(tagService::getOrCreate)
@@ -60,18 +60,6 @@ public class PlaceController {
 
         Place place = placeCommandService.register(host, newPlace, tags);
         return ResponseEntity.created(URI.create("/v1/places/" + place.getId())).body(place.getId());
-    }
-
-    @PutMapping("/{id}/title")
-    ResponseEntity<Void> updateTitle(Authentication authentication,
-                                        @PathVariable Long id,
-                                        @Valid @RequestBody PlaceUpdateRequestDto.Title dto) {
-        Host host = hostService.getByUsername(authentication.getName());
-        if (!placeQueryService.isHost(id, host))
-            throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
-
-        placeCommandService.updateTitle(id, dto);
-        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/introduction")

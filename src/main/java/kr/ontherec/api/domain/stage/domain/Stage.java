@@ -37,19 +37,12 @@ public class Stage extends BaseEntity {
 
     // images
 
-    // location
+    // introduction
     @Column(nullable = false)
     private String title;
 
-    @Column(updatable = false, nullable = false)
-    private int floor;
-
-    @Column(updatable = false, nullable = false)
-    private boolean hasElevator;
-
-    // introduction
     @Column(columnDefinition = "TEXT")
-    private String introduction;
+    private String content;
 
     @Column(columnDefinition = "TEXT")
     private String guide;
@@ -63,6 +56,13 @@ public class Stage extends BaseEntity {
 
     @Column(nullable = false)
     private int likeCount;
+
+    // location
+    @Column(updatable = false, nullable = false)
+    private int floor;
+
+    @Column(updatable = false, nullable = false)
+    private boolean hasElevator;
 
     // Area
     @Column(nullable = false)

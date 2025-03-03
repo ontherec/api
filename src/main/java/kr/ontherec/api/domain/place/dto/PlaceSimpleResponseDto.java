@@ -6,7 +6,7 @@ import java.util.Set;
 
 public record PlaceSimpleResponseDto(
         Long id,
-        String title,
         Address address,
+        String title,
         Set<String> tags
 ) { }
