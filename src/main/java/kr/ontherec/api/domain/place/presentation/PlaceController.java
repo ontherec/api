@@ -62,10 +62,10 @@ public class PlaceController {
         return ResponseEntity.created(URI.create("/v1/places/" + place.getId())).body(place.getId());
     }
 
-    @PutMapping("/{id}/location")
+    @PutMapping("/{id}/title")
     ResponseEntity<Void> updateLocation(Authentication authentication,
                                         @PathVariable Long id,
-                                        @Valid @RequestBody PlaceUpdateRequestDto.Location dto) {
+                                        @Valid @RequestBody PlaceUpdateRequestDto.Title dto) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!placeQueryService.isHost(id, host))
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);

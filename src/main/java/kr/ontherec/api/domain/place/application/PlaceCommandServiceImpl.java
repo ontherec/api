@@ -31,7 +31,7 @@ public class PlaceCommandServiceImpl implements PlaceCommandService {
     }
 
     @Override
-    public void updateLocation(Long id, PlaceUpdateRequestDto.Location dto) {
+    public void updateLocation(Long id, PlaceUpdateRequestDto.Title dto) {
         Place foundPlace = placeRepository.findByIdOrThrow(id);
 
         placeMapper.updateLocation(dto, foundPlace);

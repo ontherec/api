@@ -6,6 +6,7 @@ import kr.ontherec.api.domain.stage.domain.StageType;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 public record StageResponseDto (
@@ -69,5 +70,9 @@ public record StageResponseDto (
         boolean allowsFoodDelivery,
         boolean allowsAlcohol,
         boolean sellDrink,
-        boolean sellAlcohol
+        boolean sellAlcohol,
+
+        // time
+        LocalDateTime createdAt,
+        LocalDateTime modifiedAt
 ) { }

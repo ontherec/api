@@ -115,14 +115,14 @@ class StageCommandServiceTest {
         assertThat(stage.getFloor()).isEqualTo(newStage.getFloor());
     }
 
-    @DisplayName("공연장 위치 정보 수정 성공")
+    @DisplayName("공연장 이름 수정 성공")
     @Test
     void updateLocation() {
         // given
         Host host = hostFactory.create("test");
         Place place = placeFactory.create(host, "place", "0000000000", null);
         Stage stage = stageFactory.create(place, "stage", null);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
+        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
 
         // when
         stageCommandService.updateLocation(stage.getId(), dto);
@@ -133,13 +133,13 @@ class StageCommandServiceTest {
         assertThat(foundStage.getTitle()).isEqualTo(dto.title());
     }
 
-    @DisplayName("공연장 위치 정보 수정 실패 - 등록되지 않은 공연장")
+    @DisplayName("공연장 이름 수정 실패 - 등록되지 않은 공연장")
     @Test
     void updateLocationWithUnregisteredId() {
         // given
         Host host = hostFactory.create("test");
         placeFactory.create(host, "place", "0000000000", null);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
+        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
 
         // when
         Throwable throwable = catchThrowable(() -> stageCommandService.updateLocation(1L, dto));

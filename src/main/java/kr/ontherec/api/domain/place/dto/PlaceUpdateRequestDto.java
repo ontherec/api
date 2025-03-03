@@ -10,7 +10,7 @@ import java.time.Duration;
 import java.util.Set;
 
 public class PlaceUpdateRequestDto {
-        public record Location (
+        public record Title (
                 @NotBlank(message = "플레이스 이름을 입력해주세요.")
                 String title
         ) {}

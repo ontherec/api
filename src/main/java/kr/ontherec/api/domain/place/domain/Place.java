@@ -52,11 +52,11 @@ public class Place extends BaseEntity {
     private String introduction;
 
     @ManyToMany(fetch = EAGER)
-    private List<Tag> tags = new ArrayList<>();
+    private List<Tag> tags;
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
-    private Set<Link> links = new HashSet<>();
+    private Set<Link> links;
 
     // business
     @Column(nullable = false)
@@ -67,7 +67,7 @@ public class Place extends BaseEntity {
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn(nullable = false)
-    private Set<Holiday> holidays = new HashSet<>();
+    private Set<Holiday> holidays;
 
     public void validateBookingPeriod() {
         if(bookingFrom == null || bookingUntil == null)

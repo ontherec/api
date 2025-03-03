@@ -12,14 +12,18 @@ public record PlaceResponseDto(
         Long id,
         HostResponseDto host,
         String brn,
+        // location
         String title,
         Address address,
+        // introduction
         String introduction,
         Set<String> tags,
         Set<String> links,
+        // business
         Duration bookingFrom,
         Duration bookingUntil,
         Set<HolidayType> holidays,
+        // time
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) { }

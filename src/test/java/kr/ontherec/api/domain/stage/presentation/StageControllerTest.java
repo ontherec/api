@@ -2,6 +2,7 @@ package kr.ontherec.api.domain.stage.presentation;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
+import com.epages.restdocs.apispec.SimpleType;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
@@ -298,7 +299,15 @@ class StageControllerTest {
                                                 .description("음료 판매 여부"),
                                         fieldWithPath("[].sellAlcohol")
                                                 .type(BOOLEAN)
-                                                .description("주류 판매 여부"))
+                                                .description("주류 판매 여부"),
+                                        fieldWithPath("[].createdAt")
+                                                .type(SimpleType.STRING)
+                                                .description("생성된 시간 (UTC)")
+                                                .optional(),
+                                        fieldWithPath("[].modifiedAt")
+                                                .type(SimpleType.STRING)
+                                                .description("수정된 시간 (UTC)")
+                                                .optional())
                                 .build())))
         .when()
                 .get("/stages")
@@ -523,7 +532,15 @@ class StageControllerTest {
                                                 .description("음료 판매 여부"),
                                         fieldWithPath("sellAlcohol")
                                                 .type(BOOLEAN)
-                                                .description("주류 판매 여부"))
+                                                .description("주류 판매 여부"),
+                                        fieldWithPath("createdAt")
+                                                .type(SimpleType.STRING)
+                                                .description("생성된 시간 (UTC)")
+                                                .optional(),
+                                        fieldWithPath("modifiedAt")
+                                                .type(SimpleType.STRING)
+                                                .description("수정된 시간 (UTC)")
+                                                .optional())
                                 .build())))
         .when()
                 .get("/stages/{id}", stage.getId())
@@ -760,7 +777,7 @@ class StageControllerTest {
                 .body(notNullValue());
     }
 
-    @DisplayName("공연장 위치 정보 수정 성공")
+    @DisplayName("공연장 이름 수정 성공")
     @Test
     void updateTitle() {
 
@@ -768,31 +785,31 @@ class StageControllerTest {
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);
         Stage stage = stageFactory.create(place, "stage", tags);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
+        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .contentType(JSON)
                 .body(dto)
                 .filter(document(
-                        "update location",
+                        "update title",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
-                                .summary("update location")
-                                .description("공연장 위치 정보 수정")
-                                .requestSchema(Schema.schema(StageUpdateRequestDto.Location.class.getSimpleName()))
+                                .summary("update title")
+                                .description("공연장 이름 수정")
+                                .requestSchema(Schema.schema(StageUpdateRequestDto.Title.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("공연장 이름"))
                                 .build())))
         .when()
-                .put("/stages/{id}/location", stage.getId())
+                .put("/stages/{id}/title", stage.getId())
         .then()
                 .statusCode(OK.value());
     }
 
-    @DisplayName("공연장 위치 정보 수정 실패 - 권한 없음")
+    @DisplayName("공연장 이름 수정 실패 - 권한 없음")
     @Test
     void updateLocationWithoutAuthority() {
 
@@ -801,14 +818,14 @@ class StageControllerTest {
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);
         Stage stage = stageFactory.create(place, "stage", tags);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
+        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
                 .contentType(JSON)
                 .body(dto)
         .when()
-                .put("/stages/{id}/location", stage.getId())
+                .put("/stages/{id}/title", stage.getId())
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
@@ -837,7 +854,7 @@ class StageControllerTest {
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
                                 .summary("update introduction")
-                                .description("공연장 소개 정보 수정")
+                                .description("공연장 소개 수정")
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Introduction.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("introduction")
@@ -1164,7 +1181,7 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("update fnb policies")
                                 .description("공연장 식음료 정책 수정")
-                                .requestSchema(Schema.schema(StageUpdateRequestDto.Location.class.getSimpleName()))
+                                .requestSchema(Schema.schema(StageUpdateRequestDto.Title.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("allowsWater")
                                                 .type(BOOLEAN)

@@ -129,7 +129,7 @@ class HostControllerTest {
     void get() {
 
         // given
-        hostFactory.create("test");
+        Host host = hostFactory.create("test");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -170,10 +170,10 @@ class HostControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .get("/hosts/{id}", 1L)
+                .get("/hosts/{id}", host.getId())
         .then()
                 .statusCode(OK.value())
-                .body("id", equalTo(1));
+                .body("id", equalTo(host.getId().intValue()));
     }
 
     @Test
@@ -183,9 +183,9 @@ class HostControllerTest {
         given()
                 .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
-                .when()
+        .when()
                 .get("/hosts/{id}", 1L)
-                .then()
+        .then()
                 .statusCode(NOT_FOUND.getStatus().value())
                 .body("message", equalTo(NOT_FOUND.getMessage()));
     }

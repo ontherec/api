@@ -31,7 +31,7 @@ public interface PlaceMapper {
     @Mapping(target = "modifiedAt", expression = "java(LocalDateTime.now())")
     Place registerRequestDtoToEntity(PlaceRegisterRequestDto dto);
 
-    void updateLocation(PlaceUpdateRequestDto.Location dto, @MappingTarget Place place);
+    void updateLocation(PlaceUpdateRequestDto.Title dto, @MappingTarget Place place);
 
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "links", qualifiedByName = "deserializeLinks")
