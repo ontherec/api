@@ -1,5 +1,6 @@
 package kr.ontherec.api.domain.stage.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import kr.ontherec.api.domain.stage.domain.StageType;
 import org.hibernate.validator.constraints.URL;
@@ -9,7 +10,7 @@ import java.time.Duration;
 import java.util.Set;
 
 public class StageUpdateRequestDto {
-        public record Location(
+        public record Title(
                 @NotBlank(message = "공연장 이름을 입력해주세요")
                 String title
         ) {}
@@ -44,6 +45,7 @@ public class StageUpdateRequestDto {
         ) {}
 
         public record Business(
+                @Valid
                 @NotNull(message = "환불 정책을 입력해주세요.")
                 Set<RefundPolicyUpdateRequestDto> refundPolicies
         ) {}
@@ -74,13 +76,6 @@ public class StageUpdateRequestDto {
         ) {}
 
         public record Facilities(
-                @NotNull(message = "주차대수를 입력해주세요.")
-                @DecimalMax(value = "100", message = "주차대수는 최대 100대까지 설정 가능합니다.")
-                @Positive(message = "주차대수는 최소 1대까지 설정 가능합니다.")
-                int parkingCapacity,
-                @Size(max = 50, message = "주차장 위치 정보는 최대 50글자까지 작성할 수 있습니다.")
-                String parkingLocation,
-                Boolean freeParking,
                 @NotNull(message = "화장실 존재 여부를 입력해주세요.")
                 boolean hasRestroom,
                 @NotNull(message = "와이파이 제공 여부를 입력해주세요.")

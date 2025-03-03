@@ -62,15 +62,15 @@ public class PlaceController {
         return ResponseEntity.created(URI.create("/v1/places/" + place.getId())).body(place.getId());
     }
 
-    @PutMapping("/{id}/location")
-    ResponseEntity<Void> updateLocation(Authentication authentication,
+    @PutMapping("/{id}/title")
+    ResponseEntity<Void> updateTitle(Authentication authentication,
                                         @PathVariable Long id,
-                                        @Valid @RequestBody PlaceUpdateRequestDto.Location dto) {
+                                        @Valid @RequestBody PlaceUpdateRequestDto.Title dto) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!placeQueryService.isHost(id, host))
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
 
-        placeCommandService.updateLocation(id, dto);
+        placeCommandService.updateTitle(id, dto);
         return ResponseEntity.ok().build();
     }
 
@@ -101,6 +101,18 @@ public class PlaceController {
             throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
 
         placeCommandService.updateBusiness(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/parking")
+    ResponseEntity<Void> updateParking(Authentication authentication,
+                                        @PathVariable Long id,
+                                        @Valid @RequestBody PlaceUpdateRequestDto.Parking dto) {
+        Host host = hostService.getByUsername(authentication.getName());
+        if (!placeQueryService.isHost(id, host))
+            throw new PlaceException(PlaceExceptionCode.FORBIDDEN);
+
+        placeCommandService.updateParking(id, dto);
         return ResponseEntity.ok().build();
     }
 

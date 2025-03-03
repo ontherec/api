@@ -31,7 +31,7 @@ public interface StageMapper {
     @Mapping(target = "modifiedAt", expression = "java(LocalDateTime.now())")
     Stage registerRequestDtoToEntity(StageRegisterRequestDto dto);
 
-    void updateLocation(StageUpdateRequestDto.Location dto, @MappingTarget Stage stage);
+    void updateTitle(StageUpdateRequestDto.Title dto, @MappingTarget Stage stage);
 
     void updateArea(StageUpdateRequestDto.Area dto, @MappingTarget Stage stage);
 
@@ -65,15 +65,5 @@ public interface StageMapper {
     @AfterMapping
     default void validateEngineering(StageUpdateRequestDto.Engineering dto, @MappingTarget Stage stage) {
         stage.validateEngineering();
-    }
-
-    @AfterMapping
-    default void validateParking(StageRegisterRequestDto dto, @MappingTarget Stage stage) {
-        stage.validateParking();
-    }
-
-    @AfterMapping
-    default void validateParking(StageUpdateRequestDto.Facilities dto, @MappingTarget Stage stage) {
-        stage.validateParking();
     }
 }

@@ -87,9 +87,6 @@ class StageCommandServiceTest {
                 "https://docs.google.com/document",
                 Duration.ofDays(3),
                 // facilities
-                2,
-                "건물 뒤편",
-                true,
                 true,
                 true,
                 true,
@@ -115,17 +112,17 @@ class StageCommandServiceTest {
         assertThat(stage.getFloor()).isEqualTo(newStage.getFloor());
     }
 
-    @DisplayName("공연장 위치 정보 수정 성공")
+    @DisplayName("공연장 이름 수정 성공")
     @Test
-    void updateLocation() {
+    void updateTitle() {
         // given
         Host host = hostFactory.create("test");
         Place place = placeFactory.create(host, "place", "0000000000", null);
         Stage stage = stageFactory.create(place, "stage", null);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
+        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
 
         // when
-        stageCommandService.updateLocation(stage.getId(), dto);
+        stageCommandService.updateTitle(stage.getId(), dto);
 
         // then
         Stage foundStage = stageQueryService.get(stage.getId());
@@ -133,16 +130,16 @@ class StageCommandServiceTest {
         assertThat(foundStage.getTitle()).isEqualTo(dto.title());
     }
 
-    @DisplayName("공연장 위치 정보 수정 실패 - 등록되지 않은 공연장")
+    @DisplayName("공연장 이름 수정 실패 - 등록되지 않은 공연장")
     @Test
-    void updateLocationWithUnregisteredId() {
+    void updateTitleWithUnregisteredId() {
         // given
         Host host = hostFactory.create("test");
         placeFactory.create(host, "place", "0000000000", null);
-        StageUpdateRequestDto.Location dto = new StageUpdateRequestDto.Location("newStage");
+        StageUpdateRequestDto.Title dto = new StageUpdateRequestDto.Title("newStage");
 
         // when
-        Throwable throwable = catchThrowable(() -> stageCommandService.updateLocation(1L, dto));
+        Throwable throwable = catchThrowable(() -> stageCommandService.updateTitle(1L, dto));
 
         // then
         assertThat(throwable)
@@ -300,9 +297,6 @@ class StageCommandServiceTest {
         Place place = placeFactory.create(host, "place", "0000000000", null);
         Stage stage = stageFactory.create(place, "stage", null);
         StageUpdateRequestDto.Facilities dto = new StageUpdateRequestDto.Facilities(
-                30,
-                "건물 건너편 주차장",
-                false,
                 true,
                 true,
                 true,
@@ -317,9 +311,6 @@ class StageCommandServiceTest {
         // then
         Stage foundStage = stageQueryService.get(stage.getId());
 
-        assertThat(foundStage.getParkingCapacity()).isEqualTo(dto.parkingCapacity());
-        assertThat(foundStage.getParkingLocation()).isEqualTo(dto.parkingLocation());
-        assertThat(foundStage.getFreeParking()).isEqualTo(dto.freeParking());
         assertThat(foundStage.isHasRestroom()).isEqualTo(dto.hasRestroom());
         assertThat(foundStage.isHasWifi()).isEqualTo(dto.hasWifi());
         assertThat(foundStage.isHasCameraStanding()).isEqualTo(dto.hasCameraStanding());

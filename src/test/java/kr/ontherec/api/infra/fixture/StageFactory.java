@@ -56,9 +56,6 @@ public class StageFactory {
                 .cueSheetTemplate("https://docs.google.com/document")
                 .cueSheetDue(Duration.ofDays(3))
                 // facilities
-                .parkingCapacity(2)
-                .parkingLocation("건물 뒤편")
-                .freeParking(true)
                 .hasRestroom(true)
                 .hasWifi(true)
                 .hasCameraStanding(true)

@@ -71,15 +71,15 @@ public class StageController {
         return ResponseEntity.created(URI.create("/v1/stages/" + stage.getId())).body(stage.getId());
     }
 
-    @PutMapping("/{id}/location")
-    ResponseEntity<Void> updateLocation(Authentication authentication,
+    @PutMapping("/{id}/title")
+    ResponseEntity<Void> updateTitle(Authentication authentication,
                                         @PathVariable Long id,
-                                        @Valid @RequestBody StageUpdateRequestDto.Location dto) {
+                                        @Valid @RequestBody StageUpdateRequestDto.Title dto) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
 
-        stageCommandService.updateLocation(id, dto);
+        stageCommandService.updateTitle(id, dto);
         return ResponseEntity.ok().build();
     }
 

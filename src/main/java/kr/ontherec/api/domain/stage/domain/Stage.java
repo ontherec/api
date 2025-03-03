@@ -21,7 +21,6 @@ import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static kr.ontherec.api.domain.stage.exception.StageExceptionCode.NOT_VALID_ENGINEERING_FEE;
-import static kr.ontherec.api.domain.stage.exception.StageExceptionCode.NOT_VALID_PARKING;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
@@ -56,7 +55,7 @@ public class Stage extends BaseEntity {
     private String guide;
 
     @ManyToMany(fetch = EAGER)
-    private List<Tag> tags = new ArrayList<>();
+    private List<Tag> tags;
 
     // count
     @Column(nullable = false)
@@ -88,7 +87,7 @@ public class Stage extends BaseEntity {
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
-    private Set<RefundPolicy> refundPolicies = new HashSet<>();
+    private Set<RefundPolicy> refundPolicies;
 
     // engineering
     @Column(nullable = false)
@@ -128,15 +127,6 @@ public class Stage extends BaseEntity {
     // TODO: equipments
 
     // facilities
-    @Column(nullable = false)
-    private int parkingCapacity;
-
-    @Column
-    private String parkingLocation;
-
-    @Column
-    private Boolean freeParking;
-
     @Column(nullable = false)
     private boolean hasRestroom;
 
@@ -189,13 +179,6 @@ public class Stage extends BaseEntity {
             throw new StageException(NOT_VALID_ENGINEERING_FEE);
         if (!available && fee != null)
             throw new StageException(NOT_VALID_ENGINEERING_FEE);
-    }
-
-    public void validateParking() {
-        if (parkingCapacity > 0 && freeParking == null)
-            throw new StageException(NOT_VALID_PARKING);
-        if (parkingCapacity == 0 && freeParking != null)
-            throw new StageException(NOT_VALID_PARKING);
     }
 
     public Set<Tag> getTags() {
