@@ -1,13 +1,13 @@
 package kr.ontherec.api.domain.post.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 public record PostResponseDto (
         Long id,
         String username,
         String title,
-        List<String> tags,
+        Set<String> tags,
         String content,
         int viewCount,
         int likeCount,

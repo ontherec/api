@@ -1,9 +1,9 @@
 package kr.ontherec.api.domain.post.dto;
 
-import java.util.List;
+import java.util.Set;
 
 public record PostCreateRequestDto (
         String title,
-        List<String> tags,
+        Set<String> tags,
         String content
 ) {}

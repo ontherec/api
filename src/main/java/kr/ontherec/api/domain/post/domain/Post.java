@@ -6,7 +6,10 @@ import kr.ontherec.api.global.model.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -21,7 +24,7 @@ public class Post extends BaseEntity {
     private Long id;
 
     @Column(updatable = false, nullable = false)
-    private String username;
+    private String author;
 
     @Column(nullable = false)
     private String title;
@@ -37,4 +40,20 @@ public class Post extends BaseEntity {
 
     @Column(nullable = false)
     private int likeCount;
+
+    public Set<Tag> getTags() {
+        return tags == null ? new HashSet<>() : new HashSet<>(tags);
+    }
+
+    public void setTags(Set<Tag> tags) {
+        this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
+    }
+
+    public static abstract class PostBuilder<C extends Post, B extends Post.PostBuilder<C, B>> extends BaseEntityBuilder<C, B> {
+
+        public B tags(List<Tag> tags) {
+            this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
+            return self();
+        }
+    }
 }
