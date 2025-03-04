@@ -47,8 +47,7 @@ public class PostController {
     }
 
     @PostMapping
-    ResponseEntity<Long> register(@Valid @RequestBody PostCreateRequestDto dto) {
-
+    ResponseEntity<Long> create(Authentication authentication, @Valid @RequestBody PostCreateRequestDto dto) {
         Post newPost = postMapper.registerRequestDtoToEntity(dto);
         Set<Tag> tags = dto.tags() == null ? null : dto.tags()
                 .stream()
@@ -56,7 +55,7 @@ public class PostController {
                 .map(tagService::getOrCreate)
                 .collect(Collectors.toSet());
 
-        Post post = postCommandService.create(newPost, tags);
+        Post post = postCommandService.create(authentication.getName(), newPost, tags);
         return ResponseEntity.created(URI.create("/v1/posts/" + post.getId())).body(post.getId());
     }
 
@@ -79,7 +78,7 @@ public class PostController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> remove(Authentication authentication,
+    ResponseEntity<Void> delete(Authentication authentication,
                                 @PathVariable Long id) {
         if (!postQueryService.isAuthor(id, authentication.getName()))
             throw new PostException(PostExceptionCode.FORBIDDEN);

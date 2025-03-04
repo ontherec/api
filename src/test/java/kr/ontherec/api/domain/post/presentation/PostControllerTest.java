@@ -1,0 +1,330 @@
+package kr.ontherec.api.domain.post.presentation;
+
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.Schema;
+import com.epages.restdocs.apispec.SimpleType;
+import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
+import kr.ontherec.api.domain.post.domain.Post;
+import kr.ontherec.api.domain.post.dto.PostCreateRequestDto;
+import kr.ontherec.api.domain.post.dto.PostResponseDto;
+import kr.ontherec.api.domain.post.dto.PostUpdateRequestDto;
+import kr.ontherec.api.domain.tag.domain.Tag;
+import kr.ontherec.api.infra.IntegrationTest;
+import kr.ontherec.api.infra.fixture.PostFactory;
+import kr.ontherec.api.infra.fixture.TagFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+
+import java.util.Set;
+
+import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.SimpleType.NUMBER;
+import static com.epages.restdocs.apispec.SimpleType.STRING;
+import static io.restassured.RestAssured.given;
+import static io.restassured.http.ContentType.JSON;
+import static kr.ontherec.api.domain.post.exception.PostExceptionCode.FORBIDDEN;
+import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
+import static org.hamcrest.Matchers.*;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.snippet.Attributes.key;
+
+@IntegrationTest
+class PostControllerTest {
+    @Autowired private TagFactory tagFactory;
+    @Autowired private PostFactory postFactory;
+
+    @Value("${spring.security.api-key}")
+    private String API_KEY;
+
+    @LocalServerPort
+    private int port;
+
+    private RequestSpecification spec;
+
+    @BeforeEach
+    void setUp(RestDocumentationContextProvider restDocumentation) {
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.basePath = "/v1";
+        RestAssured.port = port;
+
+        this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)
+                .operationPreprocessors()
+                .withRequestDefaults(prettyPrint())
+                .withResponseDefaults(prettyPrint())
+        ).build();
+    }
+
+    @DisplayName("게시글 검색 성공")
+    @Test
+    void search() {
+        Set<Tag> tags = tagFactory.create("tag");
+        postFactory.create("test", "post", tags);
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "post search",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post search")
+                                .description("게시글 검색")
+                                .responseSchema(Schema.schema(PostResponseDto.class.getSimpleName() + "[]"))
+                                .responseFields(
+                                        fieldWithPath("[]")
+                                                .type(ARRAY)
+                                                .description("게시글 배열"),
+                                        fieldWithPath("[].id")
+                                                .type(NUMBER)
+                                                .description("게시글 식별자"),
+                                        fieldWithPath("[].author")
+                                                .type(STRING)
+                                                .description("게시글 작성자 ID"),
+                                        fieldWithPath("[].title")
+                                                .type(STRING)
+                                                .description("게시글 제목"),
+                                        fieldWithPath("[].tags[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("게시글 태그 목록")
+                                                .optional(),
+                                        fieldWithPath("[].content")
+                                                .type(STRING)
+                                                .description("게시글 본문"),
+                                        fieldWithPath("[].viewCount")
+                                                .type(NUMBER)
+                                                .description("조회수"),
+                                        fieldWithPath("[].likeCount")
+                                                .type(NUMBER)
+                                                .description("좋아요 수"),
+                                        fieldWithPath("[].createdAt")
+                                                .type(SimpleType.STRING)
+                                                .description("생성된 시간 (UTC)"),
+                                        fieldWithPath("[].modifiedAt")
+                                                .type(SimpleType.STRING)
+                                                .description("수정된 시간 (UTC)"))
+                                .build())))
+        .when()
+                .get("/posts")
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("게시글 조회 성공")
+    @Test
+    void get() {
+        Set<Tag> tags = tagFactory.create("tag");
+        Post post = postFactory.create("test", "post", tags);
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "post get",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post get")
+                                .description("게시글 조회")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("조회할 게시글 식별자"))
+                                .responseSchema(Schema.schema(PostResponseDto.class.getSimpleName() + "[]"))
+                                .responseFields(
+                                        fieldWithPath("id")
+                                                .type(NUMBER)
+                                                .description("게시글 식별자"),
+                                        fieldWithPath("author")
+                                                .type(STRING)
+                                                .description("게시글 작성자 ID"),
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("게시글 제목"),
+                                        fieldWithPath("tags[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("게시글 태그 목록")
+                                                .optional(),
+                                        fieldWithPath("content")
+                                                .type(STRING)
+                                                .description("게시글 본문"),
+                                        fieldWithPath("viewCount")
+                                                .type(NUMBER)
+                                                .description("조회수"),
+                                        fieldWithPath("likeCount")
+                                                .type(NUMBER)
+                                                .description("좋아요 수"),
+                                        fieldWithPath("createdAt")
+                                                .type(SimpleType.STRING)
+                                                .description("생성된 시간 (UTC)"),
+                                        fieldWithPath("modifiedAt")
+                                                .type(SimpleType.STRING)
+                                                .description("수정된 시간 (UTC)"))
+                                .build())))
+        .when()
+                .get("/posts/{id}", post.getId())
+        .then()
+                .statusCode(OK.value())
+                .body("id", equalTo(post.getId().intValue()));
+    }
+
+    @DisplayName("게시글 생성 성공")
+    @Test
+    void create() {
+        PostCreateRequestDto dto = new PostCreateRequestDto(
+                "post",
+                Set.of("tag"),
+                "post"
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "post create",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post create")
+                                .description("게시글 생성")
+                                .requestSchema(Schema.schema(PostCreateRequestDto.class.getSimpleName() + "[]"))
+                                .requestFields(
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("게시글 제목"),
+                                        fieldWithPath("tags[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("게시글 태그 목록")
+                                                .optional(),
+                                        fieldWithPath("content")
+                                                .type(STRING)
+                                                .description("게시글 본문"))
+                                .build())))
+        .when()
+                .post("/posts")
+        .then()
+                .statusCode(CREATED.value())
+                .header("Location", startsWith("/v1/posts"))
+                .body(notNullValue());
+    }
+
+    @DisplayName("게시글 수정 성공")
+    @Test
+    void update() {
+        Set<Tag> tags = tagFactory.create("tag");
+        Post post = postFactory.create("test", "post", tags);
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                "post",
+                Set.of("tag"),
+                "post"
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "post update",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post update")
+                                .description("게시글 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("수정할 게시글 식별자"))
+                                .requestSchema(Schema.schema(PostUpdateRequestDto.class.getSimpleName() + "[]"))
+                                .requestFields(
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("게시글 제목"),
+                                        fieldWithPath("tags[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("게시글 태그 목록")
+                                                .optional(),
+                                        fieldWithPath("content")
+                                                .type(STRING)
+                                                .description("게시글 본문"))
+                                .build())))
+        .when()
+                .put("/posts/{id}", post.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("게시글 수정 실패 - 권한 없음")
+    @Test
+    void updateWithoutAuthority() {
+        Set<Tag> tags = tagFactory.create("tag");
+        Post post = postFactory.create("user", "post", tags);
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                "post",
+                Set.of("tag"),
+                "post"
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+        .when()
+                .put("/posts/{id}", post.getId())
+        .then()
+                .statusCode(FORBIDDEN.getStatus().value())
+                .body("message", equalTo(FORBIDDEN.getMessage()));
+    }
+
+    @DisplayName("게시글 삭제 성공")
+    @Test
+    void delete() {
+        Set<Tag> tags = tagFactory.create("tag");
+        Post post = postFactory.create("test", "post", tags);
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "post delete",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post delete")
+                                .description("게시글 삭제")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("삭제할 게시글 식별자"))
+                                .build())))
+        .when()
+                .delete("/posts/{id}", post.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("게시글 삭제 실패 - 권한 없음")
+    @Test
+    void deleteWithoutAuthority() {
+        Set<Tag> tags = tagFactory.create("tag");
+        Post post = postFactory.create("user", "post", tags);
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+        .when()
+                .delete("/posts/{id}", post.getId())
+        .then()
+                .statusCode(FORBIDDEN.getStatus().value())
+                .body("message", equalTo(FORBIDDEN.getMessage()));
+    }
+}
