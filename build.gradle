@@ -81,6 +81,11 @@ openapi3 {
     description = '개발 서버에서 제공되는 On The Record API 서버의 문서 입니다. 상단 URL 의 서버를 변경하여, 해당 서버의 문서를 확인할 수 있습니다.'
     version = '0.3.0'
     format = 'json'
+    oauth2SecuritySchemeDefinition = {
+        flows = ['authorizationCode']
+        tokenUrl = 'https://accounts.ontherec.live/oauth2/token'
+        authorizationUrl = 'https://accounts.ontherec.live/oauth2/authroize'
+    }
 }
 
 tasks.register('docs', Copy) {

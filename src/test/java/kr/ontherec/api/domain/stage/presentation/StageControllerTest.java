@@ -149,6 +149,9 @@ class StageControllerTest {
                                                 .description("플레이스 태그 목록")
                                                 .optional(),
                                         // introduction
+                                        fieldWithPath("[].introduction")
+                                                .type(OBJECT)
+                                                .description("공연장 소개 정보"),
                                         fieldWithPath("[].introduction.title")
                                                 .type(STRING)
                                                 .description("공연장 이름"),
@@ -166,6 +169,9 @@ class StageControllerTest {
                                                 .description("공연장 태그 목록")
                                                 .optional(),
                                         // location
+                                        fieldWithPath("[].location")
+                                                .type(OBJECT)
+                                                .description("공연장 위치 정보"),
                                         fieldWithPath("[].location.floor")
                                                 .type(NUMBER)
                                                 .description("층수"),
@@ -180,6 +186,9 @@ class StageControllerTest {
                                                 .type(STRING)
                                                 .description("좋아요 수"),
                                         // area
+                                        fieldWithPath("[].area")
+                                                .type(OBJECT)
+                                                .description("공연장 면적 정보"),
                                         fieldWithPath("[].area.minCapacity")
                                                 .type(NUMBER)
                                                 .description("최소 수용인원 (좌석 기준)"),
@@ -191,11 +200,14 @@ class StageControllerTest {
                                                 .description("무대 타입 - " + Arrays.toString(StageType.values())),
                                         fieldWithPath("[].area.stageWidth")
                                                 .type(NUMBER)
-                                                .description("무대 가로 길이"),
+                                                .description("무대 가로 길이 (소수점 첫 번째 자리 이하)"),
                                         fieldWithPath("[].area.stageHeight")
                                                 .type(NUMBER)
-                                                .description("무대 세로 길이"),
+                                                .description("무대 세로 길이 (소수점 첫 번째 자리 이하)"),
                                         // business
+                                        fieldWithPath("[].business")
+                                                .type(OBJECT)
+                                                .description("공연장 영업 정보"),
                                         fieldWithPath("[].business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
@@ -205,11 +217,14 @@ class StageControllerTest {
                                                 .description("환불 정책 식별자"),
                                         fieldWithPath("[].business.refundPolicies[].dayBefore")
                                                 .type(STRING)
-                                                .description("환불 기한"),
+                                                .description("환불 마감 기한 (ISO 8601 Duration)"),
                                         fieldWithPath("[].business.refundPolicies[].percent")
                                                 .type(NUMBER)
-                                                .description("환불 비율"),
+                                                .description("환불 비율 (소수점 첫 번째 자리 이하)"),
                                         // engineering
+                                        fieldWithPath("[].engineering")
+                                                .type(OBJECT)
+                                                .description("공연장 엔지니어링 정보"),
                                         fieldWithPath("[].engineering.stageManagingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("스테이지 매니징 제공 여부"),
@@ -239,6 +254,9 @@ class StageControllerTest {
                                                 .description("촬영 비용")
                                                 .optional(),
                                         // documents
+                                        fieldWithPath("[].documents")
+                                                .type(OBJECT)
+                                                .description("공연장 문서 정보"),
                                         fieldWithPath("[].documents.applicationForm")
                                                 .type(STRING)
                                                 .description("대관 신청서 양식 URL")
@@ -248,8 +266,11 @@ class StageControllerTest {
                                                 .description("큐시트 양식 URL"),
                                         fieldWithPath("[].documents.cueSheetDue")
                                                 .type(STRING)
-                                                .description("큐시트 제출 마감 기한"),
+                                                .description("큐시트 제출 마감 기한 (ISO 8601 Duration)"),
                                         // facilities
+                                        fieldWithPath("[].facilities")
+                                                .type(OBJECT)
+                                                .description("공연장 편의시설 정보"),
                                         fieldWithPath("[].facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -269,6 +290,9 @@ class StageControllerTest {
                                                 .type(BOOLEAN)
                                                 .description("물품보관함 존재 여부"),
                                         // fnb policies
+                                        fieldWithPath("[].fnbPolicies")
+                                                .type(OBJECT)
+                                                .description("공연장 식음료 정책"),
                                         fieldWithPath("[].fnbPolicies.allowsWater")
                                                 .type(BOOLEAN)
                                                 .description("물 반입 허용 여부"),
@@ -292,12 +316,10 @@ class StageControllerTest {
                                                 .description("주류 판매 여부"),
                                         fieldWithPath("[].createdAt")
                                                 .type(SimpleType.STRING)
-                                                .description("생성된 시간 (UTC)")
-                                                .optional(),
+                                                .description("생성된 시간 (UTC)"),
                                         fieldWithPath("[].modifiedAt")
                                                 .type(SimpleType.STRING)
-                                                .description("수정된 시간 (UTC)")
-                                                .optional())
+                                                .description("수정된 시간 (UTC)"))
                                 .build())))
         .when()
                 .get("/stages")
@@ -322,6 +344,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage get")
                                 .description("공연장 조회")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("조회할 공연장 식별자"))
                                 .responseSchema(Schema.schema(StageResponseDto.class.getSimpleName()))
                                 .responseFields(
                                         fieldWithPath("id")
@@ -371,6 +397,9 @@ class StageControllerTest {
                                                 .description("플레이스 태그 목록")
                                                 .optional(),
                                         // introduction
+                                        fieldWithPath("introduction")
+                                                .type(OBJECT)
+                                                .description("공연장 소개 정보"),
                                         fieldWithPath("introduction.title")
                                                 .type(STRING)
                                                 .description("공연장 이름"),
@@ -388,6 +417,9 @@ class StageControllerTest {
                                                 .description("공연장 태그 목록")
                                                 .optional(),
                                         // location
+                                        fieldWithPath("location")
+                                                .type(OBJECT)
+                                                .description("공연장 위치 정보"),
                                         fieldWithPath("location.floor")
                                                 .type(NUMBER)
                                                 .description("층수"),
@@ -402,6 +434,9 @@ class StageControllerTest {
                                                 .type(STRING)
                                                 .description("좋아요 수"),
                                         // area
+                                        fieldWithPath("area")
+                                                .type(OBJECT)
+                                                .description("공연장 면적 정보"),
                                         fieldWithPath("area.minCapacity")
                                                 .type(NUMBER)
                                                 .description("최소 수용인원 (좌석 기준)"),
@@ -413,11 +448,14 @@ class StageControllerTest {
                                                 .description("무대 타입 - " + Arrays.toString(StageType.values())),
                                         fieldWithPath("area.stageWidth")
                                                 .type(NUMBER)
-                                                .description("무대 가로 길이"),
+                                                .description("무대 가로 길이 (소수점 첫 번째 자리 이하)"),
                                         fieldWithPath("area.stageHeight")
                                                 .type(NUMBER)
-                                                .description("무대 세로 길이"),
+                                                .description("무대 세로 길이 (소수점 첫 번째 자리 이하)"),
                                         // business
+                                        fieldWithPath("business")
+                                                .type(OBJECT)
+                                                .description("공연장 영업 정보"),
                                         fieldWithPath("business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
@@ -427,11 +465,14 @@ class StageControllerTest {
                                                 .description("환불 정책 식별자"),
                                         fieldWithPath("business.refundPolicies[].dayBefore")
                                                 .type(STRING)
-                                                .description("환불 기한"),
+                                                .description("환불 마감 기한 (ISO 8601 Duration)"),
                                         fieldWithPath("business.refundPolicies[].percent")
                                                 .type(NUMBER)
-                                                .description("환불 비율"),
+                                                .description("환불 비율 (소수점 첫 번째 자리 이하)"),
                                         // engineering
+                                        fieldWithPath("engineering")
+                                                .type(OBJECT)
+                                                .description("공연장 엔지니어링 정보"),
                                         fieldWithPath("engineering.stageManagingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("스테이지 매니징 제공 여부"),
@@ -461,6 +502,9 @@ class StageControllerTest {
                                                 .description("촬영 비용")
                                                 .optional(),
                                         // documents
+                                        fieldWithPath("documents")
+                                                .type(OBJECT)
+                                                .description("공연장 문서 정보"),
                                         fieldWithPath("documents.applicationForm")
                                                 .type(STRING)
                                                 .description("대관 신청서 양식 URL")
@@ -470,8 +514,11 @@ class StageControllerTest {
                                                 .description("큐시트 양식 URL"),
                                         fieldWithPath("documents.cueSheetDue")
                                                 .type(STRING)
-                                                .description("큐시트 제출 마감 기한"),
+                                                .description("큐시트 제출 마감 기한 (ISO 8601 Duration)"),
                                         // facilities
+                                        fieldWithPath("facilities")
+                                                .type(OBJECT)
+                                                .description("공연장 편의시설 정보"),
                                         fieldWithPath("facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -491,6 +538,9 @@ class StageControllerTest {
                                                 .type(BOOLEAN)
                                                 .description("물품보관함 존재 여부"),
                                         // fnb policies
+                                        fieldWithPath("fnbPolicies")
+                                                .type(OBJECT)
+                                                .description("공연장 식음료 정책"),
                                         fieldWithPath("fnbPolicies.allowsWater")
                                                 .type(BOOLEAN)
                                                 .description("물 반입 허용 여부"),
@@ -514,12 +564,10 @@ class StageControllerTest {
                                                 .description("주류 판매 여부"),
                                         fieldWithPath("createdAt")
                                                 .type(SimpleType.STRING)
-                                                .description("생성된 시간 (UTC)")
-                                                .optional(),
+                                                .description("생성된 시간 (UTC)"),
                                         fieldWithPath("modifiedAt")
                                                 .type(SimpleType.STRING)
-                                                .description("수정된 시간 (UTC)")
-                                                .optional())
+                                                .description("수정된 시간 (UTC)"))
                                 .build())))
         .when()
                 .get("/stages/{id}", stage.getId())
@@ -610,6 +658,9 @@ class StageControllerTest {
                                                 .type(NUMBER)
                                                 .description("공연장을 등록할 플레이스 식별자"),
                                         // location
+                                        fieldWithPath("location")
+                                                .type(OBJECT)
+                                                .description("공연장 위치 정보"),
                                         fieldWithPath("location.floor")
                                                 .type(NUMBER)
                                                 .description("층수"),
@@ -617,6 +668,9 @@ class StageControllerTest {
                                                 .type(BOOLEAN)
                                                 .description("엘리베이터 존재 여부"),
                                         // introduction
+                                        fieldWithPath("introduction")
+                                                .type(OBJECT)
+                                                .description("공연장 소개 정보"),
                                         fieldWithPath("introduction.title")
                                                 .type(STRING)
                                                 .description("공연장 이름"),
@@ -634,6 +688,9 @@ class StageControllerTest {
                                                 .description("공연장 태그 목록")
                                                 .optional(),
                                         // area
+                                        fieldWithPath("area")
+                                                .type(OBJECT)
+                                                .description("공연장 면적 정보"),
                                         fieldWithPath("area.minCapacity")
                                                 .type(NUMBER)
                                                 .description("최소 수용인원 (좌석 기준)"),
@@ -645,22 +702,28 @@ class StageControllerTest {
                                                 .description("무대 타입 - " + Arrays.toString(StageType.values())),
                                         fieldWithPath("area.stageWidth")
                                                 .type(NUMBER)
-                                                .description("무대 가로 길이"),
+                                                .description("무대 가로 길이 (소수점 첫 번째 자리 이하)"),
                                         fieldWithPath("area.stageHeight")
                                                 .type(NUMBER)
-                                                .description("무대 세로 길이"),
+                                                .description("무대 세로 길이 (소수점 첫 번째 자리 이하)"),
                                         // business
+                                        fieldWithPath("business")
+                                                .type(OBJECT)
+                                                .description("공연장 영업 정보"),
                                         fieldWithPath("business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
                                                 .optional(),
                                         fieldWithPath("business.refundPolicies[].dayBefore")
                                                 .type(STRING)
-                                                .description("환불 기한"),
+                                                .description("환불 마감 기한 (ISO 8601 Duration)"),
                                         fieldWithPath("business.refundPolicies[].percent")
                                                 .type(NUMBER)
-                                                .description("환불 비율"),
+                                                .description("환불 비율 (소수점 첫 번째 자리 이하)"),
                                         // engineering
+                                        fieldWithPath("engineering")
+                                                .type(OBJECT)
+                                                .description("공연장 엔지니어링 정보"),
                                         fieldWithPath("engineering.stageManagingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("스테이지 매니징 제공 여부"),
@@ -690,6 +753,9 @@ class StageControllerTest {
                                                 .description("촬영 비용")
                                                 .optional(),
                                         // documents
+                                        fieldWithPath("documents")
+                                                .type(OBJECT)
+                                                .description("공연장 문서 정보"),
                                         fieldWithPath("documents.applicationForm")
                                                 .type(STRING)
                                                 .description("대관 신청서 양식 URL")
@@ -699,8 +765,11 @@ class StageControllerTest {
                                                 .description("큐시트 양식 URL"),
                                         fieldWithPath("documents.cueSheetDue")
                                                 .type(STRING)
-                                                .description("큐시트 제출 마감 기한"),
+                                                .description("큐시트 제출 마감 기한 (ISO 8601 Duration)"),
                                         // facilities
+                                        fieldWithPath("facilities")
+                                                .type(OBJECT)
+                                                .description("공연장 편의시설 정보"),
                                         fieldWithPath("facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -720,6 +789,9 @@ class StageControllerTest {
                                                 .type(BOOLEAN)
                                                 .description("물품보관함 존재 여부"),
                                         // fnb policies
+                                        fieldWithPath("fnbPolicies")
+                                                .type(OBJECT)
+                                                .description("공연장 식음료 정책"),
                                         fieldWithPath("fnbPolicies.allowsWater")
                                                 .type(BOOLEAN)
                                                 .description("물 반입 허용 여부"),
@@ -851,6 +923,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage update introduction")
                                 .description("공연장 소개 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("소개를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Introduction.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("title")
@@ -930,6 +1006,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage update area")
                                 .description("공연장 면적 정보 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("면적 정보를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Area.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("minCapacity")
@@ -943,10 +1023,10 @@ class StageControllerTest {
                                                 .description("무대 타입 - " + Arrays.toString(StageType.values())),
                                         fieldWithPath("stageWidth")
                                                 .type(NUMBER)
-                                                .description("무대 가로 길이"),
+                                                .description("무대 가로 길이 (소수점 첫 번째 자리 이하)"),
                                         fieldWithPath("stageHeight")
                                                 .type(NUMBER)
-                                                .description("무대 세로 길이"))
+                                                .description("무대 세로 길이 (소수점 첫 번째 자리 이하)"))
                                 .build())))
         .when()
                 .put("/stages/{id}/area", stage.getId())
@@ -980,6 +1060,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage update business")
                                 .description("공연장 영업 정보 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("영업 정보를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Business.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("refundPolicies[]")
@@ -991,10 +1075,10 @@ class StageControllerTest {
                                                 .description("환불 정책 식별자"),
                                         fieldWithPath("refundPolicies[].dayBefore")
                                                 .type(STRING)
-                                                .description("환불 기한"),
+                                                .description("환불 마감 기한 (ISO 8601 Duration)"),
                                         fieldWithPath("refundPolicies[].percent")
                                                 .type(NUMBER)
-                                                .description("환불 비율"))
+                                                .description("환불 비율 (소수점 첫 번째 자리 이하)"))
                                 .build())))
         .when()
                 .put("/stages/{id}/business", stage.getId())
@@ -1031,6 +1115,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage update engineering")
                                 .description("공연장 엔지니어링 정보 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("엔지니어링 정보를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Engineering.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("stageManagingAvailable")
@@ -1092,6 +1180,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage update documents")
                                 .description("공연장 문서 정보 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("문서 정보를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Documents.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("applicationForm")
@@ -1103,7 +1195,7 @@ class StageControllerTest {
                                                 .description("큐시트 양식 URL"),
                                         fieldWithPath("cueSheetDue")
                                                 .type(STRING)
-                                                .description("큐시트 제출 마감 기한"))
+                                                .description("큐시트 제출 마감 기한 (ISO 8601 Duration)"))
                                 .build())))
         .when()
                 .put("/stages/{id}/documents", stage.getId())
@@ -1138,6 +1230,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage update facilities")
                                 .description("공연장 편의시설 정보 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("편의시설 정보를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Facilities.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("hasRestroom")
@@ -1193,6 +1289,10 @@ class StageControllerTest {
                                 .tag("stage")
                                 .summary("stage update fnb policies")
                                 .description("공연장 식음료 정책 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("식음료 정책을 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.FnbPolicies.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("allowsWater")

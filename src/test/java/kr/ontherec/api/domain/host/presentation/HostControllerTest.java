@@ -158,7 +158,7 @@ class HostControllerTest {
                                                 .optional(),
                                         fieldWithPath("averageResponseTime")
                                                 .type(NUMBER)
-                                                .description("평균 응답 시간")
+                                                .description("평균 응답 시간 (ISO 8601 Duration)")
                                                 .optional(),
                                         fieldWithPath("createdAt")
                                                 .type(STRING)

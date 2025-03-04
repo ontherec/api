@@ -121,7 +121,7 @@ class PlaceControllerTest {
                                                 .optional(),
                                         fieldWithPath("[].host.averageResponseTime")
                                                 .type(STRING)
-                                                .description("평균 응답 시간")
+                                                .description("평균 응답 시간 (ISO 8601 Duration)")
                                                 .optional(),
                                         fieldWithPath("[].brn")
                                                 .type(STRING)
@@ -178,16 +178,13 @@ class PlaceControllerTest {
                                         // business
                                         fieldWithPath("[].business")
                                                 .type(OBJECT)
-                                                .description("플레이스 영업 정보")
-                                                .optional(),
+                                                .description("플레이스 영업 정보"),
                                         fieldWithPath("[].business.bookingFrom")
                                                 .type(STRING)
-                                                .description("예약 시작 기간")
-                                                .optional(),
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("[].business.bookingUntil")
                                                 .type(STRING)
-                                                .description("예약 마감 기간")
-                                                .optional(),
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("[].business.holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
@@ -210,12 +207,10 @@ class PlaceControllerTest {
                                         // time
                                         fieldWithPath("[].createdAt")
                                                 .type(SimpleType.STRING)
-                                                .description("생성된 시간 (UTC)")
-                                                .optional(),
+                                                .description("생성된 시간 (UTC)"),
                                         fieldWithPath("[].modifiedAt")
                                                 .type(SimpleType.STRING)
-                                                .description("수정된 시간 (UTC)")
-                                                .optional())
+                                                .description("수정된 시간 (UTC)"))
                                 .build())))
         .when()
                 .get()
@@ -328,12 +323,10 @@ class PlaceControllerTest {
                                                 .description("플레이스 영업 정보"),
                                         fieldWithPath("business.bookingFrom")
                                                 .type(STRING)
-                                                .description("예약 시작 기간")
-                                                .optional(),
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("business.bookingUntil")
                                                 .type(STRING)
-                                                .description("예약 마감 기간")
-                                                .optional(),
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("business.holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
@@ -478,6 +471,10 @@ class PlaceControllerTest {
                                 .tag("place")
                                 .summary("place get")
                                 .description("플레이스 조회")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("조회할 플레이스 식별자"))
                                 .responseSchema(Schema.schema(PlaceResponseDto.class.getSimpleName()))
                                 .responseFields(
                                         fieldWithPath("id")
@@ -502,7 +499,7 @@ class PlaceControllerTest {
                                                 .optional(),
                                         fieldWithPath("host.averageResponseTime")
                                                 .type(STRING)
-                                                .description("평균 응답 시간")
+                                                .description("평균 응답 시간 (ISO 8601 Duration)")
                                                 .optional(),
                                         fieldWithPath("brn")
                                                 .type(STRING)
@@ -563,12 +560,10 @@ class PlaceControllerTest {
                                                 .description("플레이스 영업 정보"),
                                         fieldWithPath("business.bookingFrom")
                                                 .type(STRING)
-                                                .description("예약 시작 기간")
-                                                .optional(),
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("business.bookingUntil")
                                                 .type(STRING)
-                                                .description("예약 마감 기간")
-                                                .optional(),
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("business.holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
@@ -592,12 +587,10 @@ class PlaceControllerTest {
                                         // time
                                         fieldWithPath("createdAt")
                                                 .type(SimpleType.STRING)
-                                                .description("생성된 시간 (UTC)")
-                                                .optional(),
+                                                .description("생성된 시간 (UTC)"),
                                         fieldWithPath("modifiedAt")
                                                 .type(SimpleType.STRING)
-                                                .description("수정된 시간 (UTC)")
-                                                .optional())
+                                                .description("수정된 시간 (UTC)"))
                                 .build())))
         .when()
                 .get("/{id}", place.getId())
@@ -645,6 +638,10 @@ class PlaceControllerTest {
                                 .tag("place")
                                 .summary("place update introduction")
                                 .description("플레이스 소개 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("소개를 수정할 플레이스 식별자"))
                                 .requestSchema(Schema.schema(PlaceUpdateRequestDto.Introduction.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("title")
@@ -722,14 +719,18 @@ class PlaceControllerTest {
                                 .tag("place")
                                 .summary("place update business")
                                 .description("플레이스 영업 정보 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("영업 정보를 수정할 플레이스 식별자"))
                                 .requestSchema(Schema.schema(PlaceUpdateRequestDto.Business.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("bookingFrom")
                                                 .type(STRING)
-                                                .description("예약 시작 기간"),
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("bookingUntil")
                                                 .type(STRING)
-                                                .description("예약 마감 기간"),
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("holidays[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value("enum"))
@@ -766,7 +767,11 @@ class PlaceControllerTest {
                                 .tag("place")
                                 .summary("place update parking")
                                 .description("플레이스 주차 정보 수정")
-                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Business.class.getSimpleName()))
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("주차 정보를 수정할 플레이스 식별자"))
+                                .requestSchema(Schema.schema(PlaceUpdateRequestDto.Parking.class.getSimpleName()))
                                 .requestFields(
                                         fieldWithPath("capacity")
                                                 .type(NUMBER)
