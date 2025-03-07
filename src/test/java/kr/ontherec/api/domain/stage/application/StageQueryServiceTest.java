@@ -73,7 +73,7 @@ class StageQueryServiceTest {
                 .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
     }
 
-    @DisplayName("호스트 확인 성공")
+    @DisplayName("공연장 호스트 확인 성공")
     @Test
     void isHost() {
         // given
@@ -88,7 +88,7 @@ class StageQueryServiceTest {
         assertThat(isHost).isEqualTo(true);
     }
 
-    @DisplayName("호스트 확인 실패 - 등록되지 않은 공연장")
+    @DisplayName("공연장 호스트 확인 실패 - 등록되지 않은 공연장")
     @Test
     void isHostWithUnregisteredId() {
         // given

@@ -43,6 +43,9 @@ public interface PlaceMapper {
     @Mapping(target = "holidays", qualifiedByName = "deserializeHolidays")
     void updateBusiness(PlaceUpdateRequestDto.Business dto, @MappingTarget Place place);
 
+    @Mapping(source = "capacity", target = "parkingCapacity")
+    @Mapping(source = "location", target = "parkingLocation")
+    @Mapping(source = "free", target = "freeParking")
     void updateParking(PlaceUpdateRequestDto.Parking dto, @MappingTarget Place place);
 
     @Mapping(source = "title", target = "introduction.title")
