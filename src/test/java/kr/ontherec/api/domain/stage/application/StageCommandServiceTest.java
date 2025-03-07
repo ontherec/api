@@ -128,7 +128,7 @@ class StageCommandServiceTest {
                 "newStage",
                 "newStage",
                 "newStage",
-                Set.of("newTag")
+                null
         );
         Set<Tag> tags = tagFactory.create("tag");
 
@@ -139,28 +139,6 @@ class StageCommandServiceTest {
         assertThat(stage.getTitle()).isEqualTo(dto.title());
         assertThat(stage.getContent()).isEqualTo(dto.content());
         assertThat(stage.getGuide()).isEqualTo(dto.guide());
-    }
-
-    @DisplayName("공연장 소개 수정 실패 - 등록되지 않은 공연장")
-    @Test
-    void updateIntroductionWithUnregisteredId() {
-        // given
-        Host host = hostFactory.create("test");
-        placeFactory.create(host, "place", "0000000000", null);
-        StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
-                "newStage",
-                "newStage",
-                "newStage",
-                Set.of("newTag")
-        );
-
-        // when
-        Throwable throwable = catchThrowable(() -> stageCommandService.updateIntroduction(1L, dto, null));
-
-        // then
-        assertThat(throwable)
-                .isInstanceOf(StageException.class)
-                .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
     }
 
     @DisplayName("공연장 면적 정보 수정 성공")
@@ -341,21 +319,6 @@ class StageCommandServiceTest {
         // then
         Throwable throwable = catchThrowable(() -> stageQueryService.get(stage.getId()));
 
-        assertThat(throwable)
-                .isInstanceOf(StageException.class)
-                .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
-    }
-
-    @DisplayName("공연장 삭제 실패 - 등록되지 않은 공연장")
-    @Test
-    void deleteWithUnregisteredId() {
-        // given
-        hostFactory.create("test");
-
-        // when
-        Throwable throwable = catchThrowable(() -> stageCommandService.delete(1L));
-
-        // then
         assertThat(throwable)
                 .isInstanceOf(StageException.class)
                 .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());

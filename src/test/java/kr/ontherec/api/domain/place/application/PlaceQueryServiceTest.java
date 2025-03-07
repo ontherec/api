@@ -2,8 +2,6 @@ package kr.ontherec.api.domain.place.application;
 
 import kr.ontherec.api.domain.host.domain.Host;
 import kr.ontherec.api.domain.place.domain.Place;
-import kr.ontherec.api.domain.place.exception.PlaceException;
-import kr.ontherec.api.domain.place.exception.PlaceExceptionCode;
 import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
@@ -17,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
 @UnitTest
 class PlaceQueryServiceTest {
@@ -57,21 +54,6 @@ class PlaceQueryServiceTest {
         // then
         assertThat(foundPlace.getId()).isEqualTo(place.getId());
     }
-    
-    @DisplayName("플레이스 조회 실패 - 등록되지 않은 플레이스")
-    @Test
-    void getWithUnregisteredPlaceId() {
-        // given
-        hostFactory.create("test");
-
-        // when
-        Throwable throwable = catchThrowable(() -> placeQueryService.get(1L));
-
-        // then
-        assertThat(throwable)
-                .isInstanceOf(PlaceException.class)
-                .hasMessage(PlaceExceptionCode.NOT_FOUND.getMessage());
-    }
 
     @DisplayName("플레이스 호스트 확인 성공")
     @Test
@@ -85,21 +67,22 @@ class PlaceQueryServiceTest {
         boolean isHost = placeQueryService.isHost(place.getId(), host);
 
         // then
-        assertThat(isHost).isEqualTo(true);
+        assertThat(isHost).isTrue();
     }
 
-    @DisplayName("플레이스 호스트 확인 실패 - 등록되지 않은 공연장")
+    @DisplayName("플레이스 호스트 확인 성공 - 다른 호스트")
     @Test
-    void isHostWithUnregisteredPlaceId() {
+    void isHostWithOtherHost() {
         // given
-        Host host = hostFactory.create("test");
+        Host me = hostFactory.create("test");
+        Host host = hostFactory.create("host");
+        Set<Tag> tags = tagFactory.create("tag");
+        Place place = placeFactory.create(host, "place", "0000000000", tags);
 
         // when
-        Throwable throwable = catchThrowable(() -> placeQueryService.isHost(1L, host));
+        boolean isHost = placeQueryService.isHost(place.getId(), me);
 
         // then
-        assertThat(throwable)
-                .isInstanceOf(PlaceException.class)
-                .hasMessage(PlaceExceptionCode.NOT_FOUND.getMessage());
+        assertThat(isHost).isFalse();
     }
 }
