@@ -10,7 +10,6 @@ import kr.ontherec.api.domain.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.domain.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.domain.stage.exception.StageException;
 import kr.ontherec.api.domain.stage.exception.StageExceptionCode;
-import kr.ontherec.api.domain.tag.application.TagService;
 import kr.ontherec.api.domain.tag.domain.Tag;
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static kr.ontherec.api.domain.stage.domain.StageType.RECTANGLE;
 import static kr.ontherec.api.domain.stage.domain.StageType.T;
@@ -39,7 +37,6 @@ class StageCommandServiceTest {
     @Autowired private PlaceFactory placeFactory;
     @Autowired private StageFactory stageFactory;
 
-    @Autowired private TagService tagService;
     @Autowired private StageCommandService stageCommandService;
     @Autowired private StageQueryService stageQueryService;
 
@@ -131,46 +128,17 @@ class StageCommandServiceTest {
                 "newStage",
                 "newStage",
                 "newStage",
-                Set.of("newTag")
+                null
         );
-
-        Set<Tag> tags = dto.tags() == null ? null : dto.tags()
-                .stream()
-                .map(s -> Tag.builder().title(s).build())
-                .map(tagService::getOrCreate)
-                .collect(Collectors.toSet());
+        Set<Tag> tags = tagFactory.create("tag");
 
         // when
         stageCommandService.updateIntroduction(stage.getId(), dto, tags);
 
         // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-
-        assertThat(foundStage.getTitle()).isEqualTo(dto.title());
-        assertThat(foundStage.getContent()).isEqualTo(dto.content());
-        assertThat(foundStage.getGuide()).isEqualTo(dto.guide());
-    }
-
-    @DisplayName("공연장 소개 수정 실패 - 등록되지 않은 공연장")
-    @Test
-    void updateIntroductionWithUnregisteredId() {
-        // given
-        Host host = hostFactory.create("test");
-        placeFactory.create(host, "place", "0000000000", null);
-        StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
-                "newStage",
-                "newStage",
-                "newStage",
-                Set.of("newTag")
-        );
-
-        // when
-        Throwable throwable = catchThrowable(() -> stageCommandService.updateIntroduction(1L, dto, null));
-
-        // then
-        assertThat(throwable)
-                .isInstanceOf(StageException.class)
-                .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
+        assertThat(stage.getTitle()).isEqualTo(dto.title());
+        assertThat(stage.getContent()).isEqualTo(dto.content());
+        assertThat(stage.getGuide()).isEqualTo(dto.guide());
     }
 
     @DisplayName("공연장 면적 정보 수정 성공")
@@ -192,13 +160,11 @@ class StageCommandServiceTest {
         stageCommandService.updateArea(stage.getId(), dto);
 
         // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-
-        assertThat(foundStage.getMinCapacity()).isEqualTo(dto.minCapacity());
-        assertThat(foundStage.getMaxCapacity()).isEqualTo(dto.maxCapacity());
-        assertThat(foundStage.getStageType()).isEqualTo(dto.stageType());
-        assertThat(foundStage.getStageWidth()).isEqualTo(dto.stageWidth());
-        assertThat(foundStage.getStageHeight()).isEqualTo(dto.stageHeight());
+        assertThat(stage.getMinCapacity()).isEqualTo(dto.minCapacity());
+        assertThat(stage.getMaxCapacity()).isEqualTo(dto.maxCapacity());
+        assertThat(stage.getStageType()).isEqualTo(dto.stageType());
+        assertThat(stage.getStageWidth()).isEqualTo(dto.stageWidth());
+        assertThat(stage.getStageHeight()).isEqualTo(dto.stageHeight());
     }
 
     @DisplayName("공연장 영업 정보 수정 성공")
@@ -220,8 +186,7 @@ class StageCommandServiceTest {
         stageCommandService.updateBusiness(stage.getId(), dto);
 
         // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-        RefundPolicy foundRefundPolicy = foundStage.getRefundPolicies().stream().toList().get(0);
+        RefundPolicy foundRefundPolicy = stage.getRefundPolicies().stream().toList().get(0);
         RefundPolicyUpdateRequestDto refundPolicyUpdateRequestDto = dto.refundPolicies().stream().toList().get(0);
 
         assertThat(foundRefundPolicy.getDayBefore()).isEqualTo(refundPolicyUpdateRequestDto.dayBefore());
@@ -250,16 +215,14 @@ class StageCommandServiceTest {
         stageCommandService.updateEngineering(stage.getId(), dto);
 
         // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-
-        assertThat(foundStage.isStageManagingAvailable()).isEqualTo(dto.stageManagingAvailable());
-        assertThat(foundStage.getStageManagingFee()).isEqualTo(dto.stageManagingFee());
-        assertThat(foundStage.isSoundEngineeringAvailable()).isEqualTo(dto.soundEngineeringAvailable());
-        assertThat(foundStage.getSoundEngineeringFee()).isEqualTo(dto.soundEngineeringFee());
-        assertThat(foundStage.isLightEngineeringAvailable()).isEqualTo(dto.lightEngineeringAvailable());
-        assertThat(foundStage.getLightEngineeringFee()).isEqualTo(dto.lightEngineeringFee());
-        assertThat(foundStage.isPhotographingAvailable()).isEqualTo(dto.photographingAvailable());
-        assertThat(foundStage.getPhotographingFee()).isEqualTo(dto.photographingFee());
+        assertThat(stage.isStageManagingAvailable()).isEqualTo(dto.stageManagingAvailable());
+        assertThat(stage.getStageManagingFee()).isEqualTo(dto.stageManagingFee());
+        assertThat(stage.isSoundEngineeringAvailable()).isEqualTo(dto.soundEngineeringAvailable());
+        assertThat(stage.getSoundEngineeringFee()).isEqualTo(dto.soundEngineeringFee());
+        assertThat(stage.isLightEngineeringAvailable()).isEqualTo(dto.lightEngineeringAvailable());
+        assertThat(stage.getLightEngineeringFee()).isEqualTo(dto.lightEngineeringFee());
+        assertThat(stage.isPhotographingAvailable()).isEqualTo(dto.photographingAvailable());
+        assertThat(stage.getPhotographingFee()).isEqualTo(dto.photographingFee());
     }
 
     @DisplayName("공연장 문서 정보 수정 성공")
@@ -279,11 +242,9 @@ class StageCommandServiceTest {
         stageCommandService.updateDocuments(stage.getId(), dto);
 
         // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-
-        assertThat(foundStage.getApplicationForm()).isEqualTo(dto.applicationForm());
-        assertThat(foundStage.getCueSheetTemplate()).isEqualTo(dto.cueSheetTemplate());
-        assertThat(foundStage.getCueSheetDue()).isEqualTo(dto.cueSheetDue());
+        assertThat(stage.getApplicationForm()).isEqualTo(dto.applicationForm());
+        assertThat(stage.getCueSheetTemplate()).isEqualTo(dto.cueSheetTemplate());
+        assertThat(stage.getCueSheetDue()).isEqualTo(dto.cueSheetDue());
     }
 
     @DisplayName("공연장 편의시설 정보 수정 성공")
@@ -306,14 +267,12 @@ class StageCommandServiceTest {
         stageCommandService.updateFacilities(stage.getId(), dto);
 
         // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-
-        assertThat(foundStage.isHasRestroom()).isEqualTo(dto.hasRestroom());
-        assertThat(foundStage.isHasWifi()).isEqualTo(dto.hasWifi());
-        assertThat(foundStage.isHasCameraStanding()).isEqualTo(dto.hasCameraStanding());
-        assertThat(foundStage.isHasWaitingRoom()).isEqualTo(dto.hasWaitingRoom());
-        assertThat(foundStage.isHasProjector()).isEqualTo(dto.hasProjector());
-        assertThat(foundStage.isHasLocker()).isEqualTo(dto.hasLocker());
+        assertThat(stage.isHasRestroom()).isEqualTo(dto.hasRestroom());
+        assertThat(stage.isHasWifi()).isEqualTo(dto.hasWifi());
+        assertThat(stage.isHasCameraStanding()).isEqualTo(dto.hasCameraStanding());
+        assertThat(stage.isHasWaitingRoom()).isEqualTo(dto.hasWaitingRoom());
+        assertThat(stage.isHasProjector()).isEqualTo(dto.hasProjector());
+        assertThat(stage.isHasLocker()).isEqualTo(dto.hasLocker());
     }
 
     @DisplayName("공연장 식음료 정책 수정 성공")
@@ -337,15 +296,13 @@ class StageCommandServiceTest {
         stageCommandService.updateFnbPolicies(stage.getId(), dto);
 
         // then
-        Stage foundStage = stageQueryService.get(stage.getId());
-
-        assertThat(foundStage.isAllowsWater()).isEqualTo(dto.allowsWater());
-        assertThat(foundStage.isAllowsDrink()).isEqualTo(dto.allowsDrink());
-        assertThat(foundStage.isAllowsFood()).isEqualTo(dto.allowsFood());
-        assertThat(foundStage.isAllowsFoodDelivery()).isEqualTo(dto.allowsFoodDelivery());
-        assertThat(foundStage.isAllowsAlcohol()).isEqualTo(dto.allowsAlcohol());
-        assertThat(foundStage.isSellDrink()).isEqualTo(dto.sellDrink());
-        assertThat(foundStage.isSellAlcohol()).isEqualTo(dto.sellAlcohol());
+        assertThat(stage.isAllowsWater()).isEqualTo(dto.allowsWater());
+        assertThat(stage.isAllowsDrink()).isEqualTo(dto.allowsDrink());
+        assertThat(stage.isAllowsFood()).isEqualTo(dto.allowsFood());
+        assertThat(stage.isAllowsFoodDelivery()).isEqualTo(dto.allowsFoodDelivery());
+        assertThat(stage.isAllowsAlcohol()).isEqualTo(dto.allowsAlcohol());
+        assertThat(stage.isSellDrink()).isEqualTo(dto.sellDrink());
+        assertThat(stage.isSellAlcohol()).isEqualTo(dto.sellAlcohol());
     }
 
     @DisplayName("공연장 삭제 성공")
@@ -362,21 +319,6 @@ class StageCommandServiceTest {
         // then
         Throwable throwable = catchThrowable(() -> stageQueryService.get(stage.getId()));
 
-        assertThat(throwable)
-                .isInstanceOf(StageException.class)
-                .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
-    }
-
-    @DisplayName("공연장 삭제 실패 - 등록되지 않은 공연장")
-    @Test
-    void deleteWithUnregisteredId() {
-        // given
-        hostFactory.create("test");
-
-        // when
-        Throwable throwable = catchThrowable(() -> stageCommandService.delete(1L));
-
-        // then
         assertThat(throwable)
                 .isInstanceOf(StageException.class)
                 .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());

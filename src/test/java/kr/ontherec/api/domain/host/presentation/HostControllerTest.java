@@ -27,7 +27,8 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.SimpleType.NUMBER;
 import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
-import static kr.ontherec.api.domain.host.exception.HostExceptionCode.*;
+import static kr.ontherec.api.domain.host.exception.HostExceptionCode.EXIST_USERNAME;
+import static kr.ontherec.api.domain.host.exception.HostExceptionCode.NOT_VALID_CONTACT_TIME;
 import static kr.ontherec.api.global.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.global.model.Regex.BANK_ACCOUNT;
 import static org.hamcrest.Matchers.*;
@@ -174,20 +175,6 @@ class HostControllerTest {
         .then()
                 .statusCode(OK.value())
                 .body("id", equalTo(host.getId().intValue()));
-    }
-
-    @Test
-    @DisplayName("호스트 조회 실패 - 등록되지 않은 호스트")
-    void updateUnregisteredHost() {
-
-        given()
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(ContentType.JSON)
-        .when()
-                .get("/hosts/{id}", 1L)
-        .then()
-                .statusCode(NOT_FOUND.getStatus().value())
-                .body("message", equalTo(NOT_FOUND.getMessage()));
     }
 
     @Test

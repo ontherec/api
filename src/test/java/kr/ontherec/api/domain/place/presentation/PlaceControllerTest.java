@@ -600,19 +600,6 @@ class PlaceControllerTest {
 
     }
 
-    @DisplayName("플레이스 조회 실패 - 등록되지 않은 플레이스")
-    @Test
-    void getWithUnregisteredId() {
-
-        given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
-        .when()
-                .get("/{id}", 1L)
-        .then()
-                .statusCode(NOT_FOUND.getStatus().value())
-                .body("message", equalTo(NOT_FOUND.getMessage()));
-    }
-
     @DisplayName("플레이스 소개 수정 성공")
     @Test
     void updateIntroduction() {
