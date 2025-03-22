@@ -58,6 +58,12 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:3.0.3'
     testImplementation 'com.epages:restdocs-api-spec-restassured:0.19.4'
 
+    // aws
+    implementation 'software.amazon.awssdk:s3:2.30.38'
+    implementation platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0")
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter'
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+
     // logging
     implementation 'org.tinylog:tinylog-api:2.7.0'
     implementation 'org.tinylog:tinylog-impl:2.7.0'
