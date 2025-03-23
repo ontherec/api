@@ -35,6 +35,10 @@ jobs:
               echo DATABASE_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
               echo JWK_SET_URI=${{ secrets.JWK_SET_URI }}
               echo API_KEY=${{ secrets.API_KEY }}
+              echo AWS_REGION=${{ secrets.AWS_REGION }}
+              echo AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+              echo AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              echo AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}
             } > api.env
 
       - name: Down and Up Containers
