@@ -26,9 +26,6 @@ spring:
     init:
       mode: always
 
-  main:
-    lazy-initialization: true
-
   security:
     oauth2:
       resourceserver:
