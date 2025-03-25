@@ -23,7 +23,7 @@ INSERT INTO address(id, zipcode, state, city, street_address, detail, latitude, 
 VALUES (1, '00000', '경기도', '수원시 장안구', '율전로', '상세주소', 000.0000000000, 000.0000000000);
 
 INSERT INTO place (id, host_id, brn, address_id, title, content, booking_from, booking_until, parking_capacity, parking_location, free_parking, created_at, modified_at)
-VALUES (1, 1, '0000000000', 1, '플레이스', '내용', 2592000000000000, 604800000000000, 2, '건물 뒤편', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, 1, '0000000001', 1, '플레이스', '내용', 2592000000000000, 604800000000000, 2, '건물 뒤편', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO link(id, links_id, url)
 VALUES (1, 1, 'https://www.ontherec.kr');

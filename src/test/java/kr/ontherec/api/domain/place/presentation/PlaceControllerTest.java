@@ -87,7 +87,6 @@ class PlaceControllerTest {
         placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
                         "place search",
                         resource(ResourceSnippetParameters.builder()
@@ -458,13 +457,11 @@ class PlaceControllerTest {
     @DisplayName("플레이스 조회 성공")
     @Test
     void get() {
-
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);
 
         given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
                         "place get",
                         resource(ResourceSnippetParameters.builder()

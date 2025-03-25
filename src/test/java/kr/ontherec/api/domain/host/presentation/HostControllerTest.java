@@ -133,7 +133,6 @@ class HostControllerTest {
         Host host = hostFactory.create("test");
 
         given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
                 .contentType(ContentType.JSON)
                 .filter(RestAssuredRestDocumentationWrapper.document(
                         "host get",

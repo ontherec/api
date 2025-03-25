@@ -15,6 +15,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import java.util.Collections;
 import java.util.List;
 
+import static org.springframework.http.HttpMethod.GET;
+
 @Configuration
 public class SecurityConfig {
     public static final String API_KEY_HEADER = "X-API-KEY";
@@ -36,7 +38,10 @@ public class SecurityConfig {
                             "http://localhost:3000",
                             "https://localhost:3000",
                             "http://docs.ontherec.live",
-                            "https://docs.ontherec.live"));
+                            "https://docs.ontherec.live",
+                            "http://ontherec.kr",
+                            "https://ontherec.kr"
+                    ));
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowedHeaders(Collections.singletonList("*"));
                     config.setExposedHeaders(List.of("Authorization"));
@@ -45,6 +50,10 @@ public class SecurityConfig {
                     return config;
                 }))
                 .authorizeHttpRequests(arc -> arc
+                        .requestMatchers(GET, "/v1/hosts/**").permitAll()
+                        .requestMatchers(GET, "/v1/places/**").permitAll()
+                        .requestMatchers(GET, "/v1/stages/**").permitAll()
+                        .requestMatchers(GET, "/v1/posts/**").permitAll()
                         .requestMatchers("/static/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new ApiKeyAuthenticationFilter(API_KEY), UsernamePasswordAuthenticationFilter.class)
