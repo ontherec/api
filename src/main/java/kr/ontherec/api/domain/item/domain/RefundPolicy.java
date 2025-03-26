@@ -16,7 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @SuperBuilder @AllArgsConstructor(access = PRIVATE)
-@Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
+@Getter @Setter @EqualsAndHashCode(of = { "dayBefore", "percent" }, callSuper = false)
 public class RefundPolicy {
     @Id
     @GeneratedValue(strategy = IDENTITY)
