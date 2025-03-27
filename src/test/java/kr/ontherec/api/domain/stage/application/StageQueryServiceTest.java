@@ -21,12 +21,12 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @UnitTest
 class StageQueryServiceTest {
 
-    @Autowired private StageQueryService stageQueryService;
     @Autowired private PlaceFactory placeFactory;
     @Autowired private HostFactory hostFactory;
     @Autowired private StageFactory stageFactory;
-    @Autowired
-    private TagFactory tagFactory;
+    @Autowired private TagFactory tagFactory;
+
+    @Autowired private StageQueryService stageQueryService;
 
     @DisplayName("공연장 검색 성공")
     @Test
@@ -61,7 +61,7 @@ class StageQueryServiceTest {
 
     }
 
-    @DisplayName("공연장 호스트 확인 성공")
+    @DisplayName("공연장 호스트 확인 성공 - 호스트")
     @Test
     void isHost() {
         // given

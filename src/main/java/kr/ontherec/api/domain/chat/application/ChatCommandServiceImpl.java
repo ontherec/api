@@ -21,7 +21,7 @@ public class ChatCommandServiceImpl implements ChatCommandService {
     public void read(Chat chat, String username) {
         Participant participant = chat.getParticipant(username);
 
-        participant.updateLastReadAt();
+        participant.updateReadAt();
         chatRepository.save(chat);
     }
 

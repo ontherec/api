@@ -1,4 +1,4 @@
-package kr.ontherec.api.domain.chat.controller;
+package kr.ontherec.api.domain.chat.presentation;
 
 import kr.ontherec.api.domain.chat.application.*;
 import kr.ontherec.api.domain.chat.domain.Chat;
@@ -36,26 +36,6 @@ public class ChatController {
     private final ChatMapper chatMapper = ChatMapper.INSTANCE;
     private final MessageMapper messageMapper = MessageMapper.INSTANCE;
 
-    @PostMapping
-    ResponseEntity<Long> create(Authentication authentication, @RequestBody ChatCreateRequestDto dto) {
-        if (!dto.participants().contains(authentication.getName()))
-            throw new ChatException(ChatExceptionCode.FORBIDDEN);
-
-        Chat newChat = chatMapper.createRequestDtoToEntity(dto);
-        Chat chat = chatCommandService.create(newChat);
-        Message createdMessage = Message.builder()
-                .chat(chat)
-                .username(SYSTEM_USERNAME)
-                .type(NOTICE)
-                .content(CHAT_CREATED)
-                .createdAt(LocalDateTime.now())
-                .modifiedAt(LocalDateTime.now())
-                .build();
-
-        messageService.add(chat, createdMessage);
-        return ResponseEntity.created(URI.create("/v1/chats/" + chat.getId())).body(chat.getId());
-    }
-
     @GetMapping("/me")
     ResponseEntity<List<ChatResponseDto>> getMyChats(Authentication authentication) {
         List<Chat> chats = chatQueryService.getAllByUsername(authentication.getName());
@@ -81,6 +61,26 @@ public class ChatController {
                 .map(messageMapper::entityToResponseDto)
                 .toList();
         return ResponseEntity.ok(dtos);
+    }
+
+    @PostMapping
+    ResponseEntity<Long> create(Authentication authentication, @RequestBody ChatCreateRequestDto dto) {
+        if (!dto.participants().contains(authentication.getName()))
+            throw new ChatException(ChatExceptionCode.FORBIDDEN);
+
+        Chat newChat = chatMapper.createRequestDtoToEntity(dto);
+        Chat chat = chatCommandService.create(newChat);
+        Message createdMessage = Message.builder()
+                .chat(chat)
+                .username(SYSTEM_USERNAME)
+                .type(NOTICE)
+                .content(CHAT_CREATED)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+
+        messageService.add(chat, createdMessage);
+        return ResponseEntity.created(URI.create("/v1/chats/" + chat.getId())).body(chat.getId());
     }
 
     @PatchMapping("/{id}/read")

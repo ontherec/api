@@ -28,7 +28,7 @@ public class Participant {
     @Column(nullable = false)
     private LocalDateTime readAt;
 
-    public void updateLastReadAt() {
+    public void updateReadAt() {
         this.readAt = LocalDateTime.now();
     }
 }
