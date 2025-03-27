@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface MessageService {
     List<Message> getPageByChatId(Long chatId, Pageable pageable);
-    void send(Chat chat, Message message);
+    Message add(Chat chat, Message message);
 }

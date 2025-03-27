@@ -23,8 +23,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void send(Chat chat, Message message) {
+    public Message add(Chat chat, Message message) {
         message.setChat(chat);
-        messageRepository.save(message);
+        return messageRepository.save(message);
     }
 }

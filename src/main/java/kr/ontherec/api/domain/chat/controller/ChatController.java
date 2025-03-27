@@ -52,7 +52,7 @@ public class ChatController {
                 .modifiedAt(LocalDateTime.now())
                 .build();
 
-        messageService.send(chat, createdMessage);
+        messageService.add(chat, createdMessage);
         return ResponseEntity.created(URI.create("/v1/chats/" + chat.getId())).body(chat.getId());
     }
 
