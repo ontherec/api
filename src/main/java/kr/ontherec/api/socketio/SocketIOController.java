@@ -59,7 +59,7 @@ public class SocketIOController {
          Message message = messageService.add(chat, newMessage);
          MessageResponseDto dto = messageMapper.entityToResponseDto(message);
 
-         socketService.sendMessage(client, Long.parseLong(roomId), EVENT_MESSAGE, dto);
+         socketService.broadcastMessage(Long.parseLong(roomId), EVENT_MESSAGE, dto);
       };
    }
 }
