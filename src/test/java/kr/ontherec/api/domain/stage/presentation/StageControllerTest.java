@@ -89,7 +89,6 @@ class StageControllerTest {
         stageFactory.create(place, "stage", tags);
 
         given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
                         "stage search",
                         resource(ResourceSnippetParameters.builder()
@@ -335,7 +334,6 @@ class StageControllerTest {
         Stage stage = stageFactory.create(place, "stage", tags);
 
         given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
                         "stage get",
                         resource(ResourceSnippetParameters.builder()

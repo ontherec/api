@@ -75,7 +75,6 @@ class PostControllerTest {
         postFactory.create("test", "post", tags);
 
         given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
                         "post search",
                         resource(ResourceSnippetParameters.builder()
@@ -130,7 +129,6 @@ class PostControllerTest {
         Post post = postFactory.create("test", "post", tags);
 
         given(this.spec)
-                .header(API_KEY_HEADER, API_KEY)
                 .filter(document(
                         "post get",
                         resource(ResourceSnippetParameters.builder()
