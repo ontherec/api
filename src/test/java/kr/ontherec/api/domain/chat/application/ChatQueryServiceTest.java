@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -21,7 +22,7 @@ class ChatQueryServiceTest {
     @Test
     void getAllByUsername() {
         // given
-        Chat chat = chatFactory.create("chat", "test");
+        Chat chat = chatFactory.create("chat", Set.of("test"));
 
         // when
         List<Chat> chats = chatQueryService.getAllByUsername("test");
@@ -34,7 +35,7 @@ class ChatQueryServiceTest {
     @Test
     void get() {
         // given
-        Chat chat = chatFactory.create("chat", "test");
+        Chat chat = chatFactory.create("chat", Set.of("test"));
 
         // when
         Chat foundChat = chatQueryService.get(chat.getId());
@@ -47,7 +48,7 @@ class ChatQueryServiceTest {
     @Test
     void isParticipant() {
         // given
-        Chat chat = chatFactory.create("chat", "test");
+        Chat chat = chatFactory.create("chat", Set.of("test"));
 
         // when
         boolean isParticipant = chatQueryService.isParticipant(chat.getId(), "test");
@@ -60,7 +61,7 @@ class ChatQueryServiceTest {
     @Test
     void isParticipantWithNotParticipatedUsername() {
         // given
-        Chat chat = chatFactory.create("chat", "host");
+        Chat chat = chatFactory.create("chat", Set.of("host"));
 
         // when
         boolean isParticipant = chatQueryService.isParticipant(chat.getId(), "test");

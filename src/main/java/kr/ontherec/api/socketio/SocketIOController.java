@@ -54,9 +54,9 @@ public class SocketIOController {
       return (client, data, ack) -> {
          String roomId = client.getHandshakeData().getSingleUrlParam("roomId");
 
-         Chat chat = chatQueryService.get(Long.valueOf(roomId));
+         Chat chat = chatQueryService.get(Long.parseLong(roomId));
          Message newMessage = messageMapper.createRequestDtoToEntity(data);
-         Message message = messageService.add(chat, newMessage);
+         Message message = messageService.create(chat, newMessage);
          MessageResponseDto dto = messageMapper.entityToResponseDto(message);
 
          socketService.broadcastMessage(Long.parseLong(roomId), EVENT_MESSAGE, dto);

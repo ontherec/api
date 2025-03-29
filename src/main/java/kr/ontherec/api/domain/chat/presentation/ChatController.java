@@ -7,12 +7,7 @@ import kr.ontherec.api.domain.chat.dto.ChatCreateRequestDto;
 import kr.ontherec.api.domain.chat.dto.ChatResponseDto;
 import kr.ontherec.api.domain.chat.dto.MessageResponseDto;
 import kr.ontherec.api.domain.chat.exception.ChatException;
-import kr.ontherec.api.domain.chat.exception.ChatExceptionCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +19,7 @@ import java.util.List;
 import static kr.ontherec.api.domain.chat.domain.ChatConfig.CHAT_CREATED;
 import static kr.ontherec.api.domain.chat.domain.ChatConfig.SYSTEM_USERNAME;
 import static kr.ontherec.api.domain.chat.domain.MessageType.NOTICE;
-import static org.springframework.data.domain.Sort.Direction.DESC;
+import static kr.ontherec.api.domain.chat.exception.ChatExceptionCode.FORBIDDEN;
 
 @RestController
 @RequestMapping("/v1/chats")
@@ -41,7 +36,7 @@ public class ChatController {
         List<Chat> chats = chatQueryService.getAllByUsername(authentication.getName());
         List<ChatResponseDto> dtos = chats.stream()
                 .map(c -> {
-                    List<Message> messages = messageService.getPageByChatId(c.getId(), PageRequest.of(0, 100, Sort.by(DESC, "createdAt")));
+                    List<Message> messages = messageService.getPage(c, null, 100);
                     return chatMapper.entityToResponseDto(c, messages);
                 }).toList();
         return ResponseEntity.ok(dtos);
@@ -51,12 +46,14 @@ public class ChatController {
     ResponseEntity<List<MessageResponseDto>> getMessages(
             Authentication authentication,
             @PathVariable Long id,
-            @PageableDefault(size = 100, sort = "createdAt", direction = DESC) Pageable pageable
+            @RequestParam(required = false) Long lastMessageId,
+            @RequestParam(defaultValue = "100") int size
     ) {
         if (!chatQueryService.isParticipant(id, authentication.getName()))
-            throw new ChatException(ChatExceptionCode.FORBIDDEN);
+            throw new ChatException(FORBIDDEN);
 
-        List<Message> messages = messageService.getPageByChatId(id, pageable);
+        Chat chat = chatQueryService.get(id);
+        List<Message> messages = messageService.getPage(chat, lastMessageId, size);
         List<MessageResponseDto> dtos = messages.stream()
                 .map(messageMapper::entityToResponseDto)
                 .toList();
@@ -66,7 +63,7 @@ public class ChatController {
     @PostMapping
     ResponseEntity<Long> create(Authentication authentication, @RequestBody ChatCreateRequestDto dto) {
         if (!dto.participants().contains(authentication.getName()))
-            throw new ChatException(ChatExceptionCode.FORBIDDEN);
+            throw new ChatException(FORBIDDEN);
 
         Chat newChat = chatMapper.createRequestDtoToEntity(dto);
         Chat chat = chatCommandService.create(newChat);
@@ -79,14 +76,14 @@ public class ChatController {
                 .modifiedAt(LocalDateTime.now())
                 .build();
 
-        messageService.add(chat, createdMessage);
+        messageService.create(chat, createdMessage);
         return ResponseEntity.created(URI.create("/v1/chats/" + chat.getId())).body(chat.getId());
     }
 
     @PatchMapping("/{id}/read")
     ResponseEntity<Void> read(Authentication authentication, @PathVariable Long id) {
         if (!chatQueryService.isParticipant(id, authentication.getName()))
-            throw new ChatException(ChatExceptionCode.FORBIDDEN);
+            throw new ChatException(FORBIDDEN);
 
         Chat chat = chatQueryService.get(id);
         chatCommandService.read(chat, authentication.getName());
@@ -96,7 +93,7 @@ public class ChatController {
     @DeleteMapping("/{id}")
     ResponseEntity<Void> exit(Authentication authentication, @PathVariable Long id) {
         if (!chatQueryService.isParticipant(id, authentication.getName()))
-            throw new ChatException(ChatExceptionCode.FORBIDDEN);
+            throw new ChatException(FORBIDDEN);
 
         Chat chat = chatQueryService.get(id);
         chatCommandService.exit(chat, authentication.getName());

@@ -42,7 +42,7 @@ class ChatCommandServiceTest {
     @Test
     void read() {
         // given
-        Chat chat = chatFactory.create("chat", "test");
+        Chat chat = chatFactory.create("chat", Set.of("test"));
         LocalDateTime readAt = chat.getParticipant("test").getReadAt();
 
         // when
@@ -57,7 +57,7 @@ class ChatCommandServiceTest {
     @Test
     void exit() {
         // given
-        Chat chat = chatFactory.create("chat", "test");
+        Chat chat = chatFactory.create("chat", Set.of("test"));
 
         // when
         chatCommandService.exit(chat, "test");
