@@ -12,7 +12,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @Builder @AllArgsConstructor(access = PRIVATE)
-@Getter @EqualsAndHashCode(of = "id")
+@Getter @EqualsAndHashCode(of = "title")
 public class Tag {
     @Id
     @GeneratedValue(strategy = IDENTITY)

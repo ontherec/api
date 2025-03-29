@@ -83,7 +83,6 @@ class StageControllerTest {
     @DisplayName("공연장 검색 성공")
     @Test
     void search() {
-
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);
@@ -100,7 +99,7 @@ class StageControllerTest {
                                 .responseFields(
                                         fieldWithPath("[]")
                                                 .type(ARRAY)
-                                                .description("공연장 배열"),
+                                                .description("공연장 목록"),
                                         fieldWithPath("[].id")
                                                 .type(NUMBER)
                                                 .description("공연장 식별자"),
@@ -329,7 +328,6 @@ class StageControllerTest {
     @DisplayName("공연장 조회 성공")
     @Test
     void get() {
-
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);

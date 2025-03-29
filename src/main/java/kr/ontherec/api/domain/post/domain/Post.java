@@ -13,10 +13,11 @@ import java.util.Set;
 
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
+import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
-@SuperBuilder @AllArgsConstructor(access = PROTECTED)
+@SuperBuilder @AllArgsConstructor(access = PRIVATE)
 @Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
 public class Post extends BaseEntity {
     @Id

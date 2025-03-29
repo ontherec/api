@@ -10,7 +10,7 @@ import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @Builder @AllArgsConstructor(access = PRIVATE)
-@Getter @EqualsAndHashCode(of = "id")
+@Getter @EqualsAndHashCode(of = "type")
 public class Holiday {
     @Id
     @GeneratedValue(strategy = IDENTITY)

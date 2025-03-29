@@ -1,4 +1,4 @@
-package kr.ontherec.api.domain.item.domain;
+package kr.ontherec.api.domain.chat.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -7,24 +7,28 @@ import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
-import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
-@SuperBuilder @AllArgsConstructor(access = PRIVATE)
-@Getter @Setter @EqualsAndHashCode(of = { "dayBefore", "percent" }, callSuper = false)
-public class RefundPolicy {
+@SuperBuilder
+@AllArgsConstructor(access = PRIVATE)
+@Getter @Setter @EqualsAndHashCode(of = "username", callSuper = false)
+public class Participant {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
-    @Column(updatable = false, nullable = false)
-    private Duration dayBefore;
+    @Column(nullable = false, updatable = false)
+    private String username;
 
-    @Column(updatable = false, nullable = false)
-    private BigDecimal percent;
+    @Column(nullable = false)
+    private LocalDateTime readAt;
+
+    public void updateReadAt() {
+        this.readAt = LocalDateTime.now();
+    }
 }

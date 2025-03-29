@@ -81,7 +81,6 @@ class PlaceControllerTest {
     @DisplayName("플레이스 검색 성공")
     @Test
     void search() {
-
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         placeFactory.create(host, "place", "0000000000", tags);
@@ -97,7 +96,7 @@ class PlaceControllerTest {
                                 .responseFields(
                                         fieldWithPath("[]")
                                                 .type(ARRAY)
-                                                .description("플레이스 배열"),
+                                                .description("플레이스 목록"),
                                         fieldWithPath("[].id")
                                                 .type(NUMBER)
                                                 .description("플레이스 식별자"),
@@ -221,7 +220,6 @@ class PlaceControllerTest {
     @DisplayName("플레이스 등록 성공")
     @Test
     void register() {
-
         hostFactory.create("test");
 
         AddressRegisterRequestDto addressDto = new AddressRegisterRequestDto(

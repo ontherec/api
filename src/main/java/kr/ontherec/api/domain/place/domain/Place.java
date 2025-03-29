@@ -20,10 +20,11 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static kr.ontherec.api.domain.stage.exception.StageExceptionCode.NOT_VALID_PARKING;
+import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
-@SuperBuilder @AllArgsConstructor(access = PROTECTED)
+@SuperBuilder @AllArgsConstructor(access = PRIVATE)
 @Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
 public class Place extends BaseEntity {
     private static final int BOOKING_PERIOD_MIN = 7;

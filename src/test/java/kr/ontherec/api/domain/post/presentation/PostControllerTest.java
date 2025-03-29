@@ -85,7 +85,7 @@ class PostControllerTest {
                                 .responseFields(
                                         fieldWithPath("[]")
                                                 .type(ARRAY)
-                                                .description("게시글 배열"),
+                                                .description("게시글 목록"),
                                         fieldWithPath("[].id")
                                                 .type(NUMBER)
                                                 .description("게시글 식별자"),

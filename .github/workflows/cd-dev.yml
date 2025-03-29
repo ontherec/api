@@ -49,5 +49,5 @@ jobs:
           key: ${{ secrets.DEV_SERVER_KEY }}
           script: |
             sudo docker compose pull
-            sudo docker compose down --rmi local
             sudo docker compose up -d
+            sudo docker image prune -f
