@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 @Transactional
 public interface MessageRepositoryExtension {
-    List<Message> findPage(Long chatId, Message lastMessage, int size);
+    List<Message> findPage(Long chatId, Long lastMessageId, int size);
 }

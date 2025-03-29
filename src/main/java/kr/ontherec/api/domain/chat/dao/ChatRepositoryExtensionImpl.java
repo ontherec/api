@@ -27,6 +27,7 @@ public class ChatRepositoryExtensionImpl extends QuerydslRepositorySupport imple
 
         return from(chat)
                 .join(chat.participants, participant)
+                .fetchJoin()
                 .where(chat.id.in(subQuery))
                 .fetch();
     }

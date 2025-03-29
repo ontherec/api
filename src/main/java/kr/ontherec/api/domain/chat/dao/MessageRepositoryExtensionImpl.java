@@ -14,18 +14,17 @@ public class MessageRepositoryExtensionImpl extends QuerydslRepositorySupport im
     }
 
     @Override
-    public List<Message> findPage(Long chatId, Message lastMessage, int size) {
+    public List<Message> findPage(Long chatId, Long lastMessageId, int size) {
         QMessage message = QMessage.message;
 
-        BooleanExpression condition = lastMessage == null ?
+        BooleanExpression condition = lastMessageId == null ?
                 message.chat.id.eq(chatId) :
                 message.chat.id.eq(chatId)
-                .and(message.id.gt(lastMessage.getId()))
-                .and(message.createdAt.gt(lastMessage.getCreatedAt()));
+                .and(message.id.gt(lastMessageId));
 
         return from(message)
                 .where(condition)
-                .orderBy(message.createdAt.desc())
+                .orderBy(message.id.asc())
                 .limit(size)
                 .fetch();
     }

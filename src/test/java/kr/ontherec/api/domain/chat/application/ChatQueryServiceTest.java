@@ -18,7 +18,7 @@ class ChatQueryServiceTest {
     @Autowired private ChatFactory chatFactory;
     @Autowired private ChatQueryService chatQueryService;
 
-    @DisplayName("내 채팅방 조회 성공")
+    @DisplayName("내 채팅방 목록 조회 성공")
     @Test
     void getAllByUsername() {
         // given

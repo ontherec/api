@@ -4,19 +4,11 @@ VALUES (1, '호스트', 'KB국민', '00000000000000', '09:00:00', '18:00:00', CU
 
 -- tag
 INSERT INTO tag (id, title)
-VALUES (1, '따뜻한');
-
-INSERT INTO tag (id, title)
-VALUES (2, '세련된');
-
-INSERT INTO tag (id, title)
-VALUES (3, '재즈');
-
-INSERT INTO tag (id, title)
-VALUES (4, '악기 가이드');
-
-INSERT INTO tag (id, title)
-VALUES (5, '밴드 소개');
+VALUES (1, '따뜻한'),
+       (2, '세련된'),
+       (3, '재즈'),
+       (4, '악기 가이드'),
+       (5, '밴드 소개');
 
 -- place
 INSERT INTO address (id, zipcode, state, city, street_address, detail, latitude, longitude)
@@ -32,13 +24,9 @@ INSERT INTO holiday (id, holidays_id, type)
 VALUES (1, 1, '설날');
 
 INSERT INTO place_tags (place_id, tags_id)
-VALUES (1, 1);
-
-INSERT INTO place_tags (place_id, tags_id)
-VALUES (1, 2);
-
-INSERT INTO place_tags (place_id, tags_id)
-VALUES (1, 3);
+VALUES (1, 1),
+       (1, 2),
+       (1, 3);
 
 -- stage
 INSERT INTO stage (id, place_id, title, content, guide, view_count, like_count, floor, has_elevator, min_capacity, max_capacity, stage_type, stage_width, stage_height, stage_managing_available, stage_managing_fee, sound_engineering_available, sound_engineering_fee, light_engineering_available, light_engineering_fee, photographing_available, photographing_fee, application_form, cue_sheet_template, cue_sheet_due, has_restroom, has_wifi, has_camera_standing, has_waiting_room, has_projector, has_locker, allows_water, allows_drink, allows_food, allows_food_delivery, allows_alcohol, sell_drink, sell_alcohol, created_at, modified_at)
@@ -48,48 +36,35 @@ INSERT INTO refund_policy (id, refund_policies_id, day_before, percent)
 VALUES (1, 1, 7, 100);
 
 INSERT INTO stage_tags (stage_id, tags_id)
-VALUES (1, 1);
-
-INSERT INTO stage_tags (stage_id, tags_id)
-VALUES (1, 2);
-
-INSERT INTO stage_tags (stage_id, tags_id)
-VALUES (1, 3);
+VALUES (1, 1),
+       (1, 2),
+       (1, 3);
 
 -- post
 INSERT INTO post (id, author, title, content, view_count, like_count, created_at, modified_at)
 VALUES (1, 'test', '아티클', '내용', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO post_tags (post_id, tags_id)
-VALUES (1, 4);
-
-INSERT INTO post_tags (post_id, tags_id)
-VALUES (1, 5);
+VALUES (1, 4),
+       (1, 5);
 
 -- chat
 INSERT INTO chat (id, title)
 VALUES (1, '채팅방');
 
 INSERT INTO participant (id, participants_id, username, read_at)
-VALUES (1, 1, 'test', CURRENT_TIMESTAMP);
-
-INSERT INTO participant (id, participants_id, username, read_at)
-VALUES (2, 1, '호스트', CURRENT_TIMESTAMP);
+VALUES (1, 1, 'test', CURRENT_TIMESTAMP),
+       (2, 1, '호스트', CURRENT_TIMESTAMP);
 
 INSERT INTO message (id, chat_id, type, username, content, created_at, modified_at)
-VALUES (1, 1, 'NOTICE', 'SYSTEM', '채팅방이 생성되었습니다', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO message (id, chat_id, type, username, content, created_at, modified_at)
-VALUES (2, 1, 'TEXT', 'test', '메시지1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO message (id, chat_id, type, username, content, created_at, modified_at)
-VALUES (3, 1, 'TEXT', '호스트', '메시지2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO message (id, chat_id, type, username, content, created_at, modified_at)
-VALUES (4, 1, 'TEXT', 'test', '메시지3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO message (id, chat_id, type, username, content, created_at, modified_at)
-VALUES (5, 1, 'TEXT', '호스트', '메시지4', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-
-INSERT INTO message (id, chat_id, type, username, content, created_at, modified_at)
-VALUES (6, 1, 'TEXT', 'test', '메시지5', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+VALUES (1, 1, 'NOTICE', 'SYSTEM', '채팅방이 생성되었습니다', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (2, 1, 'TEXT', 'test', '메시지1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (3, 1, 'TEXT', '호스트', '메시지2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (4, 1, 'TEXT', 'test', '메시지3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (5, 1, 'TEXT', '호스트', '메시지4', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (6, 1, 'TEXT', 'test', '메시지5', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (7, 1, 'TEXT', '호스트', '메시지6', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (8, 1, 'TEXT', 'test', '메시지7', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (9, 1, 'TEXT', '호스트', '메시지8', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (10, 1, 'TEXT', 'test', '메시지9', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+       (11, 1, 'TEXT', '호스트', '메시지10', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
