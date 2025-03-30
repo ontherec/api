@@ -53,6 +53,8 @@ dependencies {
     testImplementation 'org.testcontainers:testcontainers:1.20.4'
     testImplementation 'org.testcontainers:junit-jupiter:1.20.4'
     testImplementation 'org.testcontainers:mysql'
+    testImplementation 'com.tngtech.archunit:archunit-junit5-api:1.4.0'
+    testRuntimeOnly 'com.tngtech.archunit:archunit-junit5-engine:1.4.0'
 
     // docs
     testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:3.0.3'

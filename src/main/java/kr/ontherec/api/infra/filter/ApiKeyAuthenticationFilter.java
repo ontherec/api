@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.ontherec.api.infra.config.SecurityConfig;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,13 +22,13 @@ import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
-
+    private final String apiKeyHeader;
     private final String apiKey;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
-        String credentials = request.getHeader(SecurityConfig.API_KEY_HEADER);
+        String credentials = request.getHeader(apiKeyHeader);
 
         if (credentials != null && credentials.equals(apiKey)) {
             Collection<GrantedAuthority> authorities = Stream.of("GUEST", "HOST", "ADMIN")

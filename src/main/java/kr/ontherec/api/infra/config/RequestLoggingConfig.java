@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RequestLoggingConfig {
-
     private static final int MAX_PAYLOAD_LENGTH = 1000;
 
     @Bean

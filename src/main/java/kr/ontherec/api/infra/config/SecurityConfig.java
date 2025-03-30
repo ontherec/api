@@ -56,7 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(GET, "/v1/posts/**").permitAll()
                         .requestMatchers("/static/**").permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(new ApiKeyAuthenticationFilter(API_KEY), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ApiKeyAuthenticationFilter(API_KEY_HEADER, API_KEY), UsernamePasswordAuthenticationFilter.class)
                 .oauth2ResourceServer(orc -> orc.jwt(jc -> jc.jwtAuthenticationConverter(jwtAuthenticationConverter)));
 
         return http.build();
