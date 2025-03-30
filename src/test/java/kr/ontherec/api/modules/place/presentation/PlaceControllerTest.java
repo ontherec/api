@@ -6,17 +6,17 @@ import com.epages.restdocs.apispec.SimpleType;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.place.entity.Place;
-import kr.ontherec.api.modules.place.dto.AddressRegisterRequestDto;
-import kr.ontherec.api.modules.place.dto.PlaceRegisterRequestDto;
-import kr.ontherec.api.modules.place.dto.PlaceResponseDto;
-import kr.ontherec.api.modules.place.dto.PlaceUpdateRequestDto;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.PlaceFactory;
 import kr.ontherec.api.infra.fixture.TagFactory;
+import kr.ontherec.api.modules.host.entity.Host;
+import kr.ontherec.api.modules.place.dto.AddressRegisterRequestDto;
+import kr.ontherec.api.modules.place.dto.PlaceRegisterRequestDto;
+import kr.ontherec.api.modules.place.dto.PlaceResponseDto;
+import kr.ontherec.api.modules.place.dto.PlaceUpdateRequestDto;
+import kr.ontherec.api.modules.place.entity.Place;
+import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,11 +35,11 @@ import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.do
 import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
+import static kr.ontherec.api.infra.model.Regex.BUSINESS_REGISTRATION_NUMBER;
 import static kr.ontherec.api.modules.place.entity.HolidayType.설날;
 import static kr.ontherec.api.modules.place.entity.HolidayType.추석;
 import static kr.ontherec.api.modules.place.exception.PlaceExceptionCode.*;
-import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
-import static kr.ontherec.api.infra.model.Regex.BUSINESS_REGISTRATION_NUMBER;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -68,7 +68,7 @@ class PlaceControllerTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.baseURI = "http://localhost";
-        RestAssured.basePath = "/v1/places";
+        RestAssured.basePath = "/v1";
         RestAssured.port = port;
 
         this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)
@@ -211,7 +211,7 @@ class PlaceControllerTest {
                                                 .description("수정된 시간 (UTC)"))
                                 .build())))
         .when()
-                .get()
+                .get("/places")
         .then()
                 .statusCode(OK.value());
 
@@ -346,7 +346,7 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .post()
+                .post("/places")
         .then()
                 .statusCode(CREATED.value())
                 .header("Location", startsWith("/v1/places"))
@@ -398,7 +398,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(placeDto)
         .when()
-                .post()
+                .post("/places")
         .then()
                 .statusCode(EXIST_BRN.getStatus().value())
                 .body("message", equalTo(EXIST_BRN.getMessage()));
@@ -446,7 +446,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(placeDto)
         .when()
-                .post()
+                .post("/places")
         .then()
                 .statusCode(NOT_VALID_BOOKING_PERIOD.getStatus().value())
                 .body("message", equalTo(NOT_VALID_BOOKING_PERIOD.getMessage()));
@@ -588,7 +588,7 @@ class PlaceControllerTest {
                                                 .description("수정된 시간 (UTC)"))
                                 .build())))
         .when()
-                .get("/{id}", place.getId())
+                .get("/places/{id}", place.getId())
         .then()
                 .statusCode(OK.value())
                 .body("id", equalTo(place.getId().intValue()));
@@ -645,7 +645,7 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .put("/{id}/introduction", place.getId())
+                .put("/places/{id}/introduction", place.getId())
         .then()
                 .statusCode(OK.value());
     }
@@ -671,7 +671,7 @@ class PlaceControllerTest {
                 .contentType(JSON)
                 .body(dto)
         .when()
-                .put("/{id}/introduction", place.getId())
+                .put("/places/{id}/introduction", place.getId())
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
@@ -720,7 +720,7 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .put("/{id}/business", place.getId())
+                .put("/places/{id}/business", place.getId())
         .then()
                 .statusCode(OK.value());
     }
@@ -768,7 +768,7 @@ class PlaceControllerTest {
                                                 .optional())
                                 .build())))
         .when()
-                .put("/{id}/parking", place.getId())
+                .put("/places/{id}/parking", place.getId())
         .then()
                 .statusCode(OK.value());
     }
@@ -776,7 +776,6 @@ class PlaceControllerTest {
     @DisplayName("플레이스 삭제 성공")
     @Test
     void remove() {
-
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
         Place place = placeFactory.create(host, "place", "0000000000", tags);
@@ -795,7 +794,7 @@ class PlaceControllerTest {
                                                 .description("삭제할 플레이스 식별자"))
                                 .build())))
         .when()
-                .delete("/{id}", place.getId())
+                .delete("/places/{id}", place.getId())
         .then()
                 .statusCode(OK.value());
     }

@@ -7,12 +7,12 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.modules.host.entity.Bank;
-import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.host.dto.HostRegisterRequestDto;
-import kr.ontherec.api.modules.host.dto.HostUpdateRequestDto;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
+import kr.ontherec.api.modules.host.dto.HostRegisterRequestDto;
+import kr.ontherec.api.modules.host.dto.HostUpdateRequestDto;
+import kr.ontherec.api.modules.host.entity.Bank;
+import kr.ontherec.api.modules.host.entity.Host;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,10 +27,10 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.SimpleType.NUMBER;
 import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
-import static kr.ontherec.api.modules.host.exception.HostExceptionCode.EXIST_USERNAME;
-import static kr.ontherec.api.modules.host.exception.HostExceptionCode.NOT_VALID_CONTACT_TIME;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.infra.model.Regex.BANK_ACCOUNT;
+import static kr.ontherec.api.modules.host.exception.HostExceptionCode.EXIST_USERNAME;
+import static kr.ontherec.api.modules.host.exception.HostExceptionCode.NOT_VALID_CONTACT_TIME;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -40,7 +40,6 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 
 @IntegrationTest
 class HostControllerTest {
-
     @Autowired private HostFactory hostFactory;
 
     @Value("${spring.security.api-key}")

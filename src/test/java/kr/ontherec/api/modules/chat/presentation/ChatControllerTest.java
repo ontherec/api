@@ -5,13 +5,13 @@ import com.epages.restdocs.apispec.Schema;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-import kr.ontherec.api.modules.chat.entity.Chat;
-import kr.ontherec.api.modules.chat.entity.MessageType;
-import kr.ontherec.api.modules.chat.dto.ChatCreateRequestDto;
-import kr.ontherec.api.modules.chat.dto.ChatResponseDto;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.ChatFactory;
 import kr.ontherec.api.infra.fixture.MessageFactory;
+import kr.ontherec.api.modules.chat.dto.ChatCreateRequestDto;
+import kr.ontherec.api.modules.chat.dto.ChatResponseDto;
+import kr.ontherec.api.modules.chat.entity.Chat;
+import kr.ontherec.api.modules.chat.entity.MessageType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,9 +30,9 @@ import static com.epages.restdocs.apispec.SimpleType.NUMBER;
 import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
+import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.modules.chat.entity.MessageType.TEXT;
 import static kr.ontherec.api.modules.chat.exception.ChatExceptionCode.FORBIDDEN;
-import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -58,7 +58,7 @@ class ChatControllerTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.baseURI = "http://localhost";
-        RestAssured.basePath = "/v1/chats";
+        RestAssured.basePath = "/v1";
         RestAssured.port = port;
 
         this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(restDocumentation)
@@ -125,7 +125,7 @@ class ChatControllerTest {
                                                 .description("메시지 전송 시간 (UTC)"))
                                 .build())))
         .when()
-                .get("/me")
+                .get("/chats/me")
         .then()
                 .statusCode(OK.value());
     }
@@ -181,7 +181,7 @@ class ChatControllerTest {
                                                 .description("메시지 전송 시간 (UTC)"))
                                 .build())))
         .when()
-                .get("/{id}/messages", chat.getId())
+                .get("/chats/{id}/messages", chat.getId())
         .then()
                 .statusCode(OK.value())
                 .body("size()", is(10));
@@ -199,7 +199,7 @@ class ChatControllerTest {
                 .header(API_KEY_HEADER, API_KEY)
                 .queryParam("size", 10)
         .when()
-                .get("/{id}/messages", chat.getId())
+                .get("/chats/{id}/messages", chat.getId())
         .then()
                 .statusCode(OK.value())
                 .body("size()", is(10));
@@ -213,7 +213,7 @@ class ChatControllerTest {
         given()
                 .header(API_KEY_HEADER, API_KEY)
         .when()
-                .get("/{id}/messages", chat.getId())
+                .get("/chats/{id}/messages", chat.getId())
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
@@ -248,7 +248,7 @@ class ChatControllerTest {
                                                 .description("참가자 목록"))
                                 .build())))
         .when()
-                .post()
+                .post("/chats")
         .then()
                 .statusCode(CREATED.value())
                 .header("Location", startsWith("/v1/chats"))
@@ -268,7 +268,7 @@ class ChatControllerTest {
                 .contentType(JSON)
                 .body(dto)
         .when()
-                .post()
+                .post("/chats")
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
@@ -293,7 +293,7 @@ class ChatControllerTest {
                                                 .description("읽음 처리할 채팅방 식별자"))
                                 .build())))
         .when()
-                .patch("/{id}/read", chat.getId())
+                .patch("/chats/{id}/read", chat.getId())
         .then()
                 .statusCode(OK.value());
     }
@@ -306,7 +306,7 @@ class ChatControllerTest {
         given()
                 .header(API_KEY_HEADER, API_KEY)
         .when()
-                .patch("/{id}/read", chat.getId())
+                .patch("/chats/{id}/read", chat.getId())
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
@@ -331,7 +331,7 @@ class ChatControllerTest {
                                                 .description("나갈 채팅방 식별자"))
                                 .build())))
         .when()
-                .delete("/{id}", chat.getId())
+                .delete("/chats/{id}", chat.getId())
         .then()
                 .statusCode(OK.value());
     }
@@ -344,7 +344,7 @@ class ChatControllerTest {
         given()
                 .header(API_KEY_HEADER, API_KEY)
         .when()
-                .delete("/{id}", chat.getId())
+                .delete("/chats/{id}", chat.getId())
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
