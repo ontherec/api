@@ -1,8 +1,8 @@
 package kr.ontherec.api.infra.fixture;
 
-import kr.ontherec.api.domain.host.application.HostService;
-import kr.ontherec.api.domain.host.domain.Bank;
-import kr.ontherec.api.domain.host.domain.Host;
+import kr.ontherec.api.modules.host.application.HostService;
+import kr.ontherec.api.modules.host.entity.Bank;
+import kr.ontherec.api.modules.host.entity.Host;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

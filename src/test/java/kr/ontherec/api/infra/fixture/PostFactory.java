@@ -1,8 +1,8 @@
 package kr.ontherec.api.infra.fixture;
 
-import kr.ontherec.api.domain.post.application.PostCommandService;
-import kr.ontherec.api.domain.post.domain.Post;
-import kr.ontherec.api.domain.tag.domain.Tag;
+import kr.ontherec.api.modules.post.application.PostCommandService;
+import kr.ontherec.api.modules.post.entity.Post;
+import kr.ontherec.api.modules.tag.entity.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

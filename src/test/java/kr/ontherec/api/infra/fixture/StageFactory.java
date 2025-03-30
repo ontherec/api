@@ -1,10 +1,10 @@
 package kr.ontherec.api.infra.fixture;
 
-import kr.ontherec.api.domain.item.domain.RefundPolicy;
-import kr.ontherec.api.domain.place.domain.Place;
-import kr.ontherec.api.domain.stage.application.StageCommandService;
-import kr.ontherec.api.domain.stage.domain.Stage;
-import kr.ontherec.api.domain.tag.domain.Tag;
+import kr.ontherec.api.modules.item.entity.RefundPolicy;
+import kr.ontherec.api.modules.place.entity.Place;
+import kr.ontherec.api.modules.stage.application.StageCommandService;
+import kr.ontherec.api.modules.stage.entity.Stage;
+import kr.ontherec.api.modules.tag.entity.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static kr.ontherec.api.domain.stage.domain.StageType.RECTANGLE;
+import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
 
 @Component
 public class StageFactory {

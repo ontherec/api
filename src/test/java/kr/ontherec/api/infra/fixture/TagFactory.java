@@ -1,7 +1,7 @@
 package kr.ontherec.api.infra.fixture;
 
-import kr.ontherec.api.domain.tag.application.TagService;
-import kr.ontherec.api.domain.tag.domain.Tag;
+import kr.ontherec.api.modules.tag.application.TagService;
+import kr.ontherec.api.modules.tag.entity.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

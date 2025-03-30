@@ -1,9 +1,9 @@
 package kr.ontherec.api.infra.fixture;
 
-import kr.ontherec.api.domain.chat.application.MessageService;
-import kr.ontherec.api.domain.chat.domain.Chat;
-import kr.ontherec.api.domain.chat.domain.Message;
-import kr.ontherec.api.domain.chat.domain.MessageType;
+import kr.ontherec.api.modules.chat.application.MessageService;
+import kr.ontherec.api.modules.chat.entity.Chat;
+import kr.ontherec.api.modules.chat.entity.Message;
+import kr.ontherec.api.modules.chat.entity.MessageType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

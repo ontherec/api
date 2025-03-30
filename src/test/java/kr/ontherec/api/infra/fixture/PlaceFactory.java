@@ -1,12 +1,12 @@
 package kr.ontherec.api.infra.fixture;
 
-import kr.ontherec.api.domain.host.domain.Host;
-import kr.ontherec.api.domain.place.application.PlaceCommandService;
-import kr.ontherec.api.domain.place.domain.Address;
-import kr.ontherec.api.domain.place.domain.Holiday;
-import kr.ontherec.api.domain.place.domain.Link;
-import kr.ontherec.api.domain.place.domain.Place;
-import kr.ontherec.api.domain.tag.domain.Tag;
+import kr.ontherec.api.modules.host.entity.Host;
+import kr.ontherec.api.modules.place.application.PlaceCommandService;
+import kr.ontherec.api.modules.place.entity.Address;
+import kr.ontherec.api.modules.place.entity.Holiday;
+import kr.ontherec.api.modules.place.entity.Link;
+import kr.ontherec.api.modules.place.entity.Place;
+import kr.ontherec.api.modules.tag.entity.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static kr.ontherec.api.domain.place.domain.HolidayType.설날;
+import static kr.ontherec.api.modules.place.entity.HolidayType.설날;
 
 @Component
 public class PlaceFactory {

@@ -1,8 +1,8 @@
 package kr.ontherec.api.infra.fixture;
 
-import kr.ontherec.api.domain.chat.application.ChatCommandService;
-import kr.ontherec.api.domain.chat.domain.Chat;
-import kr.ontherec.api.domain.chat.domain.Participant;
+import kr.ontherec.api.modules.chat.application.ChatCommandService;
+import kr.ontherec.api.modules.chat.entity.Chat;
+import kr.ontherec.api.modules.chat.entity.Participant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
