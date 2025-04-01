@@ -1,4 +1,4 @@
-package kr.ontherec.api.modules.place.entity;
+package kr.ontherec.api.modules.item.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

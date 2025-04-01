@@ -29,6 +29,6 @@ public class StageQueryServiceImpl implements StageQueryService{
     @Override
     public boolean isHost(Long id, Host host) {
         Stage stage = stageRepository.findByIdOrThrow(id);
-        return stage.getPlace().getHost().equals(host);
+        return stage.getHost().equals(host);
     }
 }

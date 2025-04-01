@@ -1,4 +1,4 @@
-package kr.ontherec.api.modules.place.entity;
+package kr.ontherec.api.modules.item.entity;
 
 /**
  * <a href="https://namu.wiki/w/공휴일/대한민국">나무위키: 공휴일/대한민국</a>

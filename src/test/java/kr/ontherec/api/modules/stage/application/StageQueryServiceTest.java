@@ -2,11 +2,9 @@ package kr.ontherec.api.modules.stage.application;
 
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
-import kr.ontherec.api.infra.fixture.PlaceFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.place.entity.Place;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +19,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @UnitTest
 class StageQueryServiceTest {
 
-    @Autowired private PlaceFactory placeFactory;
     @Autowired private HostFactory hostFactory;
     @Autowired private StageFactory stageFactory;
     @Autowired private TagFactory tagFactory;
@@ -34,8 +31,7 @@ class StageQueryServiceTest {
         // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
 
         // when
         List<Stage> stages = stageQueryService.search("stage");
@@ -50,8 +46,7 @@ class StageQueryServiceTest {
         // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
 
         // when
         Stage foundStage = stageQueryService.get(stage.getId());
@@ -67,8 +62,7 @@ class StageQueryServiceTest {
         // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
 
         // when
         boolean isHost = stageQueryService.isHost(stage.getId(), host);
@@ -84,8 +78,7 @@ class StageQueryServiceTest {
         Host me = hostFactory.create("test");
         Host host = hostFactory.create("host");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
 
         // when
         boolean isHost = stageQueryService.isHost(stage.getId(), me);
