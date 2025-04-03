@@ -13,6 +13,7 @@ import java.util.Set;
 
 public class StageUpdateRequestDto {
         public record Introduction(
+                @NotBlank(message = "공연장 소개를 입력해주세요.")
                 @Size(max = 1000, message = "공연장 소개는 최대 1000글자까지 입력 가능합니다.")
                 String content,
                 Set<@Size(max = 10, message = "태그는 최대 10글자 입니다") String> tags,
