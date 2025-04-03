@@ -2,19 +2,16 @@ package kr.ontherec.api.modules.stage.application;
 
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
-import kr.ontherec.api.infra.fixture.PlaceFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.item.entity.RefundPolicy;
-import kr.ontherec.api.modules.place.entity.Place;
+import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.RefundPolicyRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.RefundPolicyUpdateRequestDto;
 import kr.ontherec.api.modules.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
-import kr.ontherec.api.modules.stage.exception.StageExceptionCode;
 import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,8 +21,11 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Set;
 
+import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
+import static kr.ontherec.api.modules.item.entity.HolidayType.추석;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
 import static kr.ontherec.api.modules.stage.entity.StageType.T;
+import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
@@ -34,7 +34,6 @@ class StageCommandServiceTest {
 
     @Autowired private HostFactory hostFactory;
     @Autowired private TagFactory tagFactory;
-    @Autowired private PlaceFactory placeFactory;
     @Autowired private StageFactory stageFactory;
 
     @Autowired private StageCommandService stageCommandService;
@@ -48,18 +47,24 @@ class StageCommandServiceTest {
         // given
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
+
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                place.getId(),
+                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "stage",
+                "0000000000",
+                new AddressRegisterRequestDto(
+                    "00000",
+                    "경기도",
+                    "수원시 장안구",
+                    "율전로",
+                    null,
+                    new BigDecimal("000.0000000000"),
+                    new BigDecimal("000.0000000000")
+                ),
                 new StageRegisterRequestDto.Introduction(
                         "stage",
-                        "stage",
-                        "stage",
-                        null
-                ),
-                new StageRegisterRequestDto.Location(
-                        -1,
-                        false
+                        null,
+                        Set.of("https://ontherec.kr")
                 ),
                 new StageRegisterRequestDto.Area(
                         60,
@@ -69,6 +74,9 @@ class StageCommandServiceTest {
                         BigDecimal.valueOf(5)
                 ),
                 new StageRegisterRequestDto.Business(
+                        Set.of(설날),
+                        Duration.ofDays(30),
+                        Duration.ofDays(1),
                         Set.of(new RefundPolicyRegisterRequestDto(
                                 Duration.ofDays(30),
                                 BigDecimal.valueOf(33.3)
@@ -89,7 +97,13 @@ class StageCommandServiceTest {
                         "https://docs.google.com/document",
                         Duration.ofDays(3)
                 ),
+                new StageRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                ),
                 new StageRegisterRequestDto.Facilities(
+                        false,
                         true,
                         true,
                         true,
@@ -110,11 +124,279 @@ class StageCommandServiceTest {
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
 
         // when
-        Stage stage = stageCommandService.register(place, newStage, tags);
+        Stage stage = stageCommandService.register(host, newStage, tags);
 
         // then
         assertThat(stage.getTitle()).isEqualTo(newStage.getTitle());
-        assertThat(stage.getFloor()).isEqualTo(newStage.getFloor());
+        assertThat(stage.getBrn()).isEqualTo(newStage.getBrn());
+    }
+
+    @DisplayName("공연장 등록 실패 - 중복된 사업자등록번호")
+    @Test
+    void registerWithDuplicatedBrn() {
+        // given
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        stageFactory.create(host, "stage", "0000000000", tags);
+
+        StageRegisterRequestDto dto = new StageRegisterRequestDto(
+                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "stage",
+                "0000000000",
+                new AddressRegisterRequestDto(
+                        "00000",
+                        "경기도",
+                        "수원시 장안구",
+                        "율전로",
+                        null,
+                        new BigDecimal("000.0000000000"),
+                        new BigDecimal("000.0000000000")
+                ),
+                new StageRegisterRequestDto.Introduction(
+                        "stage",
+                        null,
+                        Set.of("https://ontherec.kr")
+                ),
+                new StageRegisterRequestDto.Area(
+                        60,
+                        120,
+                        RECTANGLE,
+                        BigDecimal.valueOf(10.5),
+                        BigDecimal.valueOf(5)
+                ),
+                new StageRegisterRequestDto.Business(
+                        Set.of(설날),
+                        Duration.ofDays(30),
+                        Duration.ofDays(1),
+                        Set.of(new RefundPolicyRegisterRequestDto(
+                                Duration.ofDays(30),
+                                BigDecimal.valueOf(33.3)
+                        ))
+                ),
+                new StageRegisterRequestDto.Engineering(
+                        false,
+                        null,
+                        true,
+                        100000L,
+                        false,
+                        null,
+                        true,
+                        100000L
+                ),
+                new StageRegisterRequestDto.Documents(
+                        "https://docs.google.com/document",
+                        "https://docs.google.com/document",
+                        Duration.ofDays(3)
+                ),
+                new StageRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                ),
+                new StageRegisterRequestDto.Facilities(
+                        false,
+                        true,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false
+                ),
+                new StageRegisterRequestDto.FnbPolicies(
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        false
+                )
+        );
+        Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageCommandService.register(host, newStage, tags));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(EXIST_BRN.getMessage());
+    }
+
+    @DisplayName("공연장 등록 실패 - 유효하지 않은 예약 기간")
+    @Test
+    void registerWithInvalidBookingPeriod() {
+        // given
+        hostFactory.create("test");
+        StageRegisterRequestDto dto = new StageRegisterRequestDto(
+                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "stage",
+                "0000000000",
+                new AddressRegisterRequestDto(
+                        "00000",
+                        "경기도",
+                        "수원시 장안구",
+                        "율전로",
+                        null,
+                        new BigDecimal("000.0000000000"),
+                        new BigDecimal("000.0000000000")
+                ),
+                new StageRegisterRequestDto.Introduction(
+                        "stage",
+                        null,
+                        Set.of("https://ontherec.kr")
+                ),
+                new StageRegisterRequestDto.Area(
+                        60,
+                        120,
+                        RECTANGLE,
+                        BigDecimal.valueOf(10.5),
+                        BigDecimal.valueOf(5)
+                ),
+                new StageRegisterRequestDto.Business(
+                        Set.of(설날),
+                        Duration.ofDays(30),
+                        Duration.ofDays(30),
+                        Set.of(new RefundPolicyRegisterRequestDto(
+                                Duration.ofDays(30),
+                                BigDecimal.valueOf(33.3)
+                        ))
+                ),
+                new StageRegisterRequestDto.Engineering(
+                        false,
+                        null,
+                        true,
+                        100000L,
+                        false,
+                        null,
+                        true,
+                        100000L
+                ),
+                new StageRegisterRequestDto.Documents(
+                        "https://docs.google.com/document",
+                        "https://docs.google.com/document",
+                        Duration.ofDays(3)
+                ),
+                new StageRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                ),
+                new StageRegisterRequestDto.Facilities(
+                        false,
+                        true,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false
+                ),
+                new StageRegisterRequestDto.FnbPolicies(
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        false
+                )
+        );
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageMapper.registerRequestDtoToEntity(dto));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(NOT_VALID_BOOKING_PERIOD.getMessage());
+    }
+
+    @DisplayName("공연장 등록 실패 - 유효하지 않은 엔지니어링 요금")
+    @Test
+    void registerWithInvalidEngineering() {
+        // given
+        hostFactory.create("test");
+        StageRegisterRequestDto dto = new StageRegisterRequestDto(
+                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "stage",
+                "0000000000",
+                new AddressRegisterRequestDto(
+                        "00000",
+                        "경기도",
+                        "수원시 장안구",
+                        "율전로",
+                        null,
+                        new BigDecimal("000.0000000000"),
+                        new BigDecimal("000.0000000000")
+                ),
+                new StageRegisterRequestDto.Introduction(
+                        "stage",
+                        null,
+                        Set.of("https://ontherec.kr")
+                ),
+                new StageRegisterRequestDto.Area(
+                        60,
+                        120,
+                        RECTANGLE,
+                        BigDecimal.valueOf(10.5),
+                        BigDecimal.valueOf(5)
+                ),
+                new StageRegisterRequestDto.Business(
+                        Set.of(설날),
+                        Duration.ofDays(30),
+                        Duration.ofDays(1),
+                        Set.of(new RefundPolicyRegisterRequestDto(
+                                Duration.ofDays(30),
+                                BigDecimal.valueOf(33.3)
+                        ))
+                ),
+                new StageRegisterRequestDto.Engineering(
+                        false,
+                        50000L,
+                        true,
+                        null,
+                        false,
+                        null,
+                        true,
+                        100000L
+                ),
+                new StageRegisterRequestDto.Documents(
+                        "https://docs.google.com/document",
+                        "https://docs.google.com/document",
+                        Duration.ofDays(3)
+                ),
+                new StageRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                ),
+                new StageRegisterRequestDto.Facilities(
+                        false,
+                        true,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false
+                ),
+                new StageRegisterRequestDto.FnbPolicies(
+                        true,
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        false
+                )
+        );
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageMapper.registerRequestDtoToEntity(dto));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(NOT_VALID_ENGINEERING_FEE.getMessage());
     }
 
     @DisplayName("공연장 소개 수정 성공")
@@ -122,13 +404,11 @@ class StageCommandServiceTest {
     void updateIntroduction() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
-                "newStage",
-                "newStage",
-                null
+                null,
+                Set.of("https://ontherec.live")
         );
         Set<Tag> tags = tagFactory.create("tag");
 
@@ -136,9 +416,7 @@ class StageCommandServiceTest {
         stageCommandService.updateIntroduction(stage.getId(), dto, tags);
 
         // then
-        assertThat(stage.getTitle()).isEqualTo(dto.title());
         assertThat(stage.getContent()).isEqualTo(dto.content());
-        assertThat(stage.getGuide()).isEqualTo(dto.guide());
     }
 
     @DisplayName("공연장 면적 정보 수정 성공")
@@ -146,8 +424,7 @@ class StageCommandServiceTest {
     void updateArea() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
         StageUpdateRequestDto.Area dto = new StageUpdateRequestDto.Area(
                 100,
                 200,
@@ -172,9 +449,11 @@ class StageCommandServiceTest {
     void updateBusiness() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
+                Set.of(추석),
+                Duration.ofDays(90),
+                Duration.ofDays(7),
                 Set.of(new RefundPolicyUpdateRequestDto(
                         stage.getRefundPolicies().stream().toList().get(0).getId(),
                         Duration.ofDays(15),
@@ -186,11 +465,34 @@ class StageCommandServiceTest {
         stageCommandService.updateBusiness(stage.getId(), dto);
 
         // then
-        RefundPolicy foundRefundPolicy = stage.getRefundPolicies().stream().toList().get(0);
-        RefundPolicyUpdateRequestDto refundPolicyUpdateRequestDto = dto.refundPolicies().stream().toList().get(0);
+        assertThat(stage.getBookingFrom()).isEqualTo(dto.bookingFrom());
+        assertThat(stage.getBookingUntil()).isEqualTo(dto.bookingUntil());
+    }
 
-        assertThat(foundRefundPolicy.getDayBefore()).isEqualTo(refundPolicyUpdateRequestDto.dayBefore());
-        assertThat(foundRefundPolicy.getPercent()).isEqualTo(refundPolicyUpdateRequestDto.percent());
+    @DisplayName("공연장 영업 정보 수정 실패 - 유효하지 않은 예약 기간")
+    @Test
+    void updateBusinessWithInvalidBookingPeriod() {
+        // given
+        Host host = hostFactory.create("test");
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
+                Set.of(추석),
+                Duration.ofDays(30),
+                Duration.ofDays(30),
+                Set.of(new RefundPolicyUpdateRequestDto(
+                        stage.getRefundPolicies().stream().toList().get(0).getId(),
+                        Duration.ofDays(30),
+                        BigDecimal.valueOf(30)
+                ))
+        );
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageCommandService.updateBusiness(stage.getId(), dto));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(NOT_VALID_BOOKING_PERIOD.getMessage());
     }
 
     @DisplayName("공연장 엔지니어링 정보 수정 성공")
@@ -198,8 +500,7 @@ class StageCommandServiceTest {
     void updateEngineering() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
         StageUpdateRequestDto.Engineering dto = new StageUpdateRequestDto.Engineering(
                 true,
                 50000L,
@@ -225,13 +526,38 @@ class StageCommandServiceTest {
         assertThat(stage.getPhotographingFee()).isEqualTo(dto.photographingFee());
     }
 
+    @DisplayName("공연장 엔지니어링 정보 수정 실패 - 유효하지 않은 엔지니어링 요금")
+    @Test
+    void updateEngineeringWithInvalidEngineeringFee() {
+        // given
+        Host host = hostFactory.create("test");
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        StageUpdateRequestDto.Engineering dto = new StageUpdateRequestDto.Engineering(
+                false,
+                50000L,
+                true,
+                null,
+                false,
+                null,
+                true,
+                100000L
+        );
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageCommandService.updateEngineering(stage.getId(), dto));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(NOT_VALID_ENGINEERING_FEE.getMessage());
+    }
+
     @DisplayName("공연장 문서 정보 수정 성공")
     @Test
     void updateDocuments() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
         StageUpdateRequestDto.Documents dto = new StageUpdateRequestDto.Documents(
                 "https://docs.google.com/document/u/0",
                 "https://docs.google.com/document/u/0",
@@ -247,14 +573,35 @@ class StageCommandServiceTest {
         assertThat(stage.getCueSheetDue()).isEqualTo(dto.cueSheetDue());
     }
 
+    @DisplayName("공연장 주차 정보 수정 성공")
+    @Test
+    void updateParking() {
+        // given
+        Host host = hostFactory.create("test");
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        StageUpdateRequestDto.Parking dto = new StageUpdateRequestDto.Parking(
+                30,
+                "건물 건너편 주차장",
+                false
+        );
+
+        // when
+        stageCommandService.updateParking(stage.getId(), dto);
+
+        // then
+        assertThat(stage.getParkingCapacity()).isEqualTo(dto.capacity());
+        assertThat(stage.getParkingLocation()).isEqualTo(dto.location());
+        assertThat(stage.getFreeParking()).isEqualTo(dto.free());
+    }
+
     @DisplayName("공연장 편의시설 정보 수정 성공")
     @Test
     void updateFacilities() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
         StageUpdateRequestDto.Facilities dto = new StageUpdateRequestDto.Facilities(
+                false,
                 true,
                 true,
                 true,
@@ -267,6 +614,7 @@ class StageCommandServiceTest {
         stageCommandService.updateFacilities(stage.getId(), dto);
 
         // then
+        assertThat(stage.isHasElevator()).isEqualTo(dto.hasElevator());
         assertThat(stage.isHasRestroom()).isEqualTo(dto.hasRestroom());
         assertThat(stage.isHasWifi()).isEqualTo(dto.hasWifi());
         assertThat(stage.isHasCameraStanding()).isEqualTo(dto.hasCameraStanding());
@@ -280,8 +628,7 @@ class StageCommandServiceTest {
     void updateFnbPolicies() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
         StageUpdateRequestDto.FnbPolicies dto = new StageUpdateRequestDto.FnbPolicies(
                 false,
                 false,
@@ -310,8 +657,7 @@ class StageCommandServiceTest {
     void delete() {
         // given
         Host host = hostFactory.create("test");
-        Place place = placeFactory.create(host, "place", "0000000000", null);
-        Stage stage = stageFactory.create(place, "stage", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
 
         // when
         stageCommandService.delete(stage.getId());
@@ -321,6 +667,6 @@ class StageCommandServiceTest {
 
         assertThat(throwable)
                 .isInstanceOf(StageException.class)
-                .hasMessage(StageExceptionCode.NOT_FOUND.getMessage());
+                .hasMessage(NOT_FOUND.getMessage());
     }
 }

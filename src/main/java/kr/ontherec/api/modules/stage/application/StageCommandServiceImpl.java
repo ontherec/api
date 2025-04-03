@@ -1,15 +1,18 @@
 package kr.ontherec.api.modules.stage.application;
 
-import kr.ontherec.api.modules.place.entity.Place;
+import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.stage.dao.StageRepository;
 import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
+import kr.ontherec.api.modules.stage.exception.StageException;
 import kr.ontherec.api.modules.tag.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+
+import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.EXIST_BRN;
 
 @Service @RequiredArgsConstructor
 @Transactional
@@ -18,9 +21,12 @@ public class StageCommandServiceImpl implements StageCommandService {
     private final StageMapper stageMapper = StageMapper.INSTANCE;
 
     @Override
-    public Stage register(Place place, Stage newStage, Set<Tag> tags) {
-        newStage.setPlace(place);
-        newStage.setTags(tags);
+    public Stage register(Host host, Stage newStage, Set<Tag> tags) {
+        if(stageRepository.existsByBrn(newStage.getBrn()))
+            throw new StageException(EXIST_BRN);
+
+        newStage.setHost(host);
+        newStage.getTags().addAll(tags);
 
         return stageRepository.save(newStage);
     }
@@ -36,7 +42,7 @@ public class StageCommandServiceImpl implements StageCommandService {
     public void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto, Set<Tag> tags) {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
         stageMapper.updateIntroduction(dto, foundStage);
-        foundStage.setTags(tags);
+        foundStage.getTags().addAll(tags);
         stageRepository.save(foundStage);
     }
 
@@ -58,6 +64,13 @@ public class StageCommandServiceImpl implements StageCommandService {
     public void updateDocuments(Long id, StageUpdateRequestDto.Documents dto) {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
         stageMapper.updateDocuments(dto, foundStage);
+        stageRepository.save(foundStage);
+    }
+
+    @Override
+    public void updateParking(Long id, StageUpdateRequestDto.Parking dto) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        stageMapper.updateParking(dto, foundStage);
         stageRepository.save(foundStage);
     }
 

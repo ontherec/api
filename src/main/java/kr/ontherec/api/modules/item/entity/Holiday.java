@@ -1,23 +1,22 @@
-package kr.ontherec.api.modules.place.entity;
+package kr.ontherec.api.modules.item.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @Builder @AllArgsConstructor(access = PRIVATE)
-@Getter @EqualsAndHashCode(of = "url")
-public class Link {
+@Getter @EqualsAndHashCode(of = "type")
+public class Holiday {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @Column(updatable = false, nullable = false)
-    private String url;
+    @Enumerated(STRING)
+    private HolidayType type;
 }

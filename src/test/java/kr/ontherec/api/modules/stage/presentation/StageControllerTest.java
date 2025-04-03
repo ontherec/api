@@ -8,11 +8,10 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
-import kr.ontherec.api.infra.fixture.PlaceFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.place.entity.Place;
+import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.*;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.entity.StageType;
@@ -37,10 +36,12 @@ import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
+import static kr.ontherec.api.infra.model.Regex.BUSINESS_REGISTRATION_NUMBER;
+import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
+import static kr.ontherec.api.modules.item.entity.HolidayType.추석;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
 import static kr.ontherec.api.modules.stage.entity.StageType.T;
 import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.FORBIDDEN;
-import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.NOT_VALID_ENGINEERING_FEE;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
@@ -56,7 +57,6 @@ class StageControllerTest {
 
     @Autowired private HostFactory hostFactory;
     @Autowired private TagFactory tagFactory;
-    @Autowired private PlaceFactory placeFactory;
     @Autowired private StageFactory stageFactory;
 
     @Value("${spring.security.api-key}")
@@ -85,8 +85,7 @@ class StageControllerTest {
     void search() {
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        stageFactory.create(place, "stage", tags);
+        stageFactory.create(host, "stage", "0000000000", tags);
 
         given(this.spec)
                 .filter(document(
@@ -103,79 +102,67 @@ class StageControllerTest {
                                         fieldWithPath("[].id")
                                                 .type(NUMBER)
                                                 .description("공연장 식별자"),
-                                        // place
-                                        fieldWithPath("[].place")
+                                        // host
+                                        fieldWithPath("[].host")
                                                 .type(OBJECT)
-                                                .description("공연장을 운영하는 플레이스"),
-                                        fieldWithPath("[].place.id")
+                                                .description("호스트"),
+                                        fieldWithPath("[].host.id")
                                                 .type(NUMBER)
-                                                .description("플레이스 식별자"),
-                                        fieldWithPath("[].place.title")
+                                                .description("호스트 식별자"),
+                                        fieldWithPath("[].host.username")
                                                 .type(STRING)
-                                                .description("플레이스 이름"),
-                                        fieldWithPath("[].place.address")
+                                                .description("호스트 ID"),
+                                        fieldWithPath("[].host.contactFrom")
+                                                .type(STRING)
+                                                .description("문의 가능 시작 시간 (HH:mm:ss.SSS)")
+                                                .optional(),
+                                        fieldWithPath("[].host.contactUntil")
+                                                .type(STRING)
+                                                .description("문의 가능 종료 시간 (HH:mm:ss.SSS)")
+                                                .optional(),
+                                        fieldWithPath("[].host.averageResponseTime")
+                                                .type(STRING)
+                                                .description("평균 응답 시간 (ISO 8601 Duration)")
+                                                .optional(),
+                                        fieldWithPath("[].images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("공연장 이미지 URL 목록"),
+                                        fieldWithPath("[].title")
+                                                .type(STRING)
+                                                .description("이름"),
+                                        fieldWithPath("[].brn")
+                                                .type(STRING)
+                                                .description("사업자등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
+                                        // address
+                                        fieldWithPath("[].address")
                                                 .type(OBJECT)
                                                 .description("주소"),
-                                        fieldWithPath("[].place.address.id")
+                                        fieldWithPath("[].address.id")
                                                 .type(NUMBER)
                                                 .description("주소 식별자"),
-                                        fieldWithPath("[].place.address.zipcode")
+                                        fieldWithPath("[].address.zipcode")
                                                 .type(STRING)
                                                 .description("우편번호"),
-                                        fieldWithPath("[].place.address.state")
+                                        fieldWithPath("[].address.state")
                                                 .type(STRING)
                                                 .description("도/시"),
-                                        fieldWithPath("[].place.address.city")
+                                        fieldWithPath("[].address.city")
                                                 .type(STRING)
                                                 .description("시/군/구"),
-                                        fieldWithPath("[].place.address.streetAddress")
+                                        fieldWithPath("[].address.streetAddress")
                                                 .type(STRING)
                                                 .description("도로명 주소"),
-                                        fieldWithPath("[].place.address.detail")
+                                        fieldWithPath("[].address.detail")
                                                 .type(STRING)
                                                 .description("상세 주소")
                                                 .optional(),
-                                        fieldWithPath("[].place.address.latitude")
+                                        fieldWithPath("[].address.latitude")
                                                 .type(NUMBER)
                                                 .description("위도 (정수 3자리 이하, 소수 13자리 이하)"),
-                                        fieldWithPath("[].place.address.longitude")
+                                        fieldWithPath("[].address.longitude")
                                                 .type(NUMBER)
                                                 .description("경도 (정수 3자리 이하, 소수 13자리 이하)"),
-                                        fieldWithPath("[].place.tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("플레이스 태그 목록")
-                                                .optional(),
-                                        // introduction
-                                        fieldWithPath("[].introduction")
-                                                .type(OBJECT)
-                                                .description("공연장 소개 정보"),
-                                        fieldWithPath("[].introduction.title")
-                                                .type(STRING)
-                                                .description("공연장 이름"),
-                                        fieldWithPath("[].introduction.content")
-                                                .type(STRING)
-                                                .description("소개")
-                                                .optional(),
-                                        fieldWithPath("[].introduction.guide")
-                                                .type(STRING)
-                                                .description("이용 안내")
-                                                .optional(),
-                                        fieldWithPath("[].introduction.tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("공연장 태그 목록")
-                                                .optional(),
-                                        // location
-                                        fieldWithPath("[].location")
-                                                .type(OBJECT)
-                                                .description("공연장 위치 정보"),
-                                        fieldWithPath("[].location.floor")
-                                                .type(NUMBER)
-                                                .description("층수"),
-                                        fieldWithPath("[].location.hasElevator")
-                                                .type(BOOLEAN)
-                                                .description("엘리베이터 존재 여부"),
                                         // count
                                         fieldWithPath("[].viewCount")
                                                 .type(NUMBER)
@@ -183,6 +170,24 @@ class StageControllerTest {
                                         fieldWithPath("[].likeCount")
                                                 .type(STRING)
                                                 .description("좋아요 수"),
+                                        // introduction
+                                        fieldWithPath("[].introduction")
+                                                .type(OBJECT)
+                                                .description("소개 정보"),
+                                        fieldWithPath("[].introduction.content")
+                                                .type(STRING)
+                                                .description("소개")
+                                                .optional(),
+                                        fieldWithPath("[].introduction.tags[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("태그 목록")
+                                                .optional(),
+                                        fieldWithPath("[].introduction.links[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("링크 목록")
+                                                .optional(),
                                         // area
                                         fieldWithPath("[].area")
                                                 .type(OBJECT)
@@ -206,6 +211,17 @@ class StageControllerTest {
                                         fieldWithPath("[].business")
                                                 .type(OBJECT)
                                                 .description("공연장 영업 정보"),
+                                        fieldWithPath("[].business.holidays[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록")
+                                                .optional(),
+                                        fieldWithPath("[].business.bookingFrom")
+                                                .type(STRING)
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
+                                        fieldWithPath("[].business.bookingUntil")
+                                                .type(STRING)
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("[].business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
@@ -265,10 +281,28 @@ class StageControllerTest {
                                         fieldWithPath("[].documents.cueSheetDue")
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한 (ISO 8601 Duration)"),
+                                        // parking
+                                        fieldWithPath("[].parking")
+                                                .type(OBJECT)
+                                                .description("플레이스 주차 정보"),
+                                        fieldWithPath("[].parking.capacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("[].parking.location")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("[].parking.free")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
+                                                .optional(),
                                         // facilities
                                         fieldWithPath("[].facilities")
                                                 .type(OBJECT)
                                                 .description("공연장 편의시설 정보"),
+                                        fieldWithPath("[].facilities.hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부"),
                                         fieldWithPath("[].facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -330,8 +364,7 @@ class StageControllerTest {
     void get() {
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
 
         given(this.spec)
                 .filter(document(
@@ -349,79 +382,67 @@ class StageControllerTest {
                                         fieldWithPath("id")
                                                 .type(NUMBER)
                                                 .description("공연장 식별자"),
-                                        // place
-                                        fieldWithPath("place")
+                                        // host
+                                        fieldWithPath("host")
                                                 .type(OBJECT)
-                                                .description("공연장을 운영하는 플레이스"),
-                                        fieldWithPath("place.id")
+                                                .description("호스트"),
+                                        fieldWithPath("host.id")
                                                 .type(NUMBER)
-                                                .description("플레이스 식별자"),
-                                        fieldWithPath("place.title")
+                                                .description("호스트 식별자"),
+                                        fieldWithPath("host.username")
                                                 .type(STRING)
-                                                .description("플레이스 이름"),
-                                        fieldWithPath("place.address")
+                                                .description("호스트 ID"),
+                                        fieldWithPath("host.contactFrom")
+                                                .type(STRING)
+                                                .description("문의 가능 시작 시간 (HH:mm:ss.SSS)")
+                                                .optional(),
+                                        fieldWithPath("host.contactUntil")
+                                                .type(STRING)
+                                                .description("문의 가능 종료 시간 (HH:mm:ss.SSS)")
+                                                .optional(),
+                                        fieldWithPath("host.averageResponseTime")
+                                                .type(STRING)
+                                                .description("평균 응답 시간 (ISO 8601 Duration)")
+                                                .optional(),
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("공연장 이미지 URL 목록"),
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("이름"),
+                                        fieldWithPath("brn")
+                                                .type(STRING)
+                                                .description("사업자등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
+                                        // address
+                                        fieldWithPath("address")
                                                 .type(OBJECT)
                                                 .description("주소"),
-                                        fieldWithPath("place.address.id")
+                                        fieldWithPath("address.id")
                                                 .type(NUMBER)
                                                 .description("주소 식별자"),
-                                        fieldWithPath("place.address.zipcode")
+                                        fieldWithPath("address.zipcode")
                                                 .type(STRING)
                                                 .description("우편번호"),
-                                        fieldWithPath("place.address.state")
+                                        fieldWithPath("address.state")
                                                 .type(STRING)
                                                 .description("도/시"),
-                                        fieldWithPath("place.address.city")
+                                        fieldWithPath("address.city")
                                                 .type(STRING)
                                                 .description("시/군/구"),
-                                        fieldWithPath("place.address.streetAddress")
+                                        fieldWithPath("address.streetAddress")
                                                 .type(STRING)
                                                 .description("도로명 주소"),
-                                        fieldWithPath("place.address.detail")
+                                        fieldWithPath("address.detail")
                                                 .type(STRING)
                                                 .description("상세 주소")
                                                 .optional(),
-                                        fieldWithPath("place.address.latitude")
+                                        fieldWithPath("address.latitude")
                                                 .type(NUMBER)
                                                 .description("위도 (정수 3자리 이하, 소수 13자리 이하)"),
-                                        fieldWithPath("place.address.longitude")
+                                        fieldWithPath("address.longitude")
                                                 .type(NUMBER)
                                                 .description("경도 (정수 3자리 이하, 소수 13자리 이하)"),
-                                        fieldWithPath("place.tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("플레이스 태그 목록")
-                                                .optional(),
-                                        // introduction
-                                        fieldWithPath("introduction")
-                                                .type(OBJECT)
-                                                .description("공연장 소개 정보"),
-                                        fieldWithPath("introduction.title")
-                                                .type(STRING)
-                                                .description("공연장 이름"),
-                                        fieldWithPath("introduction.content")
-                                                .type(STRING)
-                                                .description("소개")
-                                                .optional(),
-                                        fieldWithPath("introduction.guide")
-                                                .type(STRING)
-                                                .description("이용 안내")
-                                                .optional(),
-                                        fieldWithPath("introduction.tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("공연장 태그 목록")
-                                                .optional(),
-                                        // location
-                                        fieldWithPath("location")
-                                                .type(OBJECT)
-                                                .description("공연장 위치 정보"),
-                                        fieldWithPath("location.floor")
-                                                .type(NUMBER)
-                                                .description("층수"),
-                                        fieldWithPath("location.hasElevator")
-                                                .type(BOOLEAN)
-                                                .description("엘리베이터 존재 여부"),
                                         // count
                                         fieldWithPath("viewCount")
                                                 .type(NUMBER)
@@ -429,6 +450,24 @@ class StageControllerTest {
                                         fieldWithPath("likeCount")
                                                 .type(STRING)
                                                 .description("좋아요 수"),
+                                        // introduction
+                                        fieldWithPath("introduction")
+                                                .type(OBJECT)
+                                                .description("소개 정보"),
+                                        fieldWithPath("introduction.content")
+                                                .type(STRING)
+                                                .description("소개")
+                                                .optional(),
+                                        fieldWithPath("introduction.tags[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("태그 목록")
+                                                .optional(),
+                                        fieldWithPath("introduction.links[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("링크 목록")
+                                                .optional(),
                                         // area
                                         fieldWithPath("area")
                                                 .type(OBJECT)
@@ -452,6 +491,17 @@ class StageControllerTest {
                                         fieldWithPath("business")
                                                 .type(OBJECT)
                                                 .description("공연장 영업 정보"),
+                                        fieldWithPath("business.holidays[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록")
+                                                .optional(),
+                                        fieldWithPath("business.bookingFrom")
+                                                .type(STRING)
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
+                                        fieldWithPath("business.bookingUntil")
+                                                .type(STRING)
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
@@ -511,10 +561,28 @@ class StageControllerTest {
                                         fieldWithPath("documents.cueSheetDue")
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한 (ISO 8601 Duration)"),
+                                        // parking
+                                        fieldWithPath("parking")
+                                                .type(OBJECT)
+                                                .description("플레이스 주차 정보"),
+                                        fieldWithPath("parking.capacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("parking.location")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("parking.free")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
+                                                .optional(),
                                         // facilities
                                         fieldWithPath("facilities")
                                                 .type(OBJECT)
                                                 .description("공연장 편의시설 정보"),
+                                        fieldWithPath("facilities.hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부"),
                                         fieldWithPath("facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -575,21 +643,24 @@ class StageControllerTest {
     @DisplayName("공연장 등록 성공")
     @Test
     void register() {
-
-        Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
+        hostFactory.create("test");
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                place.getId(),
+                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "stage",
+                "0000000000",
+                new AddressRegisterRequestDto(
+                        "00000",
+                        "경기도",
+                        "수원시 장안구",
+                        "율전로",
+                        null,
+                        new BigDecimal("000.0000000000"),
+                        new BigDecimal("000.0000000000")
+                ),
                 new StageRegisterRequestDto.Introduction(
                         "stage",
-                        "stage",
-                        "stage",
-                        Set.of("tag")
-                ),
-                new StageRegisterRequestDto.Location(
-                        -1,
-                        false
+                        Set.of("tag"),
+                        Set.of("https://ontherec.kr")
                 ),
                 new StageRegisterRequestDto.Area(
                         60,
@@ -599,6 +670,9 @@ class StageControllerTest {
                         BigDecimal.valueOf(5)
                 ),
                 new StageRegisterRequestDto.Business(
+                        Set.of(설날),
+                        Duration.ofDays(30),
+                        Duration.ofDays(1),
                         Set.of(new RefundPolicyRegisterRequestDto(
                                 Duration.ofDays(30),
                                 BigDecimal.valueOf(33.3)
@@ -619,7 +693,13 @@ class StageControllerTest {
                         "https://docs.google.com/document",
                         Duration.ofDays(3)
                 ),
+                new StageRegisterRequestDto.Parking(
+                        2,
+                        "건물 뒤편",
+                        true
+                ),
                 new StageRegisterRequestDto.Facilities(
+                        false,
                         true,
                         true,
                         true,
@@ -650,38 +730,58 @@ class StageControllerTest {
                                 .description("공연장 등록")
                                 .requestSchema(Schema.schema(StageRegisterRequestDto.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("placeId")
-                                                .type(NUMBER)
-                                                .description("공연장을 등록할 플레이스 식별자"),
-                                        // location
-                                        fieldWithPath("location")
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("공연장 이미지 URL 목록"),
+                                        fieldWithPath("title")
+                                                .type(STRING)
+                                                .description("이름"),
+                                        fieldWithPath("brn")
+                                                .type(STRING)
+                                                .description("사업자등록번호 (" + BUSINESS_REGISTRATION_NUMBER + ")"),
+                                        fieldWithPath("address")
                                                 .type(OBJECT)
-                                                .description("공연장 위치 정보"),
-                                        fieldWithPath("location.floor")
+                                                .description("주소"),
+                                        fieldWithPath("address.zipcode")
+                                                .type(STRING)
+                                                .description("우편번호"),
+                                        fieldWithPath("address.state")
+                                                .type(STRING)
+                                                .description("도/시"),
+                                        fieldWithPath("address.city")
+                                                .type(STRING)
+                                                .description("시/군/구"),
+                                        fieldWithPath("address.streetAddress")
+                                                .type(STRING)
+                                                .description("도로명 주소"),
+                                        fieldWithPath("address.detail")
+                                                .type(STRING)
+                                                .description("상세 주소")
+                                                .optional(),
+                                        fieldWithPath("address.latitude")
                                                 .type(NUMBER)
-                                                .description("층수"),
-                                        fieldWithPath("location.hasElevator")
-                                                .type(BOOLEAN)
-                                                .description("엘리베이터 존재 여부"),
+                                                .description("위도 (정수 3자리 이하, 소수 13자리 이하)"),
+                                        fieldWithPath("address.longitude")
+                                                .type(NUMBER)
+                                                .description("경도 (정수 3자리 이하, 소수 13자리 이하)"),
                                         // introduction
                                         fieldWithPath("introduction")
                                                 .type(OBJECT)
                                                 .description("공연장 소개 정보"),
-                                        fieldWithPath("introduction.title")
-                                                .type(STRING)
-                                                .description("공연장 이름"),
                                         fieldWithPath("introduction.content")
                                                 .type(STRING)
                                                 .description("소개")
                                                 .optional(),
-                                        fieldWithPath("introduction.guide")
-                                                .type(STRING)
-                                                .description("이용 안내")
-                                                .optional(),
                                         fieldWithPath("introduction.tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
-                                                .description("공연장 태그 목록")
+                                                .description("태그 목록")
+                                                .optional(),
+                                        fieldWithPath("introduction.links[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("링크 목록")
                                                 .optional(),
                                         // area
                                         fieldWithPath("area")
@@ -706,6 +806,17 @@ class StageControllerTest {
                                         fieldWithPath("business")
                                                 .type(OBJECT)
                                                 .description("공연장 영업 정보"),
+                                        fieldWithPath("business.holidays[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록")
+                                                .optional(),
+                                        fieldWithPath("business.bookingFrom")
+                                                .type(STRING)
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
+                                        fieldWithPath("business.bookingUntil")
+                                                .type(STRING)
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("business.refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
@@ -762,10 +873,28 @@ class StageControllerTest {
                                         fieldWithPath("documents.cueSheetDue")
                                                 .type(STRING)
                                                 .description("큐시트 제출 마감 기한 (ISO 8601 Duration)"),
+                                        // parking
+                                        fieldWithPath("parking")
+                                                .type(OBJECT)
+                                                .description("플레이스 주차 정보"),
+                                        fieldWithPath("parking.capacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("parking.location")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("parking.free")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
+                                                .optional(),
                                         // facilities
                                         fieldWithPath("facilities")
                                                 .type(OBJECT)
                                                 .description("공연장 편의시설 정보"),
+                                        fieldWithPath("facilities.hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부"),
                                         fieldWithPath("facilities.hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -818,95 +947,17 @@ class StageControllerTest {
                 .body(notNullValue());
     }
 
-    @DisplayName("공연장 등록 실패 - 유효하지 않은 엔지니어링 정보")
-    @Test
-    void registerWithInvalidEngineeringFee() {
-
-        Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                place.getId(),
-                new StageRegisterRequestDto.Introduction(
-                        "stage",
-                        "stage",
-                        "stage",
-                        null
-                ),
-                new StageRegisterRequestDto.Location(
-                        -1,
-                        false
-                ),
-                new StageRegisterRequestDto.Area(
-                        60,
-                        120,
-                        RECTANGLE,
-                        BigDecimal.valueOf(10.5),
-                        BigDecimal.valueOf(5)
-                ),
-                new StageRegisterRequestDto.Business(
-                        Set.of(new RefundPolicyRegisterRequestDto(
-                                Duration.ofDays(30),
-                                BigDecimal.valueOf(33.3)
-                        ))
-                ),
-                new StageRegisterRequestDto.Engineering(
-                        false,
-                        50000L,
-                        true,
-                        null,
-                        false,
-                        null,
-                        true,
-                        100000L
-                ),
-                new StageRegisterRequestDto.Documents(
-                        "https://docs.google.com/document",
-                        "https://docs.google.com/document",
-                        Duration.ofDays(3)
-                ),
-                new StageRegisterRequestDto.Facilities(
-                        true,
-                        true,
-                        true,
-                        false,
-                        true,
-                        false
-                ),
-                new StageRegisterRequestDto.FnbPolicies(
-                        true,
-                        false,
-                        false,
-                        false,
-                        false,
-                        true,
-                        false
-                )
-        );
-
-        given()
-                .header(API_KEY_HEADER, API_KEY)
-                .contentType(JSON)
-                .body(dto)
-        .when()
-                .post("/stages")
-        .then()
-                .statusCode(NOT_VALID_ENGINEERING_FEE.getStatus().value())
-                .body("message", equalTo(NOT_VALID_ENGINEERING_FEE.getMessage()));
-    }
-
     @DisplayName("공연장 소개 수정 성공")
     @Test
     void updateIntroduction() {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
-                "newStage",
-                "newStage",
-                Set.of("newTag")
+                Set.of("newTag"),
+                Set.of("https://ontherec.live")
         );
 
         given(this.spec)
@@ -925,21 +976,19 @@ class StageControllerTest {
                                                 .description("소개를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Introduction.class.getSimpleName()))
                                 .requestFields(
-                                        fieldWithPath("title")
-                                                .type(STRING)
-                                                .description("공연장 이름"),
                                         fieldWithPath("content")
                                                 .type(STRING)
                                                 .description("소개")
-                                                .optional(),
-                                        fieldWithPath("guide")
-                                                .type(STRING)
-                                                .description("이용 안내")
                                                 .optional(),
                                         fieldWithPath("tags[]")
                                                 .type(ARRAY)
                                                 .attributes(key("itemsType").value(STRING))
                                                 .description("공연장 태그 목록")
+                                                .optional(),
+                                        fieldWithPath("links[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("공연장 링크 목록")
                                                 .optional()
                                 )
                                 .build())))
@@ -956,13 +1005,11 @@ class StageControllerTest {
         hostFactory.create("test");
         Host host = hostFactory.create("host");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
-                "newStage",
-                "newStage",
-                Set.of("newTag")
+                Set.of("newTag"),
+                Set.of("https://ontherec.live")
         );
 
         given(this.spec)
@@ -982,8 +1029,7 @@ class StageControllerTest {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.Area dto = new StageUpdateRequestDto.Area(
                 100,
                 200,
@@ -1036,9 +1082,11 @@ class StageControllerTest {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
+                Set.of(추석),
+                Duration.ofDays(90),
+                Duration.ofDays(7),
                 Set.of(new RefundPolicyUpdateRequestDto(
                         stage.getRefundPolicies().stream().toList().get(0).getId(),
                         Duration.ofDays(15),
@@ -1062,6 +1110,17 @@ class StageControllerTest {
                                                 .description("영업 정보를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Business.class.getSimpleName()))
                                 .requestFields(
+                                        fieldWithPath("holidays[]")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value("enum"))
+                                                .description("공휴일 목록")
+                                                .optional(),
+                                        fieldWithPath("bookingFrom")
+                                                .type(STRING)
+                                                .description("예약 시작 기간 (ISO 8601 Duration)"),
+                                        fieldWithPath("bookingUntil")
+                                                .type(STRING)
+                                                .description("예약 마감 기간 (ISO 8601 Duration)"),
                                         fieldWithPath("refundPolicies[]")
                                                 .type(ARRAY)
                                                 .description("환불 정책 목록")
@@ -1085,11 +1144,9 @@ class StageControllerTest {
     @DisplayName("공연장 엔지니어링 정보 수정 성공")
     @Test
     void updateEngineering() {
-
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.Engineering dto = new StageUpdateRequestDto.Engineering(
                 true,
                 50000L,
@@ -1158,8 +1215,7 @@ class StageControllerTest {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.Documents dto = new StageUpdateRequestDto.Documents(
                 "https://docs.google.com/document/u/0",
                 "https://docs.google.com/document/u/0",
@@ -1199,15 +1255,63 @@ class StageControllerTest {
                 .statusCode(OK.value());
     }
 
+    @DisplayName("공연장 주차 정보 수정 성공")
+    @Test
+    void Parking() {
+
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+
+        StageUpdateRequestDto.Parking dto = new StageUpdateRequestDto.Parking(
+                30,
+                "건물 건너편 주차장",
+                false
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "stage update parking",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("stage")
+                                .summary("stage update parking")
+                                .description("공연장 편의시설 정보 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("편의시설 정보를 수정할 공연장 식별자"))
+                                .requestSchema(Schema.schema(StageUpdateRequestDto.Parking.class.getSimpleName()))
+                                .requestFields(
+                                        fieldWithPath("capacity")
+                                                .type(NUMBER)
+                                                .description("주차 대수"),
+                                        fieldWithPath("location")
+                                                .type(STRING)
+                                                .description("주차장 위치 정보")
+                                                .optional(),
+                                        fieldWithPath("free")
+                                                .type(BOOLEAN)
+                                                .description("주차 무료 여부")
+                                                .optional())
+                                .build())))
+        .when()
+                .put("/stages/{id}/parking", stage.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
     @DisplayName("공연장 편의시설 정보 수정 성공")
     @Test
     void updateFacilities() {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.Facilities dto = new StageUpdateRequestDto.Facilities(
+                false,
                 true,
                 true,
                 true,
@@ -1232,6 +1336,9 @@ class StageControllerTest {
                                                 .description("편의시설 정보를 수정할 공연장 식별자"))
                                 .requestSchema(Schema.schema(StageUpdateRequestDto.Facilities.class.getSimpleName()))
                                 .requestFields(
+                                        fieldWithPath("hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부"),
                                         fieldWithPath("hasRestroom")
                                                 .type(BOOLEAN)
                                                 .description("화장실 존재 여부"),
@@ -1263,8 +1370,7 @@ class StageControllerTest {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
         StageUpdateRequestDto.FnbPolicies dto = new StageUpdateRequestDto.FnbPolicies(
                 false,
                 false,
@@ -1325,8 +1431,7 @@ class StageControllerTest {
 
         Host host = hostFactory.create("test");
         Set<Tag> tags = tagFactory.create("tag");
-        Place place = placeFactory.create(host, "place", "0000000000", tags);
-        Stage stage = stageFactory.create(place, "stage", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)

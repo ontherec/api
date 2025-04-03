@@ -2,22 +2,18 @@ package kr.ontherec.api.modules.post.application;
 
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.PostFactory;
-import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.post.entity.Post;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @UnitTest
 class PostQueryServiceTest {
 
-    @Autowired private TagFactory tagFactory;
     @Autowired private PostFactory postFactory;
 
     @Autowired private PostQueryService postQueryService;
@@ -26,8 +22,7 @@ class PostQueryServiceTest {
     @Test
     void search() {
         // given
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("test", "post", tags);
+        Post post = postFactory.create("test", "post");
 
         // when
         List<Post> posts = postQueryService.search("post");
@@ -40,8 +35,7 @@ class PostQueryServiceTest {
     @Test
     void get() {
         // given
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("test", "post", tags);
+        Post post = postFactory.create("test", "post");
 
         // when
         Post foundPost = postQueryService.get(post.getId());
@@ -54,8 +48,7 @@ class PostQueryServiceTest {
     @Test
     void isAuthor() {
         // given
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("test", "post", tags);
+        Post post = postFactory.create("test", "post");
 
         // when
         boolean isAuthor = postQueryService.isAuthor(post.getId(), "test");
@@ -68,8 +61,7 @@ class PostQueryServiceTest {
     @Test
     void isAuthorWithOtherAuthor() {
         // given
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("host", "post", tags);
+        Post post = postFactory.create("host", "post");
 
         // when
         boolean isAuthor = postQueryService.isAuthor(post.getId(), "test");

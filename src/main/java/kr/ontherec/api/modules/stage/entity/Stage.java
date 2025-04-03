@@ -2,8 +2,11 @@ package kr.ontherec.api.modules.stage.entity;
 
 import jakarta.persistence.*;
 import kr.ontherec.api.infra.model.BaseEntity;
+import kr.ontherec.api.modules.host.entity.Host;
+import kr.ontherec.api.modules.item.entity.Address;
+import kr.ontherec.api.modules.item.entity.Holiday;
+import kr.ontherec.api.modules.item.entity.Link;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
-import kr.ontherec.api.modules.place.entity.Place;
 import kr.ontherec.api.modules.stage.exception.StageException;
 import kr.ontherec.api.modules.tag.entity.Tag;
 import lombok.*;
@@ -20,7 +23,7 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.NOT_VALID_ENGINEERING_FEE;
+import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.*;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -28,44 +31,52 @@ import static lombok.AccessLevel.PROTECTED;
 @SuperBuilder @AllArgsConstructor(access = PRIVATE)
 @Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
 public class Stage extends BaseEntity {
+    private static final int BOOKING_PERIOD_MIN = 7;
+
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(updatable = false, nullable = false)
-    private Place place;
+    private Host host;
 
-    // images
+    @ElementCollection(fetch = EAGER)
+    @Column(nullable = false)
+    @Builder.Default
+    private List<String> images = new ArrayList<>();
 
-    // introduction
     @Column(nullable = false)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(unique = true, updatable = false, nullable = false)
+    private String brn;
+
+    @OneToOne(cascade = ALL, orphanRemoval = true)
+    @JoinColumn(updatable = false, nullable = false)
+    private Address address;
+
+    // counts
+    @Column(nullable = false)
+    private long viewCount;
+
+    @Column(nullable = false)
+    private long likeCount;
+
+    // introduction
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(columnDefinition = "TEXT")
-    private String guide;
-
     @ManyToMany(fetch = EAGER)
-    private List<Tag> tags;
+    @Builder.Default
+    private List<Tag> tags = new ArrayList<>();
 
-    // count
-    @Column(nullable = false)
-    private int viewCount;
+    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+    @JoinColumn
+    @Builder.Default
+    private Set<Link> links = new HashSet<>();
 
-    @Column(nullable = false)
-    private int likeCount;
-
-    // location
-    @Column(updatable = false, nullable = false)
-    private int floor;
-
-    @Column(updatable = false, nullable = false)
-    private boolean hasElevator;
-
-    // Area
+    // area
     @Column(nullable = false)
     private int minCapacity;
 
@@ -84,11 +95,24 @@ public class Stage extends BaseEntity {
 
     // business
     // TODO: timeblocks
-    // TODO: booking slots
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
-    private Set<RefundPolicy> refundPolicies;
+    @Builder.Default
+    private Set<Holiday> holidays = new HashSet<>();
+
+    // TODO: booking slots
+
+    @Column(nullable = false)
+    private Duration bookingFrom;
+
+    @Column(nullable = false)
+    private Duration bookingUntil;
+
+    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+    @JoinColumn
+    @Builder.Default
+    private Set<RefundPolicy> refundPolicies = new HashSet<>();
 
     // engineering
     @Column(nullable = false)
@@ -127,7 +151,20 @@ public class Stage extends BaseEntity {
 
     // TODO: equipments
 
+    // parking
+    @Column(nullable = false)
+    private int parkingCapacity;
+
+    @Column
+    private String parkingLocation;
+
+    @Column
+    private Boolean freeParking;
+
     // facilities
+    @Column(nullable = false)
+    private boolean hasElevator;
+
     @Column(nullable = false)
     private boolean hasRestroom;
 
@@ -168,6 +205,22 @@ public class Stage extends BaseEntity {
     @Column(nullable = false)
     private boolean sellAlcohol;
 
+    public void validateBookingPeriod() {
+        if(bookingFrom == null || bookingUntil == null)
+            return;
+
+        if(bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
+            throw new StageException(NOT_VALID_BOOKING_PERIOD);
+        }
+    }
+
+    public void validateParking() {
+        if (parkingCapacity > 0 && (parkingLocation == null || freeParking == null))
+            throw new StageException(NOT_VALID_PARKING);
+        if (parkingCapacity == 0 && (parkingLocation != null || freeParking != null))
+            throw new StageException(NOT_VALID_PARKING);
+    }
+
     public void validateEngineering() {
         validateEngineeringFee(stageManagingAvailable, stageManagingFee);
         validateEngineeringFee(soundEngineeringAvailable, soundEngineeringFee);
@@ -180,30 +233,5 @@ public class Stage extends BaseEntity {
             throw new StageException(NOT_VALID_ENGINEERING_FEE);
         if (!available && fee != null)
             throw new StageException(NOT_VALID_ENGINEERING_FEE);
-    }
-
-    public Set<Tag> getTags() {
-        return tags == null ? new HashSet<>() : new HashSet<>(tags);
-    }
-
-    public void setTags(Set<Tag> tags) {
-        this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
-    }
-
-    public void setRefundPolicies(Set<RefundPolicy> refundPolicies) {
-        this.refundPolicies = refundPolicies == null ? new HashSet<>() : new HashSet<>(refundPolicies);
-    }
-
-    public static abstract class StageBuilder<C extends Stage, B extends StageBuilder<C, B>> extends BaseEntityBuilder<C, B> {
-
-        public B tags(List<Tag> tags) {
-            this.tags = tags == null ? new ArrayList<>() : new ArrayList<>(tags);
-            return self();
-        }
-
-        public B refundPolicies(Set<RefundPolicy> refundPolicies) {
-            this.refundPolicies = refundPolicies == null ? new HashSet<>() : new HashSet<>(refundPolicies);
-            return self();
-        }
     }
 }

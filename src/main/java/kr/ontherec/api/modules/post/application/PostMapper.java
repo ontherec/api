@@ -23,14 +23,12 @@ public interface PostMapper {
     PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "tags", ignore = true)
     @Mapping(target = "likeCount", expression = "java(0)")
     @Mapping(target = "viewCount", expression = "java(0)")
     @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
     @Mapping(target = "modifiedAt", expression = "java(LocalDateTime.now())")
     Post registerRequestDtoToEntity(PostCreateRequestDto dto);
 
-    @Mapping(target = "tags", ignore = true)
     void update(PostUpdateRequestDto dto, @MappingTarget Post post);
 
     PostResponseDto EntityToResponseDto(Post post);

@@ -1,40 +1,41 @@
 package kr.ontherec.api.modules.stage.dto;
 
+import kr.ontherec.api.modules.host.dto.HostResponseDto;
+import kr.ontherec.api.modules.item.entity.Address;
+import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
-import kr.ontherec.api.modules.place.dto.PlaceSimpleResponseDto;
 import kr.ontherec.api.modules.stage.entity.StageType;
 
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 public record StageResponseDto (
         Long id,
-        PlaceSimpleResponseDto place,
-        Introduction introduction,
+        HostResponseDto host,
+        List<String> images,
+        String title,
+        String brn,
+        Address address,
         long viewCount,
         long likeCount,
-        Location location,
+        Introduction introduction,
         Area area,
         Business business,
         Engineering engineering,
         Documents documents,
+        Parking parking,
         Facilities facilities,
         FnbPolicies fnbPolicies,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {
     public record Introduction (
-            String title,
             String content,
-            String guide,
-            Set<String> tags
-    ) {}
-
-    public record Location (
-            int floor,
-            boolean hasElevator
+            Set<String> tags,
+            Set<String> links
     ) {}
 
     public record Area (
@@ -46,6 +47,9 @@ public record StageResponseDto (
     ) {}
 
     public record Business (
+            Duration bookingFrom,
+            Duration bookingUntil,
+            Set<HolidayType> holidays,
             Set<RefundPolicy> refundPolicies
     ) {}
 
@@ -66,7 +70,14 @@ public record StageResponseDto (
             Duration cueSheetDue
     ) {}
 
+    public record Parking (
+            int capacity,
+            String location,
+            Boolean free
+    ) {}
+
     public record Facilities (
+            boolean hasElevator,
             boolean hasRestroom,
             boolean hasWifi,
             boolean hasCameraStanding,

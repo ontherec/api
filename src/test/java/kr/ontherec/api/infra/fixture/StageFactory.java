@@ -1,7 +1,10 @@
 package kr.ontherec.api.infra.fixture;
 
+import kr.ontherec.api.modules.host.entity.Host;
+import kr.ontherec.api.modules.item.entity.Address;
+import kr.ontherec.api.modules.item.entity.Holiday;
+import kr.ontherec.api.modules.item.entity.Link;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
-import kr.ontherec.api.modules.place.entity.Place;
 import kr.ontherec.api.modules.stage.application.StageCommandService;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.tag.entity.Tag;
@@ -11,24 +14,37 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
 
 @Component
 public class StageFactory {
     @Autowired StageCommandService stageCommandService;
 
-    public Stage create(Place place, String title, Set<Tag> tags) {
+    public Stage create(Host host, String title, String brn, Set<Tag> tags) {
+        Address newAddress = Address.builder()
+                .zipcode("00000")
+                .state("경기도")
+                .city("수원시 장안구")
+                .streetAddress("율전로")
+                .detail(title)
+                .latitude(new BigDecimal("000.0000000000"))
+                .longitude(new BigDecimal("000.0000000000"))
+                .build();
+
         Stage newStage = Stage.builder()
-                .place(null)
+                .images(new ArrayList<>(List.of("https://ontherec.kr")))
+                .brn(brn)
                 .title(title)
-                .floor(-1)
-                .hasElevator(false)
+                .address(newAddress)
                 // introduction
                 .content(title)
-                .guide(title)
-                .tags(null)
+                .links(new HashSet<>(Set.of(Link.builder().url("https://ontherec.kr").build())))
                 // area
                 .minCapacity(60)
                 .maxCapacity(120)
@@ -36,12 +52,14 @@ public class StageFactory {
                 .stageWidth(BigDecimal.valueOf(10.5))
                 .stageHeight(BigDecimal.valueOf(5))
                 // business
+                .holidays(new HashSet<>(Set.of(Holiday.builder().type(설날).build())))
+                .bookingFrom(Duration.ofDays(30))
+                .bookingUntil(Duration.ofDays(1))
                 .refundPolicies(
-                        Set.of(RefundPolicy.builder()
+                        new HashSet<>(Set.of(RefundPolicy.builder()
                                 .dayBefore(Duration.ofDays(30))
                                 .percent(BigDecimal.valueOf(33.3))
-                                .build())
-                )
+                                .build())))
                 // engineering
                 .stageManagingAvailable(false)
                 .stageManagingFee(null)
@@ -55,7 +73,12 @@ public class StageFactory {
                 .applicationForm(null)
                 .cueSheetTemplate("https://docs.google.com/document")
                 .cueSheetDue(Duration.ofDays(3))
+                // parking
+                .parkingCapacity(2)
+                .parkingLocation("건물 뒤편")
+                .freeParking(true)
                 // facilities
+                .hasElevator(false)
                 .hasRestroom(true)
                 .hasWifi(true)
                 .hasCameraStanding(true)
@@ -74,6 +97,6 @@ public class StageFactory {
                 .modifiedAt(LocalDateTime.now())
                 .build();
 
-        return stageCommandService.register(place, newStage, tags);
+        return stageCommandService.register(host, newStage, tags == null ? new HashSet<>() : tags);
     }
 }

@@ -1,4 +1,4 @@
-package kr.ontherec.api.modules.place.dto;
+package kr.ontherec.api.modules.item.dto;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;

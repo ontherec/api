@@ -13,10 +13,8 @@ import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.NOT_FOU
 @Repository
 @Transactional
 public interface StageRepository extends JpaRepository<Stage, Long> {
-    List<Stage> findAllByTitleContainsOrPlace_TitleContainsOrPlace_Address_StateContainsOrPlace_Address_CityContainsOrPlace_Address_StreetAddressContainsOrderByViewCountDescAllIgnoreCase(String title, String place_title, String place_address_state, String place_address_city, String place_address_streetAddress);
-
     default List<Stage> search(String query) {
-        return findAllByTitleContainsOrPlace_TitleContainsOrPlace_Address_StateContainsOrPlace_Address_CityContainsOrPlace_Address_StreetAddressContainsOrderByViewCountDescAllIgnoreCase(query, query, query, query, query);
+        return findAll();
     }
 
     default Stage findByIdOrThrow(Long id) {
@@ -27,4 +25,6 @@ public interface StageRepository extends JpaRepository<Stage, Long> {
         findById(id).orElseThrow(() -> new StageException(NOT_FOUND));
         deleteById(id);
     }
+
+    boolean existsByBrn(String brn);
 }

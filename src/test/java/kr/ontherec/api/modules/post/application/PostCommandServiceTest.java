@@ -2,18 +2,14 @@ package kr.ontherec.api.modules.post.application;
 
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.PostFactory;
-import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.post.dto.PostCreateRequestDto;
 import kr.ontherec.api.modules.post.dto.PostUpdateRequestDto;
 import kr.ontherec.api.modules.post.entity.Post;
 import kr.ontherec.api.modules.post.exception.PostException;
 import kr.ontherec.api.modules.post.exception.PostExceptionCode;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
@@ -21,7 +17,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 @UnitTest
 class PostCommandServiceTest {
 
-    @Autowired private TagFactory tagFactory;
     @Autowired private PostFactory postFactory;
 
     @Autowired private PostCommandService postCommandService;
@@ -33,21 +28,15 @@ class PostCommandServiceTest {
     @Test
     void create() {
         // given
-        Set<Tag> tags = tagFactory.create("tag");
-        PostCreateRequestDto dto = new PostCreateRequestDto(
-                "post",
-                null,
-                "post"
-        );
+        PostCreateRequestDto dto = new PostCreateRequestDto("post", "post");
         Post newPost = postMapper.registerRequestDtoToEntity(dto);
 
         // when
-        Post post = postCommandService.create("test", newPost, tags);
+        Post post = postCommandService.create("test", newPost);
 
         // then
         assertThat(post.getAuthor()).isEqualTo("test");
         assertThat(post.getTitle()).isEqualTo(dto.title());
-        assertThat(post.getTags()).isEqualTo(tags);
         assertThat(post.getContent()).isEqualTo(dto.content());
     }
 
@@ -55,20 +44,14 @@ class PostCommandServiceTest {
     @Test
     void update() {
         // given
-        Post post = postFactory.create("test", "post", null);
-        PostUpdateRequestDto dto = new PostUpdateRequestDto(
-                "newPost",
-                null,
-                "newPost"
-        );
-        Set<Tag> tags = tagFactory.create("tag");
+        Post post = postFactory.create("test", "post");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto("newPost", "newPost");
 
         // when
-        postCommandService.update(post.getId(), dto, tags);
+        postCommandService.update(post.getId(), dto);
 
         // then
         assertThat(post.getTitle()).isEqualTo(dto.title());
-        assertThat(post.getTags()).isEqualTo(tags);
         assertThat(post.getContent()).isEqualTo(dto.content());
     }
 
@@ -76,8 +59,7 @@ class PostCommandServiceTest {
     @Test
     void delete() {
         // given
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("test", "post", tags);
+        Post post = postFactory.create("test", "post");
 
         // when
         postCommandService.delete(post.getId());
