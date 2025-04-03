@@ -8,12 +8,10 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.PostFactory;
-import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.post.dto.PostCreateRequestDto;
 import kr.ontherec.api.modules.post.dto.PostResponseDto;
 import kr.ontherec.api.modules.post.dto.PostUpdateRequestDto;
 import kr.ontherec.api.modules.post.entity.Post;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
-
-import java.util.Set;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -40,11 +36,9 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.snippet.Attributes.key;
 
 @IntegrationTest
 class PostControllerTest {
-    @Autowired private TagFactory tagFactory;
     @Autowired private PostFactory postFactory;
 
     @Value("${spring.security.api-key}")
@@ -71,8 +65,7 @@ class PostControllerTest {
     @DisplayName("게시글 검색 성공")
     @Test
     void search() {
-        Set<Tag> tags = tagFactory.create("tag");
-        postFactory.create("test", "post", tags);
+        postFactory.create("test", "post");
 
         given(this.spec)
                 .filter(document(
@@ -95,11 +88,6 @@ class PostControllerTest {
                                         fieldWithPath("[].title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
-                                        fieldWithPath("[].tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("게시글 태그 목록")
-                                                .optional(),
                                         fieldWithPath("[].content")
                                                 .type(STRING)
                                                 .description("게시글 본문"),
@@ -125,8 +113,7 @@ class PostControllerTest {
     @DisplayName("게시글 조회 성공")
     @Test
     void get() {
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("test", "post", tags);
+        Post post = postFactory.create("test", "post");
 
         given(this.spec)
                 .filter(document(
@@ -150,11 +137,6 @@ class PostControllerTest {
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
-                                        fieldWithPath("tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("게시글 태그 목록")
-                                                .optional(),
                                         fieldWithPath("content")
                                                 .type(STRING)
                                                 .description("게시글 본문"),
@@ -181,11 +163,7 @@ class PostControllerTest {
     @DisplayName("게시글 생성 성공")
     @Test
     void create() {
-        PostCreateRequestDto dto = new PostCreateRequestDto(
-                "post",
-                Set.of("tag"),
-                "post"
-        );
+        PostCreateRequestDto dto = new PostCreateRequestDto("post", "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -202,11 +180,6 @@ class PostControllerTest {
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
-                                        fieldWithPath("tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("게시글 태그 목록")
-                                                .optional(),
                                         fieldWithPath("content")
                                                 .type(STRING)
                                                 .description("게시글 본문"))
@@ -222,13 +195,8 @@ class PostControllerTest {
     @DisplayName("게시글 수정 성공")
     @Test
     void update() {
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("test", "post", tags);
-        PostUpdateRequestDto dto = new PostUpdateRequestDto(
-                "post",
-                Set.of("tag"),
-                "post"
-        );
+        Post post = postFactory.create("test", "post");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto("post", "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -249,11 +217,6 @@ class PostControllerTest {
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
-                                        fieldWithPath("tags[]")
-                                                .type(ARRAY)
-                                                .attributes(key("itemsType").value(STRING))
-                                                .description("게시글 태그 목록")
-                                                .optional(),
                                         fieldWithPath("content")
                                                 .type(STRING)
                                                 .description("게시글 본문"))
@@ -267,13 +230,8 @@ class PostControllerTest {
     @DisplayName("게시글 수정 실패 - 권한 없음")
     @Test
     void updateWithoutAuthority() {
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("user", "post", tags);
-        PostUpdateRequestDto dto = new PostUpdateRequestDto(
-                "post",
-                Set.of("tag"),
-                "post"
-        );
+        Post post = postFactory.create("user", "post");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto("post", "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -289,8 +247,7 @@ class PostControllerTest {
     @DisplayName("게시글 삭제 성공")
     @Test
     void delete() {
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("test", "post", tags);
+        Post post = postFactory.create("test", "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -314,8 +271,7 @@ class PostControllerTest {
     @DisplayName("게시글 삭제 실패 - 권한 없음")
     @Test
     void deleteWithoutAuthority() {
-        Set<Tag> tags = tagFactory.create("tag");
-        Post post = postFactory.create("user", "post", tags);
+        Post post = postFactory.create("user", "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)

@@ -38,10 +38,6 @@ VALUES (1, 1, 7, 100);
 INSERT INTO post (id, author, title, content, view_count, like_count, created_at, modified_at)
 VALUES (1, 'test', '아티클', '내용', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO post_tags (post_id, tags_id)
-VALUES (1, 4),
-       (1, 5);
-
 -- chat
 INSERT INTO chat (id, title)
 VALUES (1, '채팅방');
