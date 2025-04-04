@@ -65,15 +65,15 @@ public class StageController {
         return ResponseEntity.created(URI.create("/v1/stages/" + stage.getId())).body(stage.getId());
     }
 
-    @PutMapping("/{id}/area")
-    ResponseEntity<Void> updateArea(Authentication authentication,
-                                           @PathVariable Long id,
-                                           @Valid @RequestBody StageUpdateRequestDto.Area dto) {
+    @PutMapping("/{id}/images")
+    ResponseEntity<Void> updateImages(Authentication authentication,
+                                    @PathVariable Long id,
+                                    @Valid @RequestBody StageUpdateRequestDto.Images dto) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
 
-        stageCommandService.updateArea(id, dto);
+        stageCommandService.updateImages(id, dto);
         return ResponseEntity.ok().build();
     }
 
@@ -92,6 +92,18 @@ public class StageController {
                 .collect(Collectors.toSet());
 
         stageCommandService.updateIntroduction(id, dto, tags);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{id}/area")
+    ResponseEntity<Void> updateArea(Authentication authentication,
+                                           @PathVariable Long id,
+                                           @Valid @RequestBody StageUpdateRequestDto.Area dto) {
+        Host host = hostService.getByUsername(authentication.getName());
+        if (!stageQueryService.isHost(id, host))
+            throw new StageException(StageExceptionCode.FORBIDDEN);
+
+        stageCommandService.updateArea(id, dto);
         return ResponseEntity.ok().build();
     }
 

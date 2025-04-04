@@ -9,9 +9,15 @@ import org.hibernate.validator.constraints.time.DurationMax;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 
 public class StageUpdateRequestDto {
+        public record Images(
+                @NotNull(message = "공연장 사진을 입력해주세요.")
+                List<@URL(message = "유효하지 않은 URL 입니다") String> images
+        ) {}
+
         public record Introduction(
                 @NotBlank(message = "공연장 소개를 입력해주세요.")
                 @Size(max = 1000, message = "공연장 소개는 최대 1000글자까지 입력 가능합니다.")

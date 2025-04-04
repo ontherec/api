@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 
 import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
@@ -49,7 +50,7 @@ class StageCommandServiceTest {
         Set<Tag> tags = tagFactory.create("tag");
 
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
                 "stage",
                 "0000000000",
                 new AddressRegisterRequestDto(
@@ -140,7 +141,7 @@ class StageCommandServiceTest {
         stageFactory.create(host, "stage", "0000000000", tags);
 
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
                 "stage",
                 "0000000000",
                 new AddressRegisterRequestDto(
@@ -229,7 +230,7 @@ class StageCommandServiceTest {
         // given
         hostFactory.create("test");
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
                 "stage",
                 "0000000000",
                 new AddressRegisterRequestDto(
@@ -317,7 +318,7 @@ class StageCommandServiceTest {
         // given
         hostFactory.create("test");
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
                 "stage",
                 "0000000000",
                 new AddressRegisterRequestDto(
@@ -397,6 +398,23 @@ class StageCommandServiceTest {
         assertThat(throwable)
                 .isInstanceOf(StageException.class)
                 .hasMessage(NOT_VALID_ENGINEERING_FEE.getMessage());
+    }
+
+    @DisplayName("공연장 이미지 수정 성공")
+    @Test
+    void updateImages() {
+        // given
+        Host host = hostFactory.create("test");
+        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        StageUpdateRequestDto.Images dto = new StageUpdateRequestDto.Images(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg")
+        );
+
+        // when
+        stageCommandService.updateImages(stage.getId(), dto);
+
+        // then
+        assertThat(stage.getImages().stream().toList().get(0)).isEqualTo(dto.images().stream().toList().get(0));
     }
 
     @DisplayName("공연장 소개 수정 성공")

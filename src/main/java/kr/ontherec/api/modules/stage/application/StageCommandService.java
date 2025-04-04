@@ -9,8 +9,9 @@ import java.util.Set;
 
 public interface StageCommandService {
     Stage register(Host host, Stage newStage, Set<Tag> tags);
-    void updateArea(Long id, StageUpdateRequestDto.Area dto);
+    void updateImages(Long id, StageUpdateRequestDto.Images dto);
     void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto, Set<Tag> tags);
+    void updateArea(Long id, StageUpdateRequestDto.Area dto);
     void updateBusiness(Long id, StageUpdateRequestDto.Business dto);
     void updateEngineering(Long id, StageUpdateRequestDto.Engineering dto);
     void updateDocuments(Long id, StageUpdateRequestDto.Documents dto);

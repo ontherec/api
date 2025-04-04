@@ -41,6 +41,8 @@ public interface StageMapper {
     @Mapping(target = "modifiedAt", expression = "java(LocalDateTime.now())")
     Stage registerRequestDtoToEntity(StageRegisterRequestDto dto);
 
+    void updateImages(StageUpdateRequestDto.Images dto, @MappingTarget Stage stage);
+
     void updateArea(StageUpdateRequestDto.Area dto, @MappingTarget Stage stage);
 
     @Mapping(target = "tags", ignore = true)

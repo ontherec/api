@@ -32,9 +32,9 @@ public class StageCommandServiceImpl implements StageCommandService {
     }
 
     @Override
-    public void updateArea(Long id, StageUpdateRequestDto.Area dto) {
+    public void updateImages(Long id, StageUpdateRequestDto.Images dto) {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
-        stageMapper.updateArea(dto, foundStage);
+        stageMapper.updateImages(dto, foundStage);
         stageRepository.save(foundStage);
     }
 
@@ -43,6 +43,13 @@ public class StageCommandServiceImpl implements StageCommandService {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
         stageMapper.updateIntroduction(dto, foundStage);
         foundStage.getTags().addAll(tags);
+        stageRepository.save(foundStage);
+    }
+
+    @Override
+    public void updateArea(Long id, StageUpdateRequestDto.Area dto) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        stageMapper.updateArea(dto, foundStage);
         stageRepository.save(foundStage);
     }
 

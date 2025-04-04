@@ -27,6 +27,7 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
@@ -645,7 +646,7 @@ class StageControllerTest {
     void register() {
         hostFactory.create("test");
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
                 "stage",
                 "0000000000",
                 new AddressRegisterRequestDto(
@@ -945,6 +946,43 @@ class StageControllerTest {
                 .statusCode(CREATED.value())
                 .header("Location", startsWith("/v1/stages"))
                 .body(notNullValue());
+    }
+
+    @DisplayName("공연장 이미지 수정 성공")
+    @Test
+    void updateImages() {
+        Host host = hostFactory.create("test");
+        Set<Tag> tags = tagFactory.create("tag");
+        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        StageUpdateRequestDto.Images dto = new StageUpdateRequestDto.Images(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg")
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "stage update images",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("stage")
+                                .summary("stage update images")
+                                .description("공연장 소개 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("소개를 수정할 공연장 식별자"))
+                                .requestSchema(Schema.schema(StageUpdateRequestDto.Images.class.getSimpleName()))
+                                .requestFields(
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("공연장 이미지 URL 목록"))
+                                .build())))
+        .when()
+                .put("/stages/{id}/images", stage.getId())
+        .then()
+                .statusCode(OK.value());
     }
 
     @DisplayName("공연장 소개 수정 성공")
