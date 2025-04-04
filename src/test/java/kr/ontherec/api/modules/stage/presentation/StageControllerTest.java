@@ -9,10 +9,8 @@ import io.restassured.specification.RequestSpecification;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
-import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
-import kr.ontherec.api.modules.item.entity.Tag;
 import kr.ontherec.api.modules.stage.dto.*;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.entity.StageType;
@@ -57,7 +55,6 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 class StageControllerTest {
 
     @Autowired private HostFactory hostFactory;
-    @Autowired private TagFactory tagFactory;
     @Autowired private StageFactory stageFactory;
 
     @Value("${spring.security.api-key}")
@@ -85,8 +82,9 @@ class StageControllerTest {
     @Test
     void search() {
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        stageFactory.create(host, "stage", "0000000000", tags);
+        stageFactory.create(host, "stage", "0000000000");
+        stageFactory.create(host, "스테이지1", "0000000004");
+        stageFactory.create(host, "스테이지2", "0000000005");
 
         given(this.spec)
                 .filter(document(
@@ -364,8 +362,7 @@ class StageControllerTest {
     @Test
     void get() {
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         given(this.spec)
                 .filter(document(
@@ -952,8 +949,7 @@ class StageControllerTest {
     @Test
     void updateImages() {
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Images dto = new StageUpdateRequestDto.Images(
                 List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg")
         );
@@ -990,8 +986,7 @@ class StageControllerTest {
     void updateIntroduction() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
                 Set.of("newTag"),
@@ -1042,8 +1037,7 @@ class StageControllerTest {
 
         hostFactory.create("test");
         Host host = hostFactory.create("host");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
                 Set.of("newTag"),
@@ -1066,8 +1060,7 @@ class StageControllerTest {
     void updateArea() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Area dto = new StageUpdateRequestDto.Area(
                 100,
                 200,
@@ -1119,8 +1112,7 @@ class StageControllerTest {
     void updateBusiness() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
                 Duration.ofDays(90),
@@ -1183,8 +1175,7 @@ class StageControllerTest {
     @Test
     void updateEngineering() {
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Engineering dto = new StageUpdateRequestDto.Engineering(
                 true,
                 50000L,
@@ -1252,8 +1243,7 @@ class StageControllerTest {
     void updateDocuments() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Documents dto = new StageUpdateRequestDto.Documents(
                 "https://docs.google.com/document/u/0",
                 "https://docs.google.com/document/u/0",
@@ -1298,8 +1288,7 @@ class StageControllerTest {
     void Parking() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         StageUpdateRequestDto.Parking dto = new StageUpdateRequestDto.Parking(
                 30,
@@ -1346,8 +1335,7 @@ class StageControllerTest {
     void updateFacilities() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Facilities dto = new StageUpdateRequestDto.Facilities(
                 false,
                 true,
@@ -1407,8 +1395,7 @@ class StageControllerTest {
     void updateFnbPolicies() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.FnbPolicies dto = new StageUpdateRequestDto.FnbPolicies(
                 false,
                 false,
@@ -1468,8 +1455,7 @@ class StageControllerTest {
     void remove() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)

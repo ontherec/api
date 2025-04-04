@@ -3,17 +3,16 @@ package kr.ontherec.api.modules.stage.application;
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
-import kr.ontherec.api.infra.fixture.TagFactory;
+import kr.ontherec.api.infra.model.BaseEntity;
 import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.item.entity.Tag;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -22,7 +21,6 @@ class StageQueryServiceTest {
 
     @Autowired private HostFactory hostFactory;
     @Autowired private StageFactory stageFactory;
-    @Autowired private TagFactory tagFactory;
 
     @Autowired private StageQueryService stageQueryService;
 
@@ -31,11 +29,11 @@ class StageQueryServiceTest {
     void search() {
         // given
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         // when
-        List<Stage> stages = stageQueryService.search("stage", PageRequest.of(0, 12));
+        List<Stage> stages = stageQueryService.search(null ,
+                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending()));
 
         // then
         assertThat(stages.contains(stage)).isTrue();
@@ -46,8 +44,7 @@ class StageQueryServiceTest {
     void get() {
         // given
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         // when
         Stage foundStage = stageQueryService.get(stage.getId());
@@ -62,8 +59,7 @@ class StageQueryServiceTest {
     void isHost() {
         // given
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         // when
         boolean isHost = stageQueryService.isHost(stage.getId(), host);
@@ -78,8 +74,7 @@ class StageQueryServiceTest {
         // given
         Host me = hostFactory.create("test");
         Host host = hostFactory.create("host");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         // when
         boolean isHost = stageQueryService.isHost(stage.getId(), me);

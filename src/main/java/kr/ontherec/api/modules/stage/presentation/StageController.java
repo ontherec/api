@@ -4,8 +4,6 @@ package kr.ontherec.api.modules.stage.presentation;
 import jakarta.validation.Valid;
 import kr.ontherec.api.modules.host.application.HostService;
 import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.item.application.TagService;
-import kr.ontherec.api.modules.item.entity.Tag;
 import kr.ontherec.api.modules.stage.application.StageCommandService;
 import kr.ontherec.api.modules.stage.application.StageMapper;
 import kr.ontherec.api.modules.stage.application.StageQueryService;
@@ -17,17 +15,15 @@ import kr.ontherec.api.modules.stage.exception.StageException;
 import kr.ontherec.api.modules.stage.exception.StageExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequestMapping("/v1/stages")
@@ -37,14 +33,9 @@ public class StageController {
     private final StageCommandService stageCommandService;
     private final StageMapper stageMapper = StageMapper.INSTANCE;
     private final HostService hostService;
-    private final TagService tagService;
 
     @GetMapping
-    ResponseEntity<List<StageResponseDto>> search(
-            @RequestParam(value = "q", required = false) String query,
-            @RequestParam(required = false)
-            @PageableDefault(size = 12, sort = { "viewCount", "createdAt" }, direction = Sort.Direction.DESC)
-            Pageable pageable) {
+    ResponseEntity<List<StageResponseDto>> search(@RequestParam(value = "q", required = false) String query, @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable) {
         List<StageResponseDto> response = stageQueryService.search(query, pageable)
                 .stream()
                 .map(stageMapper::EntityToResponseDto)
@@ -64,13 +55,7 @@ public class StageController {
                                   @Valid @RequestBody StageRegisterRequestDto dto) {
         Host host = hostService.getByUsername(authentication.getName());
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
-        Set<Tag> tags = dto.introduction().tags() == null ? new HashSet<>() : dto.introduction().tags()
-                .stream()
-                .map(s -> Tag.builder().title(s).build())
-                .map(tagService::getOrCreate)
-                .collect(Collectors.toSet());
-
-        Stage stage = stageCommandService.register(host, newStage, tags);
+        Stage stage = stageCommandService.register(host, newStage);
         return ResponseEntity.created(URI.create("/v1/stages/" + stage.getId())).body(stage.getId());
     }
 
@@ -93,14 +78,7 @@ public class StageController {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
-
-        Set<Tag> tags = dto.tags() == null ? new HashSet<>() : dto.tags()
-                .stream()
-                .map(s -> Tag.builder().title(s).build())
-                .map(tagService::getOrCreate)
-                .collect(Collectors.toSet());
-
-        stageCommandService.updateIntroduction(id, dto, tags);
+        stageCommandService.updateIntroduction(id, dto);
         return ResponseEntity.ok().build();
     }
 

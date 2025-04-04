@@ -1,22 +1,17 @@
 package kr.ontherec.api.modules.stage.application;
 
 import kr.ontherec.api.infra.config.MapperConfig;
-import kr.ontherec.api.modules.item.entity.Holiday;
-import kr.ontherec.api.modules.item.entity.HolidayType;
-import kr.ontherec.api.modules.item.entity.Link;
-import kr.ontherec.api.modules.item.entity.Tag;
 import kr.ontherec.api.modules.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.StageResponseDto;
 import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
-import org.mapstruct.*;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Mapper(
         config = MapperConfig.class,
@@ -25,11 +20,9 @@ import java.util.stream.Collectors;
 public interface StageMapper {
     StageMapper INSTANCE = Mappers.getMapper(StageMapper.class);
 
-    @Mapping(target = "tags", ignore = true)
     @Mapping(target = "likeCount", expression = "java(0)")
     @Mapping(target = "viewCount", expression = "java(0)")
     @Mapping(source = "introduction", target = ".")
-    @Mapping(source = "introduction.links", target = "links", qualifiedByName = "deserializeLinks")
     @Mapping(source = "area", target = ".")
     @Mapping(source = "business", target = ".")
     @Mapping(source = "engineering", target = ".")
@@ -47,8 +40,6 @@ public interface StageMapper {
 
     void updateArea(StageUpdateRequestDto.Area dto, @MappingTarget Stage stage);
 
-    @Mapping(target = "tags", ignore = true)
-    @Mapping(target = "links", qualifiedByName = "deserializeLinks")
     void updateIntroduction(StageUpdateRequestDto.Introduction dto, @MappingTarget Stage stage);
 
     void updateBusiness(StageUpdateRequestDto.Business dto, @MappingTarget Stage stage);
@@ -107,45 +98,6 @@ public interface StageMapper {
     @Mapping(source = "sellDrink", target = "fnbPolicies.sellDrink")
     @Mapping(source = "sellAlcohol", target = "fnbPolicies.sellAlcohol")
     StageResponseDto EntityToResponseDto(Stage stage);
-
-    @Named("deserializeLinks")
-    default Set<Link> deserializeLinks(Set<String> links) {
-        if(links == null) return new HashSet<>();
-
-        return links.stream()
-                .map(s -> Link.builder()
-                        .url(s)
-                        .build())
-                .collect(Collectors.toSet());
-    }
-
-    default Set<Holiday> deserializeHolidays(Set<HolidayType> types) {
-        if(types == null) return new HashSet<>();
-
-        return types.stream()
-                .map(type -> Holiday.builder()
-                        .type(type)
-                        .build()
-                ).collect(Collectors.toSet());
-    }
-
-    default Set<String> serializeTags(List<Tag> tags) {
-        return tags.stream()
-                .map(Tag::getTitle)
-                .collect(Collectors.toSet());
-    }
-
-    default Set<String> serializeLinks(Set<Link> links) {
-        return links.stream()
-                .map(Link::getUrl)
-                .collect(Collectors.toSet());
-    }
-
-    default Set<HolidayType> serializeHolidays(Set<Holiday> holidays) {
-        return holidays.stream()
-                .map(Holiday::getType)
-                .collect(Collectors.toSet());
-    }
 
     @AfterMapping
     default void validateBookingPeriod(StageRegisterRequestDto dto, @MappingTarget Stage stage) {

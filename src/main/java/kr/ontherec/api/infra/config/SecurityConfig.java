@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
@@ -31,6 +32,7 @@ public class SecurityConfig {
 
         http.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(hc -> hc.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .cors(corsConfig -> corsConfig.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     // TODO: 배포시 수정
@@ -55,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers(GET, "/v1/stages/**").permitAll()
                         .requestMatchers(GET, "/v1/posts/**").permitAll()
                         .requestMatchers("/static/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new ApiKeyAuthenticationFilter(API_KEY_HEADER, API_KEY), UsernamePasswordAuthenticationFilter.class)
                 .oauth2ResourceServer(orc -> orc.jwt(jc -> jc.jwtAuthenticationConverter(jwtAuthenticationConverter)));

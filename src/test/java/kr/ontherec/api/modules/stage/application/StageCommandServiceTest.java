@@ -3,10 +3,8 @@ package kr.ontherec.api.modules.stage.application;
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
-import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
-import kr.ontherec.api.modules.item.entity.Tag;
 import kr.ontherec.api.modules.stage.dto.RefundPolicyRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.RefundPolicyUpdateRequestDto;
 import kr.ontherec.api.modules.stage.dto.StageRegisterRequestDto;
@@ -34,7 +32,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 class StageCommandServiceTest {
 
     @Autowired private HostFactory hostFactory;
-    @Autowired private TagFactory tagFactory;
     @Autowired private StageFactory stageFactory;
 
     @Autowired private StageCommandService stageCommandService;
@@ -47,7 +44,6 @@ class StageCommandServiceTest {
     void register() {
         // given
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
 
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
                 List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
@@ -125,7 +121,7 @@ class StageCommandServiceTest {
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
 
         // when
-        Stage stage = stageCommandService.register(host, newStage, tags);
+        Stage stage = stageCommandService.register(host, newStage);
 
         // then
         assertThat(stage.getTitle()).isEqualTo(newStage.getTitle());
@@ -137,8 +133,7 @@ class StageCommandServiceTest {
     void registerWithDuplicatedBrn() {
         // given
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        stageFactory.create(host, "stage", "0000000000", tags);
+        stageFactory.create(host, "stage", "0000000000");
 
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
                 List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
@@ -216,7 +211,7 @@ class StageCommandServiceTest {
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
 
         // when
-        Throwable throwable = catchThrowable(() -> stageCommandService.register(host, newStage, tags));
+        Throwable throwable = catchThrowable(() -> stageCommandService.register(host, newStage));
 
         // then
         assertThat(throwable)
@@ -405,7 +400,7 @@ class StageCommandServiceTest {
     void updateImages() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Images dto = new StageUpdateRequestDto.Images(
                 List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg")
         );
@@ -422,16 +417,15 @@ class StageCommandServiceTest {
     void updateIntroduction() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
                 null,
                 Set.of("https://ontherec.live")
         );
-        Set<Tag> tags = tagFactory.create("tag");
 
         // when
-        stageCommandService.updateIntroduction(stage.getId(), dto, tags);
+        stageCommandService.updateIntroduction(stage.getId(), dto);
 
         // then
         assertThat(stage.getContent()).isEqualTo(dto.content());
@@ -442,7 +436,7 @@ class StageCommandServiceTest {
     void updateArea() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Area dto = new StageUpdateRequestDto.Area(
                 100,
                 200,
@@ -467,7 +461,7 @@ class StageCommandServiceTest {
     void updateBusiness() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
                 Duration.ofDays(90),
@@ -492,7 +486,7 @@ class StageCommandServiceTest {
     void updateBusinessWithInvalidBookingPeriod() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
                 Duration.ofDays(30),
@@ -518,7 +512,7 @@ class StageCommandServiceTest {
     void updateEngineering() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Engineering dto = new StageUpdateRequestDto.Engineering(
                 true,
                 50000L,
@@ -549,7 +543,7 @@ class StageCommandServiceTest {
     void updateEngineeringWithInvalidEngineeringFee() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Engineering dto = new StageUpdateRequestDto.Engineering(
                 false,
                 50000L,
@@ -575,7 +569,7 @@ class StageCommandServiceTest {
     void updateDocuments() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Documents dto = new StageUpdateRequestDto.Documents(
                 "https://docs.google.com/document/u/0",
                 "https://docs.google.com/document/u/0",
@@ -596,7 +590,7 @@ class StageCommandServiceTest {
     void updateParking() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Parking dto = new StageUpdateRequestDto.Parking(
                 30,
                 "건물 건너편 주차장",
@@ -617,7 +611,7 @@ class StageCommandServiceTest {
     void updateFacilities() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Facilities dto = new StageUpdateRequestDto.Facilities(
                 false,
                 true,
@@ -646,7 +640,7 @@ class StageCommandServiceTest {
     void updateFnbPolicies() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.FnbPolicies dto = new StageUpdateRequestDto.FnbPolicies(
                 false,
                 false,
@@ -675,7 +669,7 @@ class StageCommandServiceTest {
     void delete() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", null);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         // when
         stageCommandService.delete(stage.getId());

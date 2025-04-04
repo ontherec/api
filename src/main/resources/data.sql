@@ -2,14 +2,6 @@
 INSERT INTO host (id, username, bank, account, contact_from, contact_until, created_at, modified_at)
 VALUES (1, '호스트', 'KB국민', '00000000000000', '09:00:00', '18:00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
--- tag
-INSERT INTO tag (id, title)
-VALUES (1, '따뜻한'),
-       (2, '세련된'),
-       (3, '재즈'),
-       (4, '악기 가이드'),
-       (5, '밴드 소개');
-
 -- stage
 INSERT INTO address (id, zipcode, state, city, street_address, detail, latitude, longitude)
 VALUES (1, '00000', '경기도', '수원시 장안구', '율전로', '상세주소', 000.0000000000, 000.0000000000);
@@ -20,16 +12,16 @@ VALUES (1, 1, '스테이지1', '0000000001', 1, 10, 3, '내용', 60, 120, 'RECTA
 INSERT INTO stage_images (stage_id, images)
 VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg');
 
-INSERT INTO link (id, links_id, url)
-VALUES (1, 1, 'https://www.ontherec.kr');
+INSERT INTO stage_tags (stage_id, tags)
+VALUES (1, '따뜻한'),
+       (1, '세련된'),
+       (1, '재즈');
 
-INSERT INTO stage_tags (stage_id, tags_id)
-VALUES (1, 1),
-       (1, 2),
-       (1, 3);
+INSERT INTO stage_links (stage_id, links)
+VALUES (1, 'https://www.ontherec.kr');
 
-INSERT INTO holiday (id, holidays_id, type)
-VALUES (1, 1, '설날');
+INSERT INTO stage_holidays (stage_id, holidays)
+VALUES (1, '설날');
 
 INSERT INTO refund_policy (id, refund_policies_id, day_before, percent)
 VALUES (1, 1, 7, 100);
@@ -43,16 +35,16 @@ VALUES (2, 1, '스테이지2', '0000000002', 2, 10, 3, '내용', 60, 120, 'RECTA
 INSERT INTO stage_images (stage_id, images)
 VALUES (2, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg');
 
-INSERT INTO link (id, links_id, url)
-VALUES (2, 2, 'https://www.ontherec.kr');
+INSERT INTO stage_tags (stage_id, tags)
+VALUES (2, '따뜻한'),
+       (2, '세련된'),
+       (2, '재즈');
 
-INSERT INTO stage_tags (stage_id, tags_id)
-VALUES (2, 1),
-       (2, 2),
-       (2, 3);
+INSERT INTO stage_links (stage_id, links)
+VALUES (2, 'https://www.ontherec.kr');
 
-INSERT INTO holiday (id, holidays_id, type)
-VALUES (2, 2, '설날');
+INSERT INTO stage_holidays (stage_id, holidays)
+VALUES (2, '설날');
 
 INSERT INTO refund_policy (id, refund_policies_id, day_before, percent)
 VALUES (2, 2, 7, 100);

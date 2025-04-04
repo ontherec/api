@@ -1,10 +1,12 @@
 package kr.ontherec.api.modules.stage.dao;
 
+import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import kr.ontherec.api.modules.stage.entity.QStage;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -23,21 +25,21 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                         .or(stage.address.state.containsIgnoreCase(query))
                         .or(stage.address.city.containsIgnoreCase(query))
                         .or(stage.address.streetAddress.containsIgnoreCase(query))
-                        .or(stage.tags.any().title.containsIgnoreCase(query))
+                        .or(stage.tags.any().containsIgnoreCase(query))
                         .or(stage.content.containsIgnoreCase(query));
 
+        Assert.notNull(getQuerydsl(), "QueryDSL must not be null");
+        SubQueryExpression<Stage> subQuery = getQuerydsl().applyPagination(pageable, from(stage).where(condition));
+
         return from(stage)
-                .where(condition)
-                .join(stage.host).fetchJoin()
-                .join(stage.images).fetchJoin()
-                .join(stage.address).fetchJoin()
-                .join(stage.tags).fetchJoin()
-                .join(stage.links).fetchJoin()
-                .join(stage.holidays).fetchJoin()
-                .join(stage.refundPolicies).fetchJoin()
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .distinct()
+                .leftJoin(stage.host).fetchJoin()
+                .leftJoin(stage.images).fetchJoin()
+                .leftJoin(stage.address).fetchJoin()
+                .leftJoin(stage.tags).fetchJoin()
+                .leftJoin(stage.links).fetchJoin()
+                .leftJoin(stage.holidays).fetchJoin()
+                .leftJoin(stage.refundPolicies).fetchJoin()
+                .where(stage.in(subQuery))
                 .fetch();
     }
 }
