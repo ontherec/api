@@ -1,11 +1,11 @@
 package kr.ontherec.api.modules.stage.application;
 
 import kr.ontherec.api.modules.host.entity.Host;
+import kr.ontherec.api.modules.item.entity.Tag;
 import kr.ontherec.api.modules.stage.dao.StageRepository;
 import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

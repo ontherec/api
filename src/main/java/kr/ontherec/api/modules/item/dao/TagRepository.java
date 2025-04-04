@@ -1,8 +1,8 @@
-package kr.ontherec.api.modules.tag.dao;
+package kr.ontherec.api.modules.item.dao;
 
-import kr.ontherec.api.modules.tag.entity.Tag;
-import kr.ontherec.api.modules.tag.exception.TagException;
-import kr.ontherec.api.modules.tag.exception.TagExceptionCode;
+import kr.ontherec.api.modules.item.entity.Tag;
+import kr.ontherec.api.modules.item.exception.TagException;
+import kr.ontherec.api.modules.item.exception.TagExceptionCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

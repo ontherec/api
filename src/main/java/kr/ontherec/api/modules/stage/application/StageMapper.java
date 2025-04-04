@@ -4,11 +4,11 @@ import kr.ontherec.api.infra.config.MapperConfig;
 import kr.ontherec.api.modules.item.entity.Holiday;
 import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.item.entity.Link;
+import kr.ontherec.api.modules.item.entity.Tag;
 import kr.ontherec.api.modules.stage.dto.StageRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.StageResponseDto;
 import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

@@ -1,13 +1,9 @@
 package kr.ontherec.api.infra.fixture;
 
 import kr.ontherec.api.modules.host.entity.Host;
-import kr.ontherec.api.modules.item.entity.Address;
-import kr.ontherec.api.modules.item.entity.Holiday;
-import kr.ontherec.api.modules.item.entity.Link;
-import kr.ontherec.api.modules.item.entity.RefundPolicy;
+import kr.ontherec.api.modules.item.entity.*;
 import kr.ontherec.api.modules.stage.application.StageCommandService;
 import kr.ontherec.api.modules.stage.entity.Stage;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

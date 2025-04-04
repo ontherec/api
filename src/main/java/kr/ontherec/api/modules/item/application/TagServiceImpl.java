@@ -1,7 +1,7 @@
-package kr.ontherec.api.modules.tag.application;
+package kr.ontherec.api.modules.item.application;
 
-import kr.ontherec.api.modules.tag.dao.TagRepository;
-import kr.ontherec.api.modules.tag.entity.Tag;
+import kr.ontherec.api.modules.item.dao.TagRepository;
+import kr.ontherec.api.modules.item.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
