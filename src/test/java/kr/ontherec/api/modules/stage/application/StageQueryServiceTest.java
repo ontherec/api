@@ -10,6 +10,7 @@ import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Set;
@@ -34,7 +35,7 @@ class StageQueryServiceTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
 
         // when
-        List<Stage> stages = stageQueryService.search("stage");
+        List<Stage> stages = stageQueryService.search("stage", PageRequest.of(0, 12));
 
         // then
         assertThat(stages.contains(stage)).isTrue();

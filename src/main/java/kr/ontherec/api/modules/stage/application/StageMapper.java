@@ -1,5 +1,6 @@
 package kr.ontherec.api.modules.stage.application;
 
+import kr.ontherec.api.infra.config.MapperConfig;
 import kr.ontherec.api.modules.item.entity.Holiday;
 import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.item.entity.Link;
@@ -18,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper(
+        config = MapperConfig.class,
         imports = LocalDateTime.class
 )
 public interface StageMapper {
