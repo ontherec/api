@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
+import java.util.List;
+
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
@@ -36,6 +38,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.snippet.Attributes.key;
 
 @IntegrationTest
 class PostControllerTest {
@@ -85,6 +88,10 @@ class PostControllerTest {
                                         fieldWithPath("[].author")
                                                 .type(STRING)
                                                 .description("게시글 작성자 ID"),
+                                        fieldWithPath("[].images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("[].title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -134,6 +141,10 @@ class PostControllerTest {
                                         fieldWithPath("author")
                                                 .type(STRING)
                                                 .description("게시글 작성자 ID"),
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -163,7 +174,10 @@ class PostControllerTest {
     @DisplayName("게시글 생성 성공")
     @Test
     void create() {
-        PostCreateRequestDto dto = new PostCreateRequestDto("post", "post");
+        PostCreateRequestDto dto = new PostCreateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "post",
+                "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -175,8 +189,12 @@ class PostControllerTest {
                                 .tag("post")
                                 .summary("post create")
                                 .description("게시글 생성")
-                                .requestSchema(Schema.schema(PostCreateRequestDto.class.getSimpleName() + "[]"))
+                                .requestSchema(Schema.schema(PostCreateRequestDto.class.getSimpleName()))
                                 .requestFields(
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -196,7 +214,11 @@ class PostControllerTest {
     @Test
     void update() {
         Post post = postFactory.create("test", "post");
-        PostUpdateRequestDto dto = new PostUpdateRequestDto("post", "post");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "post",
+                "post"
+        );
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -212,8 +234,12 @@ class PostControllerTest {
                                         parameterWithName("id")
                                                 .type(NUMBER)
                                                 .description("수정할 게시글 식별자"))
-                                .requestSchema(Schema.schema(PostUpdateRequestDto.class.getSimpleName() + "[]"))
+                                .requestSchema(Schema.schema(PostUpdateRequestDto.class.getSimpleName()))
                                 .requestFields(
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -231,7 +257,10 @@ class PostControllerTest {
     @Test
     void updateWithoutAuthority() {
         Post post = postFactory.create("user", "post");
-        PostUpdateRequestDto dto = new PostUpdateRequestDto("post", "post");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "post",
+                "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)

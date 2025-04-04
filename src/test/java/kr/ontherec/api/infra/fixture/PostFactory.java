@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class PostFactory {
@@ -13,6 +15,7 @@ public class PostFactory {
 
     public Post create(String author, String title) {
         Post newPost = Post.builder()
+                .images(new ArrayList<>(List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg")))
                 .title(title)
                 .content(title)
                 .createdAt(LocalDateTime.now())

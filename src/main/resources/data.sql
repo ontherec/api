@@ -38,6 +38,9 @@ VALUES (1, 1, 7, 100);
 INSERT INTO post (id, author, title, content, view_count, like_count, created_at, modified_at)
 VALUES (1, 'test', '아티클', '내용', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
+INSERT INTO post_images (post_id, images)
+VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg');
+
 -- chat
 INSERT INTO chat (id, title)
 VALUES (1, '채팅방');

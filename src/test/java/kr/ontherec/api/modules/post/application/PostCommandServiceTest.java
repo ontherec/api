@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
@@ -28,7 +30,10 @@ class PostCommandServiceTest {
     @Test
     void create() {
         // given
-        PostCreateRequestDto dto = new PostCreateRequestDto("post", "post");
+        PostCreateRequestDto dto = new PostCreateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "post",
+                "post");
         Post newPost = postMapper.registerRequestDtoToEntity(dto);
 
         // when
@@ -45,7 +50,10 @@ class PostCommandServiceTest {
     void update() {
         // given
         Post post = postFactory.create("test", "post");
-        PostUpdateRequestDto dto = new PostUpdateRequestDto("newPost", "newPost");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                "newPost",
+                "newPost");
 
         // when
         postCommandService.update(post.getId(), dto);

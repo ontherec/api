@@ -1,13 +1,14 @@
 package kr.ontherec.api.modules.post.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import kr.ontherec.api.infra.model.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
@@ -22,6 +23,11 @@ public class Post extends BaseEntity {
 
     @Column(updatable = false, nullable = false)
     private String author;
+
+    @ElementCollection(fetch = EAGER)
+    @Column(nullable = false)
+    @Builder.Default
+    private List<String> images = new ArrayList<>();
 
     @Column(nullable = false)
     private String title;
