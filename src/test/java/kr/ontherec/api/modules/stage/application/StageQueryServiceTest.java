@@ -6,15 +6,20 @@ import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.infra.model.BaseEntity;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.stage.entity.Stage;
+import kr.ontherec.api.modules.stage.exception.StageException;
+import kr.ontherec.api.modules.stage.exception.StageExceptionCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
 @UnitTest
 class StageQueryServiceTest {
@@ -30,13 +35,56 @@ class StageQueryServiceTest {
         // given
         Host host = hostFactory.create("test");
         Stage stage = stageFactory.create(host, "stage", "0000000000");
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "stage");
+        params.put("minCapacity", "30");
+        params.put("parkingAvailable", "true");
+        params.put("stageManagingAvailable", "false");
 
         // when
-        List<Stage> stages = stageQueryService.search(null ,
+        List<Stage> stages = stageQueryService.search(params ,
                 PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending()));
 
         // then
         assertThat(stages.contains(stage)).isTrue();
+    }
+
+    @DisplayName("공연장 검색 실패 - 미지원 필터")
+    @Test
+    void searchWithUnSupportParams() {
+        // given
+        Host host = hostFactory.create("test");
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
+        Map<String, String> params = new HashMap<>();
+        params.put("newFilter", "value");
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageQueryService.search(params ,
+                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending())));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(StageExceptionCode.NOT_SUPPORT_FILTER.getMessage());
+    }
+
+    @DisplayName("공연장 검색 실패 - 유효하지 않은 필터")
+    @Test
+    void searchWithInvalidParams() {
+        // given
+        Host host = hostFactory.create("test");
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
+        Map<String, String> params = new HashMap<>();
+        params.put("stageManagingAvailable", "5");
+
+        // when
+        Throwable throwable = catchThrowable(() -> stageQueryService.search(params ,
+                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending())));
+
+        // then
+        assertThat(throwable)
+                .isInstanceOf(StageException.class)
+                .hasMessage(StageExceptionCode.NOT_VALID_FILTER.getMessage());
     }
 
     @DisplayName("공연장 조회 성공")

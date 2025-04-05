@@ -24,9 +24,7 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -83,16 +81,112 @@ class StageControllerTest {
     void search() {
         Host host = hostFactory.create("test");
         stageFactory.create(host, "stage", "0000000000");
-        stageFactory.create(host, "스테이지1", "0000000004");
-        stageFactory.create(host, "스테이지2", "0000000005");
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "stage");
+        params.put("minCapacity", "30");
+        params.put("parkingAvailable", "true");
+        params.put("stageManagingAvailable", "false");
 
         given(this.spec)
+                .params(params)
                 .filter(document(
                         "stage search",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
                                 .summary("stage search")
                                 .description("공연장 검색")
+                                .queryParameters(
+                                        parameterWithName("q")
+                                                .type(STRING)
+                                                .description("검색어")
+                                                .optional(),
+                                        parameterWithName("minCapacity")
+                                                .type(NUMBER)
+                                                .description("최소 수용인원 (좌석 기준)")
+                                                .optional(),
+                                        parameterWithName("maxCapacity")
+                                                .type(NUMBER)
+                                                .description("최대 수용인원 (스탠딩 기준)")
+                                                .optional(),
+                                        parameterWithName("parkingAvailable")
+                                                .type(BOOLEAN)
+                                                .description("주차 가능 여부")
+                                                .optional(),
+                                        // engineering
+                                        parameterWithName("stageManagingAvailable")
+                                                .type(BOOLEAN)
+                                                .description("스테이지 매니징 제공 여부")
+                                                .optional(),
+                                        parameterWithName("soundEngineeringAvailable")
+                                                .type(BOOLEAN)
+                                                .description("사운드 엔지니어링 제공 여부")
+                                                .optional(),
+                                        parameterWithName("lightEngineeringAvailable")
+                                                .type(BOOLEAN)
+                                                .description("조명 엔지니어링 제공 여부")
+                                                .optional(),
+                                        parameterWithName("photographingAvailable")
+                                                .type(BOOLEAN)
+                                                .description("촬영 제공 여부")
+                                                .optional(),
+                                        // facilities
+                                        parameterWithName("hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasRestroom")
+                                                .type(BOOLEAN)
+                                                .description("화장실 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasWifi")
+                                                .type(BOOLEAN)
+                                                .description("와이파이 제공 여부")
+                                                .optional(),
+                                        parameterWithName("hasCameraStanding")
+                                                .type(BOOLEAN)
+                                                .description("카메라 스탠드 제공 여부")
+                                                .optional(),
+                                        parameterWithName("hasWaitingRoom")
+                                                .type(BOOLEAN)
+                                                .description("대기실 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasProjector")
+                                                .type(BOOLEAN)
+                                                .description("프로젝터 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasLocker")
+                                                .type(BOOLEAN)
+                                                .description("물품보관함 존재 여부")
+                                                .optional(),
+                                        // fnb policies
+                                        parameterWithName("allowsWater")
+                                                .type(BOOLEAN)
+                                                .description("물 반입 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsDrink")
+                                                .type(BOOLEAN)
+                                                .description("음료 반입 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsFood")
+                                                .type(BOOLEAN)
+                                                .description("음식 반입 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsFoodDelivery")
+                                                .type(BOOLEAN)
+                                                .description("음식 배달 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsAlcohol")
+                                                .type(BOOLEAN)
+                                                .description("주류 반입 여부")
+                                                .optional(),
+                                        parameterWithName("sellDrink")
+                                                .type(BOOLEAN)
+                                                .description("음료 판매 여부")
+                                                .optional(),
+                                        parameterWithName("sellAlcohol")
+                                                .type(BOOLEAN)
+                                                .description("주류 판매 여부")
+                                                .optional())
                                 .responseSchema(Schema.schema(StageResponseDto.class.getSimpleName() + "[]"))
                                 .responseFields(
                                         fieldWithPath("[]")

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
@@ -35,8 +36,11 @@ public class StageController {
     private final HostService hostService;
 
     @GetMapping
-    ResponseEntity<List<StageResponseDto>> search(@RequestParam(value = "q", required = false) String query, @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable) {
-        List<StageResponseDto> response = stageQueryService.search(query, pageable)
+    ResponseEntity<List<StageResponseDto>> search(
+            @RequestParam Map<String, String> params,
+            @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable
+    ) {
+        List<StageResponseDto> response = stageQueryService.search(params, pageable)
                 .stream()
                 .map(stageMapper::EntityToResponseDto)
                 .toList();

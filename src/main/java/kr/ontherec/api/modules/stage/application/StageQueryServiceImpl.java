@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +18,8 @@ public class StageQueryServiceImpl implements StageQueryService{
     private final StageRepository stageRepository;
 
     @Override
-    public List<Stage> search(String query, Pageable pageable) {
-        return stageRepository.search(query, pageable);
+    public List<Stage> search(Map<String, String> params, Pageable pageable) {
+        return stageRepository.search(params, pageable);
     }
 
     @Override
