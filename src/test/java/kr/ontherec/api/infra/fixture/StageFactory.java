@@ -41,7 +41,6 @@ public class StageFactory {
                 .address(newAddress)
                 // introduction
                 .content(title)
-                .tags(new HashSet<>(Set.of("tag")))
                 .links(new HashSet<>(Set.of("https://ontherec.kr")))
                 // area
                 .minCapacity(60)

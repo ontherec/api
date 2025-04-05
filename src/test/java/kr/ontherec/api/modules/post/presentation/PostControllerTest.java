@@ -175,7 +175,7 @@ class PostControllerTest {
     @Test
     void create() {
         PostCreateRequestDto dto = new PostCreateRequestDto(
-                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
                 "post",
                 "post");
 
@@ -215,7 +215,7 @@ class PostControllerTest {
     void update() {
         Post post = postFactory.create("test", "post");
         PostUpdateRequestDto dto = new PostUpdateRequestDto(
-                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
                 "post",
                 "post"
         );
@@ -258,7 +258,7 @@ class PostControllerTest {
     void updateWithoutAuthority() {
         Post post = postFactory.create("user", "post");
         PostUpdateRequestDto dto = new PostUpdateRequestDto(
-                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
                 "post",
                 "post");
 

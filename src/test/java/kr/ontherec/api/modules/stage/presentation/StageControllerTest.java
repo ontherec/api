@@ -737,7 +737,7 @@ class StageControllerTest {
     void register() {
         hostFactory.create("test");
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
                 "stage",
                 "0000000000",
                 new AddressRegisterRequestDto(
@@ -1045,7 +1045,7 @@ class StageControllerTest {
         Host host = hostFactory.create("test");
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Images dto = new StageUpdateRequestDto.Images(
-                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg")
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg")
         );
 
         given(this.spec)

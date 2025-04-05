@@ -10,7 +10,7 @@ INSERT INTO stage (id, host_id, title, brn, address_id, view_count, like_count, 
 VALUES (1, 1, '스테이지1', '0000000001', 1, 10, 3, '내용', 60, 120, 'RECTANGLE', 8, 5, 2592000000000000, 604800000000000, true, 0, true, 50000, false, null, true, 50000, 'https://docs.google.com/document', 'https://docs.google.com/document', 259200000000000, 2, '건물 뒤편', true, false, true, true, true, false, true, false, true, false, false, false, false, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO stage_images (stage_id, images)
-VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg');
+VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg');
 
 INSERT INTO stage_tags (stage_id, tags)
 VALUES (1, '따뜻한'),
@@ -33,7 +33,7 @@ INSERT INTO stage (id, host_id, title, brn, address_id, view_count, like_count, 
 VALUES (2, 1, '스테이지2', '0000000002', 2, 10, 3, '내용', 60, 120, 'RECTANGLE', 8, 5, 2592000000000000, 604800000000000, true, 0, true, 50000, false, null, true, 50000, 'https://docs.google.com/document', 'https://docs.google.com/document', 259200000000000, 2, '건물 뒤편', true, false, true, true, true, false, true, false, true, false, false, false, false, true, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO stage_images (stage_id, images)
-VALUES (2, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg');
+VALUES (2, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg');
 
 INSERT INTO stage_tags (stage_id, tags)
 VALUES (2, '따뜻한'),
@@ -54,7 +54,7 @@ INSERT INTO post (id, author, title, content, view_count, like_count, created_at
 VALUES (1, 'test', '아티클', '내용', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO post_images (post_id, images)
-VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg');
+VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg');
 
 -- chat
 INSERT INTO chat (id, title)

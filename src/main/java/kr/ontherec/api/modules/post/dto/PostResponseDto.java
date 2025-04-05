@@ -9,8 +9,8 @@ public record PostResponseDto (
         List<String> images,
         String title,
         String content,
-        int viewCount,
-        int likeCount,
+        long viewCount,
+        long likeCount,
         LocalDateTime createdAt,
         LocalDateTime modifiedAt
 ) {}

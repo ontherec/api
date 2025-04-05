@@ -36,8 +36,8 @@ public class Post extends BaseEntity {
     private String content;
 
     @Column(nullable = false)
-    private int viewCount;
+    private long viewCount;
 
     @Column(nullable = false)
-    private int likeCount;
+    private long likeCount;
 }
