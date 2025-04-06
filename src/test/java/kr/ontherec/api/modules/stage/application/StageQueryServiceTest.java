@@ -43,7 +43,9 @@ class StageQueryServiceTest {
 
         // when
         List<Stage> stages = stageQueryService.search(params ,
-                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending()));
+                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending()),
+                "test"
+        );
 
         // then
         assertThat(stages.contains(stage)).isTrue();
@@ -59,8 +61,11 @@ class StageQueryServiceTest {
         params.put("newFilter", "value");
 
         // when
-        Throwable throwable = catchThrowable(() -> stageQueryService.search(params ,
-                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending())));
+        Throwable throwable = catchThrowable(() -> stageQueryService.search(
+                params,
+                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending()),
+                "test"
+        ));
 
         // then
         assertThat(throwable)
@@ -78,8 +83,11 @@ class StageQueryServiceTest {
         params.put("stageManagingAvailable", "5");
 
         // when
-        Throwable throwable = catchThrowable(() -> stageQueryService.search(params ,
-                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending())));
+        Throwable throwable = catchThrowable(() -> stageQueryService.search(
+                params,
+                PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending()),
+                "test"
+        ));
 
         // then
         assertThat(throwable)

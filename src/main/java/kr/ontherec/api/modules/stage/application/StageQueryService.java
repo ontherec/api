@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface StageQueryService {
-    List<Stage> search(Map<String, String> params, Pageable pageable);
+    List<Stage> search(Map<String, String> params, Pageable pageable, String username);
     Stage get(Long id);
     boolean isHost(Long id, Host host);
 }

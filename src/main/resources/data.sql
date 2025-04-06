@@ -26,6 +26,9 @@ VALUES (1, '설날');
 INSERT INTO refund_policy (id, refund_policies_id, day_before, percent)
 VALUES (1, 1, 7, 100);
 
+INSERT INTO stage_liked_usernames (stage_id, liked_usernames)
+VALUES (1, 'test');
+
 INSERT INTO address (id, zipcode, state, city, street_address, detail, latitude, longitude)
 VALUES (2, '00000', '경기도', '수원시 장안구', '율전로', '상세주소', 000.0000000000, 000.0000000000);
 

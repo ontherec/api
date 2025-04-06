@@ -18,8 +18,8 @@ public class StageQueryServiceImpl implements StageQueryService{
     private final StageRepository stageRepository;
 
     @Override
-    public List<Stage> search(Map<String, String> params, Pageable pageable) {
-        return stageRepository.search(params, pageable);
+    public List<Stage> search(Map<String, String> params, Pageable pageable, String username) {
+        return stageRepository.search(params, pageable, username);
     }
 
     @Override

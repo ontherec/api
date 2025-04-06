@@ -61,6 +61,11 @@ public class Stage extends BaseEntity {
     @Column(nullable = false)
     private long likeCount;
 
+    @ElementCollection(fetch = EAGER)
+    @Column
+    @Builder.Default
+    private Set<String> likedUsernames = new HashSet<>();
+
     // introduction
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;

@@ -38,19 +38,22 @@ public class StageController {
     @GetMapping
     ResponseEntity<List<StageResponseDto>> search(
             @RequestParam Map<String, String> params,
-            @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable
+            @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable,
+            Authentication authentication
     ) {
-        List<StageResponseDto> response = stageQueryService.search(params, pageable)
+        String username = authentication == null ? null : authentication.getName();
+        List<StageResponseDto> response = stageQueryService.search(params, pageable, username)
                 .stream()
-                .map(stageMapper::EntityToResponseDto)
+                .map(stage -> stageMapper.EntityToResponseDto(stage, username))
                 .toList();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<StageResponseDto> get(@PathVariable Long id) {
+    ResponseEntity<StageResponseDto> get(@PathVariable Long id, Authentication authentication) {
+        String username = authentication == null ? null : authentication.getName();
         Stage stage = stageQueryService.get(id);
-        StageResponseDto response = stageMapper.EntityToResponseDto(stage);
+        StageResponseDto response = stageMapper.EntityToResponseDto(stage, username);
         return ResponseEntity.ok(response);
     }
 
