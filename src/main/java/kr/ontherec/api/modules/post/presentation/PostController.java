@@ -12,12 +12,16 @@ import kr.ontherec.api.modules.post.entity.Post;
 import kr.ontherec.api.modules.post.exception.PostException;
 import kr.ontherec.api.modules.post.exception.PostExceptionCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+
+import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @RestController
 @RequestMapping("/v1/posts")
@@ -28,16 +32,22 @@ public class PostController {
     private final PostMapper postMapper = PostMapper.INSTANCE;
 
     @GetMapping
-    ResponseEntity<List<PostResponseDto>> search(@RequestParam(value = "q", required = false) String query) {
-        List<Post> posts = postQueryService.search(query);
-        List<PostResponseDto> response = posts.stream().map(postMapper::EntityToResponseDto).toList();
+    ResponseEntity<List<PostResponseDto>> search(
+            @RequestParam(value = "q", required = false) String query,
+            @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable,
+            Authentication authentication
+    ) {
+        String username = authentication == null ? null : authentication.getName();
+        List<Post> posts = postQueryService.search(query, pageable, username);
+        List<PostResponseDto> response = posts.stream().map(post -> postMapper.EntityToResponseDto(post, username)).toList();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<PostResponseDto> get(@PathVariable Long id) {
+    ResponseEntity<PostResponseDto> get(@PathVariable Long id, Authentication authentication) {
+        String username = authentication == null ? null : authentication.getName();
         Post post = postQueryService.get(id);
-        PostResponseDto response = postMapper.EntityToResponseDto(post);
+        PostResponseDto response = postMapper.EntityToResponseDto(post, username);
         return ResponseEntity.ok(response);
     }
 
@@ -53,8 +63,7 @@ public class PostController {
     ResponseEntity<Void> update(Authentication authentication,
                                            @PathVariable Long id,
                                            @Valid @RequestBody PostUpdateRequestDto dto) {
-
-        if (!postQueryService.isAuthor(id, authentication.getName()))
+        if(!postQueryService.isAuthor(id, authentication.getName()))
             throw new PostException(PostExceptionCode.FORBIDDEN);
 
         postCommandService.update(id, dto);

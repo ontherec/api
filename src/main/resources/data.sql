@@ -54,7 +54,19 @@ INSERT INTO post (id, author, title, content, view_count, like_count, created_at
 VALUES (1, 'test', '아티클', '내용', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO post_images (post_id, images)
-VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg');
+VALUES (1, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/poster-1.jpg');
+
+INSERT INTO post_liked_usernames (post_id, liked_usernames)
+VALUES (1, 'test');
+
+INSERT INTO post (id, author, title, content, view_count, like_count, created_at, modified_at)
+VALUES (2, 'host', '아티클', '내용', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+
+INSERT INTO post_images (post_id, images)
+VALUES (2, 'https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/poster-2.jpg');
+
+INSERT INTO post_liked_usernames (post_id, liked_usernames)
+VALUES (2, 'host');
 
 -- chat
 INSERT INTO chat (id, title)

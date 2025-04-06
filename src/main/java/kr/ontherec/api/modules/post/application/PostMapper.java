@@ -5,6 +5,7 @@ import kr.ontherec.api.modules.post.dto.PostCreateRequestDto;
 import kr.ontherec.api.modules.post.dto.PostResponseDto;
 import kr.ontherec.api.modules.post.dto.PostUpdateRequestDto;
 import kr.ontherec.api.modules.post.entity.Post;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -28,5 +29,12 @@ public interface PostMapper {
 
     void update(PostUpdateRequestDto dto, @MappingTarget Post post);
 
-    PostResponseDto EntityToResponseDto(Post post);
+    PostResponseDto EntityToResponseDto(Post post, String username);
+
+    @AfterMapping
+    default void mapLiked(Post post, String username, @MappingTarget PostResponseDto dto) {
+        if(username != null) {
+            dto.setLiked(post.getLikedUsernames().contains(username));
+        }
+    }
 }

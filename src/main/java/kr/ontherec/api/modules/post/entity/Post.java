@@ -6,7 +6,9 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -40,4 +42,9 @@ public class Post extends BaseEntity {
 
     @Column(nullable = false)
     private long likeCount;
+
+    @ElementCollection(fetch = EAGER)
+    @Column
+    @Builder.Default
+    private Set<String> likedUsernames = new HashSet<>();
 }
