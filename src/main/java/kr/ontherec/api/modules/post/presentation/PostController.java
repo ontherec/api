@@ -54,7 +54,6 @@ public class PostController {
     @PostMapping
     ResponseEntity<Long> create(Authentication authentication, @Valid @RequestBody PostCreateRequestDto dto) {
         Post newPost = postMapper.registerRequestDtoToEntity(dto);
-
         Post post = postCommandService.create(authentication.getName(), newPost);
         return ResponseEntity.created(URI.create("/v1/posts/" + post.getId())).body(post.getId());
     }
