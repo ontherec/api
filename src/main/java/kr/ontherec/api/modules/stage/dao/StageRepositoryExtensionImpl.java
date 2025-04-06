@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.JPQLQuery;
+import kr.ontherec.api.modules.post.exception.PostException;
 import kr.ontherec.api.modules.stage.entity.QStage;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 import static com.querydsl.core.types.dsl.PathBuilderValidator.PROPERTIES;
 import static kr.ontherec.api.infra.util.ReflectionUtils.getFieldTypeMap;
+import static kr.ontherec.api.modules.post.exception.PostExceptionCode.UNAUTHORIZED;
 import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.NOT_SUPPORT_FILTER;
 import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.NOT_VALID_FILTER;
 
@@ -25,15 +27,25 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
     }
 
     @Override
-    public List<Stage> search(Map<String, String> params, Pageable pageable, String username) {
+    public List<Stage> search(String query, Map<String, String> params, Pageable pageable, String username) {
         QStage stage = QStage.stage;
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         PathBuilder<Stage> pathBuilder = new PathBuilder<>(stage.getType(), stage.getMetadata(), PROPERTIES);
         Map<String, Class<?>> fieldTypes = getFieldTypeMap(Stage.class);
 
+        // select
+        JPQLQuery<Stage> jpqlQuery = from(stage)
+                .join(stage.host).fetchJoin()
+                .join(stage.images).fetchJoin()
+                .join(stage.address).fetchJoin()
+                .leftJoin(stage.tags).fetchJoin()
+                .leftJoin(stage.links).fetchJoin()
+                .leftJoin(stage.holidays).fetchJoin()
+                .leftJoin(stage.refundPolicies).fetchJoin()
+                .leftJoin(stage.likedUsernames);
+
         // query
-        if (params.containsKey("q")) {
-            String query = params.get("q");
+        if (query != null) {
             booleanBuilder.or(stage.title.containsIgnoreCase(query))
                     .or(stage.address.state.containsIgnoreCase(query))
                     .or(stage.address.city.containsIgnoreCase(query))
@@ -44,10 +56,6 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
 
         // filter
         params.forEach((key, value) -> {
-
-            if(key.equalsIgnoreCase("q"))
-                return;
-
             try {
                 switch(key) {
                     case "minCapacity":
@@ -64,6 +72,20 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                         if(value.equalsIgnoreCase("false"))
                             booleanBuilder.and(pathBuilder.getNumber("parkingCapacity", Integer.class).loe(0));
                         break;
+                    case "liked":
+                        if(username == null)
+                            throw new PostException(UNAUTHORIZED);
+                        if(!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false"))
+                            throw new StageException(NOT_VALID_FILTER);
+
+                        if(Boolean.parseBoolean(value)) {
+                            jpqlQuery.on(stage.likedUsernames.any().eq(username));
+                            booleanBuilder.and(stage.likedUsernames.contains(username));
+                        } else {
+                            jpqlQuery.on(stage.likedUsernames.any().eq(username));
+                            booleanBuilder.andNot(stage.likedUsernames.contains(username));
+                        }
+                        break;
                     default:
                         if(!fieldTypes.containsKey(key) || !fieldTypes.get(key).getSimpleName().equalsIgnoreCase("boolean"))
                             throw new StageException(NOT_SUPPORT_FILTER);
@@ -79,20 +101,6 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
         // pagination
         Assert.notNull(getQuerydsl(), "QueryDSL must not be null");
         SubQueryExpression<Stage> subQuery = getQuerydsl().applyPagination(pageable, from(stage).where(booleanBuilder));
-
-        JPQLQuery<Stage> jpqlQuery = from(stage)
-                .join(stage.host).fetchJoin()
-                .join(stage.images).fetchJoin()
-                .join(stage.address).fetchJoin()
-                .leftJoin(stage.tags).fetchJoin()
-                .leftJoin(stage.links).fetchJoin()
-                .leftJoin(stage.holidays).fetchJoin()
-                .leftJoin(stage.refundPolicies).fetchJoin()
-                .leftJoin(stage.likedUsernames);
-
-        if(username != null) {
-            jpqlQuery.on(stage.likedUsernames.any().eq(username));
-        }
 
         return jpqlQuery.where(stage.in(subQuery)).fetch();
     }

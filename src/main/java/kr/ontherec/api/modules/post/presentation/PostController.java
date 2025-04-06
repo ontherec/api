@@ -35,11 +35,12 @@ public class PostController {
     @GetMapping
     ResponseEntity<List<PostResponseDto>> search(
             @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "liked", required = false) Boolean liked,
             @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable,
             Authentication authentication
     ) {
         String username = authentication == null ? null : authentication.getName();
-        List<Post> posts = postQueryService.search(query, pageable, username);
+        List<Post> posts = postQueryService.search(query, liked, pageable, username);
         List<PostResponseDto> response = posts.stream().map(post -> postMapper.EntityToResponseDto(post, username)).toList();
         return ResponseEntity.ok(response);
     }

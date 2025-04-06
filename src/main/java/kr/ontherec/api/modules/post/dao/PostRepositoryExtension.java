@@ -10,5 +10,5 @@ import java.util.List;
 @Repository
 @Transactional
 public interface PostRepositoryExtension {
-    List<Post> search(String query, Pageable pageable, String username);
+    List<Post> search(String query, Boolean liked, Pageable pageable, String username);
 }

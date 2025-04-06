@@ -16,8 +16,8 @@ public class PostQueryServiceImpl implements PostQueryService {
     private final PostRepository postRepository;
 
     @Override
-    public List<Post> search(String query, Pageable pageable, String username) {
-        return postRepository.search(query, pageable, username);
+    public List<Post> search(String query, Boolean liked, Pageable pageable, String username) {
+        return postRepository.search(query, liked, pageable, username);
     }
 
     @Override

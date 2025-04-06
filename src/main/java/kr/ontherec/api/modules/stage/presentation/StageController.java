@@ -37,12 +37,13 @@ public class StageController {
 
     @GetMapping
     ResponseEntity<List<StageResponseDto>> search(
+            @RequestParam(required = false) String query,
             @RequestParam Map<String, String> params,
             @PageableDefault(size = 12, sort = "createdAt", direction = DESC) Pageable pageable,
             Authentication authentication
     ) {
         String username = authentication == null ? null : authentication.getName();
-        List<StageResponseDto> response = stageQueryService.search(params, pageable, username)
+        List<StageResponseDto> response = stageQueryService.search(query, params, pageable, username)
                 .stream()
                 .map(stage -> stageMapper.EntityToResponseDto(stage, username))
                 .toList();

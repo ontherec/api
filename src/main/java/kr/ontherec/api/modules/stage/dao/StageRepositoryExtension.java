@@ -11,5 +11,5 @@ import java.util.Map;
 @Repository
 @Transactional
 public interface StageRepositoryExtension {
-    List<Stage> search(Map<String, String> params, Pageable pageable, String username);
+    List<Stage> search(String query, Map<String, String> params, Pageable pageable, String username);
 }
