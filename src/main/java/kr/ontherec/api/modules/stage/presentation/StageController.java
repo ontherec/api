@@ -51,7 +51,10 @@ public class StageController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<StageResponseDto> get(@PathVariable Long id, Authentication authentication) {
+    ResponseEntity<StageResponseDto> get(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
         String username = authentication == null ? null : authentication.getName();
         Stage stage = stageQueryService.get(id);
         StageResponseDto response = stageMapper.EntityToResponseDto(stage, username);
@@ -59,8 +62,10 @@ public class StageController {
     }
 
     @PostMapping
-    ResponseEntity<Long> register(Authentication authentication,
-                                  @Valid @RequestBody StageRegisterRequestDto dto) {
+    ResponseEntity<Long> register(
+            Authentication authentication,
+            @Valid @RequestBody StageRegisterRequestDto dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         Stage newStage = stageMapper.registerRequestDtoToEntity(dto);
         Stage stage = stageCommandService.register(host, newStage);
@@ -68,9 +73,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/images")
-    ResponseEntity<Void> updateImages(Authentication authentication,
-                                    @PathVariable Long id,
-                                    @Valid @RequestBody StageUpdateRequestDto.Images dto) {
+    ResponseEntity<Void> updateImages(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Images dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -80,9 +87,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/introduction")
-    ResponseEntity<Void> updateIntroduction(Authentication authentication,
-                                            @PathVariable Long id,
-                                            @Valid @RequestBody StageUpdateRequestDto.Introduction dto) {
+    ResponseEntity<Void> updateIntroduction(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Introduction dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -91,9 +100,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/area")
-    ResponseEntity<Void> updateArea(Authentication authentication,
-                                           @PathVariable Long id,
-                                           @Valid @RequestBody StageUpdateRequestDto.Area dto) {
+    ResponseEntity<Void> updateArea(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Area dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -103,9 +114,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/business")
-    ResponseEntity<Void> updateBusiness(Authentication authentication,
-                                        @PathVariable Long id,
-                                        @Valid @RequestBody StageUpdateRequestDto.Business dto) {
+    ResponseEntity<Void> updateBusiness(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Business dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -115,9 +128,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/engineering")
-    ResponseEntity<Void> updateEngineering(Authentication authentication,
-                                           @PathVariable Long id,
-                                           @Valid @RequestBody StageUpdateRequestDto.Engineering dto) {
+    ResponseEntity<Void> updateEngineering(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Engineering dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -127,9 +142,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/documents")
-    ResponseEntity<Void> updateDocuments(Authentication authentication,
-                                         @PathVariable Long id,
-                                         @Valid @RequestBody StageUpdateRequestDto.Documents dto) {
+    ResponseEntity<Void> updateDocuments(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Documents dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -139,9 +156,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/parking")
-    ResponseEntity<Void> updateParking(Authentication authentication,
-                                          @PathVariable Long id,
-                                          @Valid @RequestBody StageUpdateRequestDto.Parking dto) {
+    ResponseEntity<Void> updateParking(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Parking dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -151,9 +170,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/facilities")
-    ResponseEntity<Void> updateFacilities(Authentication authentication,
-                                          @PathVariable Long id,
-                                          @Valid @RequestBody StageUpdateRequestDto.Facilities dto) {
+    ResponseEntity<Void> updateFacilities(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.Facilities dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -163,9 +184,11 @@ public class StageController {
     }
 
     @PutMapping("/{id}/fnb-policies")
-    ResponseEntity<Void> updateFnbPolicies(Authentication authentication,
-                                           @PathVariable Long id,
-                                           @Valid @RequestBody StageUpdateRequestDto.FnbPolicies dto) {
+    ResponseEntity<Void> updateFnbPolicies(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody StageUpdateRequestDto.FnbPolicies dto
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);
@@ -175,20 +198,28 @@ public class StageController {
     }
 
     @PostMapping("/{id}/like")
-    ResponseEntity<Void> like(Authentication authentication, @PathVariable Long id) {
+    ResponseEntity<Void> like(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
         stageCommandService.like(id, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{id}/unlike")
-    ResponseEntity<Void> unlike(Authentication authentication, @PathVariable Long id) {
+    ResponseEntity<Void> unlike(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
         stageCommandService.unlike(id, authentication.getName());
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> remove(Authentication authentication,
-                                @PathVariable Long id) {
+    ResponseEntity<Void> remove(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
         Host host = hostService.getByUsername(authentication.getName());
         if (!stageQueryService.isHost(id, host))
             throw new StageException(StageExceptionCode.FORBIDDEN);

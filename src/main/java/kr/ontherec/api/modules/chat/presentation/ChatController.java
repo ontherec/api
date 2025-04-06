@@ -1,11 +1,11 @@
 package kr.ontherec.api.modules.chat.presentation;
 
 import kr.ontherec.api.modules.chat.application.*;
-import kr.ontherec.api.modules.chat.entity.Chat;
-import kr.ontherec.api.modules.chat.entity.Message;
 import kr.ontherec.api.modules.chat.dto.ChatCreateRequestDto;
 import kr.ontherec.api.modules.chat.dto.ChatResponseDto;
 import kr.ontherec.api.modules.chat.dto.MessageResponseDto;
+import kr.ontherec.api.modules.chat.entity.Chat;
+import kr.ontherec.api.modules.chat.entity.Message;
 import kr.ontherec.api.modules.chat.exception.ChatException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +61,10 @@ public class ChatController {
     }
 
     @PostMapping
-    ResponseEntity<Long> create(Authentication authentication, @RequestBody ChatCreateRequestDto dto) {
+    ResponseEntity<Long> create(
+            Authentication authentication,
+            @RequestBody ChatCreateRequestDto dto
+    ) {
         if (!dto.participants().contains(authentication.getName()))
             throw new ChatException(FORBIDDEN);
 
@@ -81,7 +84,10 @@ public class ChatController {
     }
 
     @PatchMapping("/{id}/read")
-    ResponseEntity<Void> read(Authentication authentication, @PathVariable Long id) {
+    ResponseEntity<Void> read(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
         if (!chatQueryService.isParticipant(id, authentication.getName()))
             throw new ChatException(FORBIDDEN);
 
@@ -91,7 +97,10 @@ public class ChatController {
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> exit(Authentication authentication, @PathVariable Long id) {
+    ResponseEntity<Void> exit(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
         if (!chatQueryService.isParticipant(id, authentication.getName()))
             throw new ChatException(FORBIDDEN);
 
