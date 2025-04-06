@@ -90,6 +90,18 @@ public class StageCommandServiceImpl implements StageCommandService {
     }
 
     @Override
+    public void like(Long id, String username) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        foundStage.getLikedUsernames().add(username);
+    }
+
+    @Override
+    public void unlike(Long id, String username) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        foundStage.getLikedUsernames().remove(username);
+    }
+
+    @Override
     public void delete(Long id) {
         stageRepository.deleteByIdOrThrow(id);
     }

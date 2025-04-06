@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,7 +45,10 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<PostResponseDto> get(@PathVariable Long id, Authentication authentication) {
+    ResponseEntity<PostResponseDto> get(
+            @PathVariable Long id,
+            Authentication authentication
+    ) {
         String username = authentication == null ? null : authentication.getName();
         Post post = postQueryService.get(id);
         PostResponseDto response = postMapper.EntityToResponseDto(post, username);
@@ -52,16 +56,23 @@ public class PostController {
     }
 
     @PostMapping
-    ResponseEntity<Long> create(Authentication authentication, @Valid @RequestBody PostCreateRequestDto dto) {
+    @PreAuthorize("hasRole('ADMIN')")
+    ResponseEntity<Long> create(
+            Authentication authentication,
+            @Valid @RequestBody PostCreateRequestDto dto
+    ) {
         Post newPost = postMapper.registerRequestDtoToEntity(dto);
         Post post = postCommandService.create(authentication.getName(), newPost);
         return ResponseEntity.created(URI.create("/v1/posts/" + post.getId())).body(post.getId());
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<Void> update(Authentication authentication,
-                                           @PathVariable Long id,
-                                           @Valid @RequestBody PostUpdateRequestDto dto) {
+    @PreAuthorize("hasRole('ADMIN')")
+    ResponseEntity<Void> update(
+            Authentication authentication,
+            @PathVariable Long id,
+            @Valid @RequestBody PostUpdateRequestDto dto
+    ) {
         if(!postQueryService.isAuthor(id, authentication.getName()))
             throw new PostException(PostExceptionCode.FORBIDDEN);
 
@@ -69,9 +80,30 @@ public class PostController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/like")
+    ResponseEntity<Void> like(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
+        postCommandService.like(id, authentication.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/unlike")
+    ResponseEntity<Void> unlike(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
+        postCommandService.unlike(id, authentication.getName());
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
-    ResponseEntity<Void> delete(Authentication authentication,
-                                @PathVariable Long id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    ResponseEntity<Void> delete(
+            Authentication authentication,
+            @PathVariable Long id
+    ) {
         if (!postQueryService.isAuthor(id, authentication.getName()))
             throw new PostException(PostExceptionCode.FORBIDDEN);
 

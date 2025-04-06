@@ -173,6 +173,18 @@ public class StageController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{id}/like")
+    ResponseEntity<Void> like(Authentication authentication, @PathVariable Long id) {
+        stageCommandService.like(id, authentication.getName());
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/unlike")
+    ResponseEntity<Void> unlike(Authentication authentication, @PathVariable Long id) {
+        stageCommandService.unlike(id, authentication.getName());
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{id}")
     ResponseEntity<Void> remove(Authentication authentication,
                                 @PathVariable Long id) {

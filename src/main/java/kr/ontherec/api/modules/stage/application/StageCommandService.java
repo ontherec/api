@@ -15,5 +15,7 @@ public interface StageCommandService {
     void updateParking(Long id, StageUpdateRequestDto.Parking dto);
     void updateFacilities(Long id, StageUpdateRequestDto.Facilities dto);
     void updateFnbPolicies(Long id, StageUpdateRequestDto.FnbPolicies dto);
+    void like(Long id, String username);
+    void unlike(Long id, String username);
     void delete(Long id);
 }
