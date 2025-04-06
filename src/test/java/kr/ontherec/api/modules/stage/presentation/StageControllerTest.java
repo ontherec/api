@@ -33,7 +33,7 @@ import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
-import static kr.ontherec.api.infra.model.Regex.BUSINESS_REGISTRATION_NUMBER;
+import static kr.ontherec.api.infra.entity.Regex.BUSINESS_REGISTRATION_NUMBER;
 import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
 import static kr.ontherec.api.modules.item.entity.HolidayType.추석;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
@@ -111,6 +111,10 @@ class StageControllerTest {
                                         parameterWithName("parkingAvailable")
                                                 .type(BOOLEAN)
                                                 .description("주차 가능 여부")
+                                                .optional(),
+                                        parameterWithName("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (로그인 필요)")
                                                 .optional(),
                                         // engineering
                                         parameterWithName("stageManagingAvailable")
@@ -263,6 +267,9 @@ class StageControllerTest {
                                         fieldWithPath("[].likeCount")
                                                 .type(STRING)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("[].liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         // introduction
                                         fieldWithPath("[].introduction")
                                                 .type(OBJECT)
@@ -542,6 +549,9 @@ class StageControllerTest {
                                         fieldWithPath("likeCount")
                                                 .type(STRING)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         // introduction
                                         fieldWithPath("introduction")
                                                 .type(OBJECT)

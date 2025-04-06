@@ -1,8 +1,8 @@
 package kr.ontherec.api.modules.post.application;
 
 import kr.ontherec.api.infra.UnitTest;
+import kr.ontherec.api.infra.entity.BaseEntity;
 import kr.ontherec.api.infra.fixture.PostFactory;
-import kr.ontherec.api.infra.model.BaseEntity;
 import kr.ontherec.api.modules.post.entity.Post;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +30,7 @@ class PostQueryServiceTest {
         // when
         List<Post> posts = postQueryService.search(
                 "post",
+                null,
                 PageRequest.of(0, 12, Sort.sort(Post.class).by(BaseEntity::getCreatedAt).descending()),
                 "test"
         );

@@ -1,9 +1,9 @@
 package kr.ontherec.api.modules.stage.application;
 
 import kr.ontherec.api.infra.UnitTest;
+import kr.ontherec.api.infra.entity.BaseEntity;
 import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
-import kr.ontherec.api.infra.model.BaseEntity;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
@@ -42,7 +42,8 @@ class StageQueryServiceTest {
         params.put("stageManagingAvailable", "false");
 
         // when
-        List<Stage> stages = stageQueryService.search(params ,
+        List<Stage> stages = stageQueryService.search(
+                params,
                 PageRequest.of(0, 12, Sort.sort(Stage.class).by(BaseEntity::getCreatedAt).descending()),
                 "test"
         );
@@ -56,8 +57,9 @@ class StageQueryServiceTest {
     void searchWithUnSupportParams() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000");
+        stageFactory.create(host, "stage", "0000000000");
         Map<String, String> params = new HashMap<>();
+        params.put("q", "stage");
         params.put("newFilter", "value");
 
         // when
@@ -78,8 +80,9 @@ class StageQueryServiceTest {
     void searchWithInvalidParams() {
         // given
         Host host = hostFactory.create("test");
-        Stage stage = stageFactory.create(host, "stage", "0000000000");
+        stageFactory.create(host, "stage", "0000000000");
         Map<String, String> params = new HashMap<>();
+        params.put("q", "stage");
         params.put("stageManagingAvailable", "5");
 
         // when

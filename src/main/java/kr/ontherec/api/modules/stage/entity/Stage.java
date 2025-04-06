@@ -1,7 +1,7 @@
 package kr.ontherec.api.modules.stage.entity;
 
 import jakarta.persistence.*;
-import kr.ontherec.api.infra.model.BaseEntity;
+import kr.ontherec.api.infra.entity.BaseEntity;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.entity.Address;
 import kr.ontherec.api.modules.item.entity.HolidayType;

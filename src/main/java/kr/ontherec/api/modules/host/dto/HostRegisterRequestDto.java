@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import kr.ontherec.api.modules.host.entity.Bank;
 
-import static kr.ontherec.api.infra.model.Regex.BANK_ACCOUNT;
+import static kr.ontherec.api.infra.entity.Regex.BANK_ACCOUNT;
 
 public record HostRegisterRequestDto(
         @NotNull(message = "은행을 입력해주세요")

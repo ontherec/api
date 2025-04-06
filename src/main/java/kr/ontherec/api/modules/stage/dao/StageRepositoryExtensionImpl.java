@@ -27,7 +27,7 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
     }
 
     @Override
-    public List<Stage> search(String query, Map<String, String> params, Pageable pageable, String username) {
+    public List<Stage> search(Map<String, String> params, Pageable pageable, String username) {
         QStage stage = QStage.stage;
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         PathBuilder<Stage> pathBuilder = new PathBuilder<>(stage.getType(), stage.getMetadata(), PROPERTIES);
@@ -45,7 +45,8 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                 .leftJoin(stage.likedUsernames);
 
         // query
-        if (query != null) {
+        if (params.containsKey("q")) {
+            String query = params.get("q");
             booleanBuilder.or(stage.title.containsIgnoreCase(query))
                     .or(stage.address.state.containsIgnoreCase(query))
                     .or(stage.address.city.containsIgnoreCase(query))
@@ -58,6 +59,8 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
         params.forEach((key, value) -> {
             try {
                 switch(key) {
+                    case "q":
+                        break;
                     case "minCapacity":
                         booleanBuilder.and(pathBuilder.getNumber(key, Integer.class).goe(Integer.valueOf(value)));
                         break;
@@ -77,7 +80,6 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                             throw new PostException(UNAUTHORIZED);
                         if(!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false"))
                             throw new StageException(NOT_VALID_FILTER);
-
                         if(Boolean.parseBoolean(value)) {
                             jpqlQuery.on(stage.likedUsernames.any().eq(username));
                             booleanBuilder.and(stage.likedUsernames.contains(username));

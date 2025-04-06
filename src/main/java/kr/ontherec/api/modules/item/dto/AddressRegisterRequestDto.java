@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 
 import java.math.BigDecimal;
 
-import static kr.ontherec.api.infra.model.Regex.ZIP_CODE;
+import static kr.ontherec.api.infra.entity.Regex.ZIP_CODE;
 
 /**
  * <a href="https://namu.wiki/w/대한민국/행정구역">나무위키: 행정구역</a>

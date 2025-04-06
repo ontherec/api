@@ -1,7 +1,7 @@
 package kr.ontherec.api.modules.post.entity;
 
 import jakarta.persistence.*;
-import kr.ontherec.api.infra.model.BaseEntity;
+import kr.ontherec.api.infra.entity.BaseEntity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 

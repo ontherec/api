@@ -20,13 +20,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.SimpleType.NUMBER;
-import static com.epages.restdocs.apispec.SimpleType.STRING;
+import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
@@ -69,14 +70,26 @@ class PostControllerTest {
     @Test
     void search() {
         postFactory.create("test", "post");
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "post");
 
         given(this.spec)
+                .params(params)
                 .filter(document(
                         "post search",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("post")
                                 .summary("post search")
                                 .description("게시글 검색")
+                                .queryParameters(
+                                        parameterWithName("q")
+                                                .type(STRING)
+                                                .description("검색어")
+                                                .optional(),
+                                        parameterWithName("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (로그인 필요)")
+                                                .optional())
                                 .responseSchema(Schema.schema(PostResponseDto.class.getSimpleName() + "[]"))
                                 .responseFields(
                                         fieldWithPath("[]")
@@ -104,6 +117,9 @@ class PostControllerTest {
                                         fieldWithPath("[].likeCount")
                                                 .type(NUMBER)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("[].liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         fieldWithPath("[].createdAt")
                                                 .type(SimpleType.STRING)
                                                 .description("생성된 시간 (UTC)"),
@@ -157,6 +173,9 @@ class PostControllerTest {
                                         fieldWithPath("likeCount")
                                                 .type(NUMBER)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         fieldWithPath("createdAt")
                                                 .type(SimpleType.STRING)
                                                 .description("생성된 시간 (UTC)"),

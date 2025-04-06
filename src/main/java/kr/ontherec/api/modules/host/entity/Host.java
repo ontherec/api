@@ -1,7 +1,7 @@
 package kr.ontherec.api.modules.host.entity;
 
 import jakarta.persistence.*;
-import kr.ontherec.api.infra.model.BaseEntity;
+import kr.ontherec.api.infra.entity.BaseEntity;
 import kr.ontherec.api.modules.host.exception.HostException;
 import kr.ontherec.api.modules.host.exception.HostExceptionCode;
 import lombok.*;

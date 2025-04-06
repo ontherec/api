@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 
-import static kr.ontherec.api.infra.model.Regex.BUSINESS_REGISTRATION_NUMBER;
+import static kr.ontherec.api.infra.entity.Regex.BUSINESS_REGISTRATION_NUMBER;
 
 
 public record StageRegisterRequestDto (
