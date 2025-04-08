@@ -664,6 +664,36 @@ class StageCommandServiceTest {
         assertThat(stage.isSellAlcohol()).isEqualTo(dto.sellAlcohol());
     }
 
+    @DisplayName("공연장 좋아요 성공")
+    @Test
+    void like() {
+        // given
+        String username = "test";
+        Host host = hostFactory.create(username);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
+
+        // when
+        stageCommandService.like(stage.getId(), username);
+
+        // then
+        assertThat(stage.getLikedUsernames().contains(username)).isTrue();
+    }
+
+    @DisplayName("공연장 좋아요 취소 성공")
+    @Test
+    void unlike() {
+        // given
+        String username = "test";
+        Host host = hostFactory.create(username);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
+
+        // when
+        stageCommandService.unlike(stage.getId(), username);
+
+        // then
+        assertThat(stage.getLikedUsernames().contains(username)).isFalse();
+    }
+
     @DisplayName("공연장 삭제 성공")
     @Test
     void delete() {

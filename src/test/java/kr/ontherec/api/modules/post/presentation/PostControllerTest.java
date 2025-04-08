@@ -31,6 +31,7 @@ import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
+import static kr.ontherec.api.infra.exception.CommonExceptionCode.UNAUTHORIZED;
 import static kr.ontherec.api.modules.post.exception.PostExceptionCode.FORBIDDEN;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -290,6 +291,66 @@ class PostControllerTest {
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
+    }
+
+    @DisplayName("게시글 좋아요 성공")
+    @Test
+    void like() {
+        Post post = postFactory.create("test", "post");
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "post like",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post like")
+                                .description("게시글 좋아요")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("좋아요할 게시글 식별자"))
+                                .build())))
+        .when()
+                .post("/posts/{id}/like", post.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("게시글 좋아요 실패 - 미인증")
+    @Test
+    void likeWithoutAuthorize() {
+        Post post = postFactory.create("test", "post");
+
+        given()
+        .when()
+                .post("/posts/{id}/like", post.getId())
+        .then()
+                .statusCode(UNAUTHORIZED.getStatus().value());
+    }
+
+    @DisplayName("게시글 좋아요 취소 성공")
+    @Test
+    void unlike() {
+        Post post = postFactory.create("test", "post");
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "post unlike",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post unlike")
+                                .description("게시글 좋아요 취소")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("좋아요 취소할 게시글 식별자"))
+                                .build())))
+        .when()
+                .post("/posts/{id}/unlike", post.getId())
+        .then()
+                .statusCode(OK.value());
     }
 
     @DisplayName("게시글 삭제 성공")

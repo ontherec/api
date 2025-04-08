@@ -63,6 +63,34 @@ class PostCommandServiceTest {
         assertThat(post.getContent()).isEqualTo(dto.content());
     }
 
+    @DisplayName("게시글 좋아요 성공")
+    @Test
+    void like() {
+        // given
+        String username = "test";
+        Post post = postFactory.create(username, "post");
+
+        // when
+        postCommandService.like(post.getId(), username);
+
+        // then
+        assertThat(post.getLikedUsernames().contains(username)).isTrue();
+    }
+
+    @DisplayName("게시글 좋아요 취소 성공")
+    @Test
+    void unlike() {
+        // given
+        String username = "test";
+        Post post = postFactory.create(username, "post");
+
+        // when
+        postCommandService.unlike(post.getId(), username);
+
+        // then
+        assertThat(post.getLikedUsernames().contains(username)).isFalse();
+    }
+
     @DisplayName("게시글 삭제 성공")
     @Test
     void delete() {
