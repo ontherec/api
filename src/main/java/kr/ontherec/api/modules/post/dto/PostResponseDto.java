@@ -1,14 +1,22 @@
 package kr.ontherec.api.modules.post.dto;
 
-import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
-public record PostResponseDto (
-        Long id,
-        String author,
-        String title,
-        String content,
-        int viewCount,
-        int likeCount,
-        LocalDateTime createdAt,
-        LocalDateTime modifiedAt
-) {}
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@Setter
+public class PostResponseDto {
+    Long id;
+    String author;
+    List<String> images;
+    String title;
+    String content;
+    long viewCount;
+    long likeCount;
+    boolean liked;
+    LocalDateTime createdAt;
+    LocalDateTime modifiedAt;
+}

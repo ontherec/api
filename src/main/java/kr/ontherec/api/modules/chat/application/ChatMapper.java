@@ -1,11 +1,11 @@
 package kr.ontherec.api.modules.chat.application;
 
+import kr.ontherec.api.infra.config.MapperConfig;
+import kr.ontherec.api.modules.chat.dto.ChatCreateRequestDto;
+import kr.ontherec.api.modules.chat.dto.ChatResponseDto;
 import kr.ontherec.api.modules.chat.entity.Chat;
 import kr.ontherec.api.modules.chat.entity.Message;
 import kr.ontherec.api.modules.chat.entity.Participant;
-import kr.ontherec.api.modules.chat.dto.ChatCreateRequestDto;
-import kr.ontherec.api.modules.chat.dto.ChatResponseDto;
-import kr.ontherec.api.infra.config.MapperConfig;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;

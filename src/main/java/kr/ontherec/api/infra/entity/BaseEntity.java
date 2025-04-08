@@ -1,4 +1,4 @@
-package kr.ontherec.api.infra.model;
+package kr.ontherec.api.infra.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

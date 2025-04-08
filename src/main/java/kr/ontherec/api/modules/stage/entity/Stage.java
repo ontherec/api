@@ -1,14 +1,12 @@
 package kr.ontherec.api.modules.stage.entity;
 
 import jakarta.persistence.*;
-import kr.ontherec.api.infra.model.BaseEntity;
+import kr.ontherec.api.infra.entity.BaseEntity;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.entity.Address;
-import kr.ontherec.api.modules.item.entity.Holiday;
-import kr.ontherec.api.modules.item.entity.Link;
+import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
 import kr.ontherec.api.modules.stage.exception.StageException;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -63,18 +61,24 @@ public class Stage extends BaseEntity {
     @Column(nullable = false)
     private long likeCount;
 
+    @ElementCollection(fetch = EAGER)
+    @Column
+    @Builder.Default
+    private Set<String> likedUsernames = new HashSet<>();
+
     // introduction
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @ManyToMany(fetch = EAGER)
+    @ElementCollection(fetch = EAGER)
+    @Column
     @Builder.Default
-    private List<Tag> tags = new ArrayList<>();
+    private Set<String> tags = new HashSet<>();
 
-    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
-    @JoinColumn
+    @ElementCollection(fetch = EAGER)
+    @Column
     @Builder.Default
-    private Set<Link> links = new HashSet<>();
+    private Set<String> links = new HashSet<>();
 
     // area
     @Column(nullable = false)
@@ -96,10 +100,11 @@ public class Stage extends BaseEntity {
     // business
     // TODO: timeblocks
 
-    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
-    @JoinColumn
+    @ElementCollection(fetch = EAGER)
+    @Column
+    @Enumerated(STRING)
     @Builder.Default
-    private Set<Holiday> holidays = new HashSet<>();
+    private Set<HolidayType> holidays = new HashSet<>();
 
     // TODO: booking slots
 

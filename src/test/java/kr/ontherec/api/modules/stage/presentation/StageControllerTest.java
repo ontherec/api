@@ -9,13 +9,11 @@ import io.restassured.specification.RequestSpecification;
 import kr.ontherec.api.infra.IntegrationTest;
 import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
-import kr.ontherec.api.infra.fixture.TagFactory;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
 import kr.ontherec.api.modules.stage.dto.*;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.entity.StageType;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,8 +24,7 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.*;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
@@ -36,7 +33,7 @@ import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
-import static kr.ontherec.api.infra.model.Regex.BUSINESS_REGISTRATION_NUMBER;
+import static kr.ontherec.api.infra.entity.Regex.BUSINESS_REGISTRATION_NUMBER;
 import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
 import static kr.ontherec.api.modules.item.entity.HolidayType.추석;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
@@ -56,7 +53,6 @@ import static org.springframework.restdocs.snippet.Attributes.key;
 class StageControllerTest {
 
     @Autowired private HostFactory hostFactory;
-    @Autowired private TagFactory tagFactory;
     @Autowired private StageFactory stageFactory;
 
     @Value("${spring.security.api-key}")
@@ -84,16 +80,117 @@ class StageControllerTest {
     @Test
     void search() {
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        stageFactory.create(host, "stage", "0000000000", tags);
+        stageFactory.create(host, "stage", "0000000000");
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "stage");
+        params.put("minCapacity", "30");
+        params.put("parkingAvailable", "true");
+        params.put("stageManagingAvailable", "false");
 
         given(this.spec)
+                .params(params)
                 .filter(document(
                         "stage search",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("stage")
                                 .summary("stage search")
                                 .description("공연장 검색")
+                                .queryParameters(
+                                        parameterWithName("q")
+                                                .type(STRING)
+                                                .description("검색어")
+                                                .optional(),
+                                        parameterWithName("minCapacity")
+                                                .type(NUMBER)
+                                                .description("최소 수용인원 (좌석 기준)")
+                                                .optional(),
+                                        parameterWithName("maxCapacity")
+                                                .type(NUMBER)
+                                                .description("최대 수용인원 (스탠딩 기준)")
+                                                .optional(),
+                                        parameterWithName("parkingAvailable")
+                                                .type(BOOLEAN)
+                                                .description("주차 가능 여부")
+                                                .optional(),
+                                        parameterWithName("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (로그인 필요)")
+                                                .optional(),
+                                        // engineering
+                                        parameterWithName("stageManagingAvailable")
+                                                .type(BOOLEAN)
+                                                .description("스테이지 매니징 제공 여부")
+                                                .optional(),
+                                        parameterWithName("soundEngineeringAvailable")
+                                                .type(BOOLEAN)
+                                                .description("사운드 엔지니어링 제공 여부")
+                                                .optional(),
+                                        parameterWithName("lightEngineeringAvailable")
+                                                .type(BOOLEAN)
+                                                .description("조명 엔지니어링 제공 여부")
+                                                .optional(),
+                                        parameterWithName("photographingAvailable")
+                                                .type(BOOLEAN)
+                                                .description("촬영 제공 여부")
+                                                .optional(),
+                                        // facilities
+                                        parameterWithName("hasElevator")
+                                                .type(BOOLEAN)
+                                                .description("엘리베이터 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasRestroom")
+                                                .type(BOOLEAN)
+                                                .description("화장실 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasWifi")
+                                                .type(BOOLEAN)
+                                                .description("와이파이 제공 여부")
+                                                .optional(),
+                                        parameterWithName("hasCameraStanding")
+                                                .type(BOOLEAN)
+                                                .description("카메라 스탠드 제공 여부")
+                                                .optional(),
+                                        parameterWithName("hasWaitingRoom")
+                                                .type(BOOLEAN)
+                                                .description("대기실 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasProjector")
+                                                .type(BOOLEAN)
+                                                .description("프로젝터 존재 여부")
+                                                .optional(),
+                                        parameterWithName("hasLocker")
+                                                .type(BOOLEAN)
+                                                .description("물품보관함 존재 여부")
+                                                .optional(),
+                                        // fnb policies
+                                        parameterWithName("allowsWater")
+                                                .type(BOOLEAN)
+                                                .description("물 반입 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsDrink")
+                                                .type(BOOLEAN)
+                                                .description("음료 반입 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsFood")
+                                                .type(BOOLEAN)
+                                                .description("음식 반입 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsFoodDelivery")
+                                                .type(BOOLEAN)
+                                                .description("음식 배달 허용 여부")
+                                                .optional(),
+                                        parameterWithName("allowsAlcohol")
+                                                .type(BOOLEAN)
+                                                .description("주류 반입 여부")
+                                                .optional(),
+                                        parameterWithName("sellDrink")
+                                                .type(BOOLEAN)
+                                                .description("음료 판매 여부")
+                                                .optional(),
+                                        parameterWithName("sellAlcohol")
+                                                .type(BOOLEAN)
+                                                .description("주류 판매 여부")
+                                                .optional())
                                 .responseSchema(Schema.schema(StageResponseDto.class.getSimpleName() + "[]"))
                                 .responseFields(
                                         fieldWithPath("[]")
@@ -170,6 +267,9 @@ class StageControllerTest {
                                         fieldWithPath("[].likeCount")
                                                 .type(STRING)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("[].liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         // introduction
                                         fieldWithPath("[].introduction")
                                                 .type(OBJECT)
@@ -363,8 +463,7 @@ class StageControllerTest {
     @Test
     void get() {
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         given(this.spec)
                 .filter(document(
@@ -450,6 +549,9 @@ class StageControllerTest {
                                         fieldWithPath("likeCount")
                                                 .type(STRING)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         // introduction
                                         fieldWithPath("introduction")
                                                 .type(OBJECT)
@@ -645,7 +747,7 @@ class StageControllerTest {
     void register() {
         hostFactory.create("test");
         StageRegisterRequestDto dto = new StageRegisterRequestDto(
-                Set.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/71fa830b-5cb2-4902-8eb5-f0594ed8371a.jpg"),
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
                 "stage",
                 "0000000000",
                 new AddressRegisterRequestDto(
@@ -947,13 +1049,48 @@ class StageControllerTest {
                 .body(notNullValue());
     }
 
+    @DisplayName("공연장 이미지 수정 성공")
+    @Test
+    void updateImages() {
+        Host host = hostFactory.create("test");
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
+        StageUpdateRequestDto.Images dto = new StageUpdateRequestDto.Images(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg")
+        );
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .contentType(JSON)
+                .body(dto)
+                .filter(document(
+                        "stage update images",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("stage")
+                                .summary("stage update images")
+                                .description("공연장 소개 수정")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("소개를 수정할 공연장 식별자"))
+                                .requestSchema(Schema.schema(StageUpdateRequestDto.Images.class.getSimpleName()))
+                                .requestFields(
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("공연장 이미지 URL 목록"))
+                                .build())))
+        .when()
+                .put("/stages/{id}/images", stage.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
     @DisplayName("공연장 소개 수정 성공")
     @Test
     void updateIntroduction() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
                 Set.of("newTag"),
@@ -1004,8 +1141,7 @@ class StageControllerTest {
 
         hostFactory.create("test");
         Host host = hostFactory.create("host");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Introduction dto = new StageUpdateRequestDto.Introduction(
                 "newStage",
                 Set.of("newTag"),
@@ -1028,8 +1164,7 @@ class StageControllerTest {
     void updateArea() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Area dto = new StageUpdateRequestDto.Area(
                 100,
                 200,
@@ -1081,8 +1216,7 @@ class StageControllerTest {
     void updateBusiness() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
                 Duration.ofDays(90),
@@ -1145,8 +1279,7 @@ class StageControllerTest {
     @Test
     void updateEngineering() {
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Engineering dto = new StageUpdateRequestDto.Engineering(
                 true,
                 50000L,
@@ -1214,8 +1347,7 @@ class StageControllerTest {
     void updateDocuments() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Documents dto = new StageUpdateRequestDto.Documents(
                 "https://docs.google.com/document/u/0",
                 "https://docs.google.com/document/u/0",
@@ -1260,8 +1392,7 @@ class StageControllerTest {
     void Parking() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         StageUpdateRequestDto.Parking dto = new StageUpdateRequestDto.Parking(
                 30,
@@ -1308,8 +1439,7 @@ class StageControllerTest {
     void updateFacilities() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Facilities dto = new StageUpdateRequestDto.Facilities(
                 false,
                 true,
@@ -1369,8 +1499,7 @@ class StageControllerTest {
     void updateFnbPolicies() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.FnbPolicies dto = new StageUpdateRequestDto.FnbPolicies(
                 false,
                 false,
@@ -1430,8 +1559,7 @@ class StageControllerTest {
     void remove() {
 
         Host host = hostFactory.create("test");
-        Set<Tag> tags = tagFactory.create("tag");
-        Stage stage = stageFactory.create(host, "stage", "0000000000", tags);
+        Stage stage = stageFactory.create(host, "stage", "0000000000");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)

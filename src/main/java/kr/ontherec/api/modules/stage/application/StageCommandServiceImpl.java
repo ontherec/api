@@ -5,12 +5,9 @@ import kr.ontherec.api.modules.stage.dao.StageRepository;
 import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Set;
 
 import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.EXIST_BRN;
 
@@ -21,28 +18,32 @@ public class StageCommandServiceImpl implements StageCommandService {
     private final StageMapper stageMapper = StageMapper.INSTANCE;
 
     @Override
-    public Stage register(Host host, Stage newStage, Set<Tag> tags) {
+    public Stage register(Host host, Stage newStage) {
         if(stageRepository.existsByBrn(newStage.getBrn()))
             throw new StageException(EXIST_BRN);
 
         newStage.setHost(host);
-        newStage.getTags().addAll(tags);
-
         return stageRepository.save(newStage);
+    }
+
+    @Override
+    public void updateImages(Long id, StageUpdateRequestDto.Images dto) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        stageMapper.updateImages(dto, foundStage);
+        stageRepository.save(foundStage);
+    }
+
+    @Override
+    public void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        stageMapper.updateIntroduction(dto, foundStage);
+        stageRepository.save(foundStage);
     }
 
     @Override
     public void updateArea(Long id, StageUpdateRequestDto.Area dto) {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
         stageMapper.updateArea(dto, foundStage);
-        stageRepository.save(foundStage);
-    }
-
-    @Override
-    public void updateIntroduction(Long id, StageUpdateRequestDto.Introduction dto, Set<Tag> tags) {
-        Stage foundStage = stageRepository.findByIdOrThrow(id);
-        stageMapper.updateIntroduction(dto, foundStage);
-        foundStage.getTags().addAll(tags);
         stageRepository.save(foundStage);
     }
 
@@ -86,6 +87,18 @@ public class StageCommandServiceImpl implements StageCommandService {
         Stage foundStage = stageRepository.findByIdOrThrow(id);
         stageMapper.updateFnbPolicies(dto, foundStage);
         stageRepository.save(foundStage);
+    }
+
+    @Override
+    public void like(Long id, String username) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        foundStage.getLikedUsernames().add(username);
+    }
+
+    @Override
+    public void unlike(Long id, String username) {
+        Stage foundStage = stageRepository.findByIdOrThrow(id);
+        foundStage.getLikedUsernames().remove(username);
     }
 
     @Override

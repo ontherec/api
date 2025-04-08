@@ -20,14 +20,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.SimpleType.NUMBER;
-import static com.epages.restdocs.apispec.SimpleType.STRING;
+import static com.epages.restdocs.apispec.SimpleType.*;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
+import static kr.ontherec.api.infra.exception.CommonExceptionCode.UNAUTHORIZED;
 import static kr.ontherec.api.modules.post.exception.PostExceptionCode.FORBIDDEN;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -36,6 +40,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.pr
 import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.snippet.Attributes.key;
 
 @IntegrationTest
 class PostControllerTest {
@@ -66,14 +71,26 @@ class PostControllerTest {
     @Test
     void search() {
         postFactory.create("test", "post");
+        Map<String, String> params = new HashMap<>();
+        params.put("q", "post");
 
         given(this.spec)
+                .params(params)
                 .filter(document(
                         "post search",
                         resource(ResourceSnippetParameters.builder()
                                 .tag("post")
                                 .summary("post search")
                                 .description("게시글 검색")
+                                .queryParameters(
+                                        parameterWithName("q")
+                                                .type(STRING)
+                                                .description("검색어")
+                                                .optional(),
+                                        parameterWithName("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (로그인 필요)")
+                                                .optional())
                                 .responseSchema(Schema.schema(PostResponseDto.class.getSimpleName() + "[]"))
                                 .responseFields(
                                         fieldWithPath("[]")
@@ -85,6 +102,10 @@ class PostControllerTest {
                                         fieldWithPath("[].author")
                                                 .type(STRING)
                                                 .description("게시글 작성자 ID"),
+                                        fieldWithPath("[].images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("[].title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -97,6 +118,9 @@ class PostControllerTest {
                                         fieldWithPath("[].likeCount")
                                                 .type(NUMBER)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("[].liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         fieldWithPath("[].createdAt")
                                                 .type(SimpleType.STRING)
                                                 .description("생성된 시간 (UTC)"),
@@ -134,6 +158,10 @@ class PostControllerTest {
                                         fieldWithPath("author")
                                                 .type(STRING)
                                                 .description("게시글 작성자 ID"),
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -146,6 +174,9 @@ class PostControllerTest {
                                         fieldWithPath("likeCount")
                                                 .type(NUMBER)
                                                 .description("좋아요 수"),
+                                        fieldWithPath("liked")
+                                                .type(BOOLEAN)
+                                                .description("좋아요 여부 (미로그인시 false)"),
                                         fieldWithPath("createdAt")
                                                 .type(SimpleType.STRING)
                                                 .description("생성된 시간 (UTC)"),
@@ -163,7 +194,10 @@ class PostControllerTest {
     @DisplayName("게시글 생성 성공")
     @Test
     void create() {
-        PostCreateRequestDto dto = new PostCreateRequestDto("post", "post");
+        PostCreateRequestDto dto = new PostCreateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
+                "post",
+                "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -175,8 +209,12 @@ class PostControllerTest {
                                 .tag("post")
                                 .summary("post create")
                                 .description("게시글 생성")
-                                .requestSchema(Schema.schema(PostCreateRequestDto.class.getSimpleName() + "[]"))
+                                .requestSchema(Schema.schema(PostCreateRequestDto.class.getSimpleName()))
                                 .requestFields(
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -196,7 +234,11 @@ class PostControllerTest {
     @Test
     void update() {
         Post post = postFactory.create("test", "post");
-        PostUpdateRequestDto dto = new PostUpdateRequestDto("post", "post");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
+                "post",
+                "post"
+        );
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -212,8 +254,12 @@ class PostControllerTest {
                                         parameterWithName("id")
                                                 .type(NUMBER)
                                                 .description("수정할 게시글 식별자"))
-                                .requestSchema(Schema.schema(PostUpdateRequestDto.class.getSimpleName() + "[]"))
+                                .requestSchema(Schema.schema(PostUpdateRequestDto.class.getSimpleName()))
                                 .requestFields(
+                                        fieldWithPath("images")
+                                                .type(ARRAY)
+                                                .attributes(key("itemsType").value(STRING))
+                                                .description("이미지 URL 목록"),
                                         fieldWithPath("title")
                                                 .type(STRING)
                                                 .description("게시글 제목"),
@@ -231,7 +277,10 @@ class PostControllerTest {
     @Test
     void updateWithoutAuthority() {
         Post post = postFactory.create("user", "post");
-        PostUpdateRequestDto dto = new PostUpdateRequestDto("post", "post");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
+                "post",
+                "post");
 
         given(this.spec)
                 .header(API_KEY_HEADER, API_KEY)
@@ -242,6 +291,66 @@ class PostControllerTest {
         .then()
                 .statusCode(FORBIDDEN.getStatus().value())
                 .body("message", equalTo(FORBIDDEN.getMessage()));
+    }
+
+    @DisplayName("게시글 좋아요 성공")
+    @Test
+    void like() {
+        Post post = postFactory.create("test", "post");
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "post like",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post like")
+                                .description("게시글 좋아요")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("좋아요할 게시글 식별자"))
+                                .build())))
+        .when()
+                .post("/posts/{id}/like", post.getId())
+        .then()
+                .statusCode(OK.value());
+    }
+
+    @DisplayName("게시글 좋아요 실패 - 미인증")
+    @Test
+    void likeWithoutAuthorize() {
+        Post post = postFactory.create("test", "post");
+
+        given()
+        .when()
+                .post("/posts/{id}/like", post.getId())
+        .then()
+                .statusCode(UNAUTHORIZED.getStatus().value());
+    }
+
+    @DisplayName("게시글 좋아요 취소 성공")
+    @Test
+    void unlike() {
+        Post post = postFactory.create("test", "post");
+
+        given(this.spec)
+                .header(API_KEY_HEADER, API_KEY)
+                .filter(document(
+                        "post unlike",
+                        resource(ResourceSnippetParameters.builder()
+                                .tag("post")
+                                .summary("post unlike")
+                                .description("게시글 좋아요 취소")
+                                .pathParameters(
+                                        parameterWithName("id")
+                                                .type(NUMBER)
+                                                .description("좋아요 취소할 게시글 식별자"))
+                                .build())))
+        .when()
+                .post("/posts/{id}/unlike", post.getId())
+        .then()
+                .statusCode(OK.value());
     }
 
     @DisplayName("게시글 삭제 성공")

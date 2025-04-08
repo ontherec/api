@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 
@@ -28,7 +30,10 @@ class PostCommandServiceTest {
     @Test
     void create() {
         // given
-        PostCreateRequestDto dto = new PostCreateRequestDto("post", "post");
+        PostCreateRequestDto dto = new PostCreateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
+                "post",
+                "post");
         Post newPost = postMapper.registerRequestDtoToEntity(dto);
 
         // when
@@ -45,7 +50,10 @@ class PostCommandServiceTest {
     void update() {
         // given
         Post post = postFactory.create("test", "post");
-        PostUpdateRequestDto dto = new PostUpdateRequestDto("newPost", "newPost");
+        PostUpdateRequestDto dto = new PostUpdateRequestDto(
+                List.of("https://d3j0mzt56d6iv2.cloudfront.net/images/o/test/logo-symbol.jpg"),
+                "newPost",
+                "newPost");
 
         // when
         postCommandService.update(post.getId(), dto);
@@ -53,6 +61,34 @@ class PostCommandServiceTest {
         // then
         assertThat(post.getTitle()).isEqualTo(dto.title());
         assertThat(post.getContent()).isEqualTo(dto.content());
+    }
+
+    @DisplayName("게시글 좋아요 성공")
+    @Test
+    void like() {
+        // given
+        String username = "test";
+        Post post = postFactory.create(username, "post");
+
+        // when
+        postCommandService.like(post.getId(), username);
+
+        // then
+        assertThat(post.getLikedUsernames().contains(username)).isTrue();
+    }
+
+    @DisplayName("게시글 좋아요 취소 성공")
+    @Test
+    void unlike() {
+        // given
+        String username = "test";
+        Post post = postFactory.create(username, "post");
+
+        // when
+        postCommandService.unlike(post.getId(), username);
+
+        // then
+        assertThat(post.getLikedUsernames().contains(username)).isFalse();
     }
 
     @DisplayName("게시글 삭제 성공")

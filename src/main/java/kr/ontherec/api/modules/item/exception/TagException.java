@@ -1,4 +1,4 @@
-package kr.ontherec.api.modules.tag.exception;
+package kr.ontherec.api.modules.item.exception;
 
 import kr.ontherec.api.infra.exception.CustomException;
 import lombok.Getter;

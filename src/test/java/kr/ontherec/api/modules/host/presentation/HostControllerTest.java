@@ -28,7 +28,7 @@ import static com.epages.restdocs.apispec.SimpleType.NUMBER;
 import static com.epages.restdocs.apispec.SimpleType.STRING;
 import static io.restassured.RestAssured.given;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
-import static kr.ontherec.api.infra.model.Regex.BANK_ACCOUNT;
+import static kr.ontherec.api.infra.entity.Regex.BANK_ACCOUNT;
 import static kr.ontherec.api.modules.host.exception.HostExceptionCode.EXIST_USERNAME;
 import static kr.ontherec.api.modules.host.exception.HostExceptionCode.NOT_VALID_CONTACT_TIME;
 import static org.hamcrest.Matchers.*;

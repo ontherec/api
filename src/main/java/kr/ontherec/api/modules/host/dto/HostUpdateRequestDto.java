@@ -5,7 +5,7 @@ import kr.ontherec.api.modules.host.entity.Bank;
 
 import java.time.LocalTime;
 
-import static kr.ontherec.api.infra.model.Regex.BANK_ACCOUNT;
+import static kr.ontherec.api.infra.entity.Regex.BANK_ACCOUNT;
 
 public record HostUpdateRequestDto(
         Bank bank,

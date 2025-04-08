@@ -2,12 +2,9 @@ package kr.ontherec.api.infra.fixture;
 
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.entity.Address;
-import kr.ontherec.api.modules.item.entity.Holiday;
-import kr.ontherec.api.modules.item.entity.Link;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
 import kr.ontherec.api.modules.stage.application.StageCommandService;
 import kr.ontherec.api.modules.stage.entity.Stage;
-import kr.ontherec.api.modules.tag.entity.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +23,7 @@ import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
 public class StageFactory {
     @Autowired StageCommandService stageCommandService;
 
-    public Stage create(Host host, String title, String brn, Set<Tag> tags) {
+    public Stage create(Host host, String title, String brn) {
         Address newAddress = Address.builder()
                 .zipcode("00000")
                 .state("경기도")
@@ -44,7 +41,7 @@ public class StageFactory {
                 .address(newAddress)
                 // introduction
                 .content(title)
-                .links(new HashSet<>(Set.of(Link.builder().url("https://ontherec.kr").build())))
+                .links(new HashSet<>(Set.of("https://ontherec.kr")))
                 // area
                 .minCapacity(60)
                 .maxCapacity(120)
@@ -52,7 +49,7 @@ public class StageFactory {
                 .stageWidth(BigDecimal.valueOf(10.5))
                 .stageHeight(BigDecimal.valueOf(5))
                 // business
-                .holidays(new HashSet<>(Set.of(Holiday.builder().type(설날).build())))
+                .holidays(new HashSet<>(Set.of(설날)))
                 .bookingFrom(Duration.ofDays(30))
                 .bookingUntil(Duration.ofDays(1))
                 .refundPolicies(
@@ -97,6 +94,6 @@ public class StageFactory {
                 .modifiedAt(LocalDateTime.now())
                 .build();
 
-        return stageCommandService.register(host, newStage, tags == null ? new HashSet<>() : tags);
+        return stageCommandService.register(host, newStage);
     }
 }

@@ -10,14 +10,15 @@ import org.hibernate.validator.constraints.time.DurationMax;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
 
-import static kr.ontherec.api.infra.model.Regex.BUSINESS_REGISTRATION_NUMBER;
+import static kr.ontherec.api.infra.entity.Regex.BUSINESS_REGISTRATION_NUMBER;
 
 
 public record StageRegisterRequestDto (
         @NotNull(message = "공연장 사진을 입력해주세요.")
-        Set<@URL(message = "유효하지 않은 URL 입니다") String> images,
+        List<@URL(message = "유효하지 않은 URL 입니다") String> images,
         @NotBlank(message = "공연장 이름을 입력해주세요.")
         String title,
         @NotBlank(message = "사업자 등록 번호를 입력해주세요")

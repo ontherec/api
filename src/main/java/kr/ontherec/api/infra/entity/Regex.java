@@ -1,4 +1,4 @@
-package kr.ontherec.api.infra.model;
+package kr.ontherec.api.infra.entity;
 
 public class Regex {
     public static final String BANK_ACCOUNT = "\\d{8,14}"; // https://www.cmsedi.or.kr/cms/board/workdata/view/992
