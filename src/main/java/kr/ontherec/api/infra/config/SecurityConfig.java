@@ -42,7 +42,9 @@ public class SecurityConfig {
                             "http://docs.ontherec.live",
                             "https://docs.ontherec.live",
                             "http://ontherec.kr",
-                            "https://ontherec.kr"
+                            "https://ontherec.kr",
+                            "http://www.ontherec.kr",
+                            "https://www.ontherec.kr"
                     ));
                     config.setAllowedMethods(Collections.singletonList("*"));
                     config.setAllowedHeaders(Collections.singletonList("*"));
