@@ -5,10 +5,7 @@ import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
-import kr.ontherec.api.modules.stage.dto.RefundPolicyRegisterRequestDto;
-import kr.ontherec.api.modules.stage.dto.RefundPolicyUpdateRequestDto;
-import kr.ontherec.api.modules.stage.dto.StageRegisterRequestDto;
-import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
+import kr.ontherec.api.modules.stage.dto.*;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
+import static kr.ontherec.api.modules.item.entity.DOW.MON;
 import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
 import static kr.ontherec.api.modules.item.entity.HolidayType.추석;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
@@ -72,6 +71,14 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
+                        Set.of(new TimeBlockCreateRequestDto(
+                                MON,
+                                LocalTime.NOON,
+                                LocalTime.MAX,
+                                Duration.ofHours(3),
+                                BigDecimal.valueOf(300000),
+                                BigDecimal.valueOf(20000)
+                        )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
                         Set.of(new RefundPolicyRegisterRequestDto(
@@ -162,6 +169,14 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
+                        Set.of(new TimeBlockCreateRequestDto(
+                                MON,
+                                LocalTime.NOON,
+                                LocalTime.MAX,
+                                Duration.ofHours(3),
+                                BigDecimal.valueOf(300000),
+                                BigDecimal.valueOf(20000)
+                        )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
                         Set.of(new RefundPolicyRegisterRequestDto(
@@ -251,6 +266,14 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
+                        Set.of(new TimeBlockCreateRequestDto(
+                                MON,
+                                LocalTime.NOON,
+                                LocalTime.MAX,
+                                Duration.ofHours(3),
+                                BigDecimal.valueOf(300000),
+                                BigDecimal.valueOf(20000)
+                        )),
                         Duration.ofDays(30),
                         Duration.ofDays(30),
                         Set.of(new RefundPolicyRegisterRequestDto(
@@ -339,6 +362,14 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
+                        Set.of(new TimeBlockCreateRequestDto(
+                                MON,
+                                LocalTime.NOON,
+                                LocalTime.MAX,
+                                Duration.ofHours(3),
+                                BigDecimal.valueOf(300000),
+                                BigDecimal.valueOf(20000)
+                        )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
                         Set.of(new RefundPolicyRegisterRequestDto(
@@ -464,6 +495,15 @@ class StageCommandServiceTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
+                Set.of(new TimeBlockUpdateRequestDto(
+                        stage.getTimeBlocks().stream().toList().get(0).getId(),
+                        MON,
+                        LocalTime.MIDNIGHT,
+                        LocalTime.MAX,
+                        Duration.ofHours(7),
+                        BigDecimal.valueOf(500000),
+                        BigDecimal.valueOf(50000)
+                )),
                 Duration.ofDays(90),
                 Duration.ofDays(7),
                 Set.of(new RefundPolicyUpdateRequestDto(
@@ -489,6 +529,15 @@ class StageCommandServiceTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
+                Set.of(new TimeBlockUpdateRequestDto(
+                        stage.getTimeBlocks().stream().toList().get(0).getId(),
+                        MON,
+                        LocalTime.MIDNIGHT,
+                        LocalTime.MAX,
+                        Duration.ofHours(7),
+                        BigDecimal.valueOf(500000),
+                        BigDecimal.valueOf(50000)
+                )),
                 Duration.ofDays(30),
                 Duration.ofDays(30),
                 Set.of(new RefundPolicyUpdateRequestDto(
