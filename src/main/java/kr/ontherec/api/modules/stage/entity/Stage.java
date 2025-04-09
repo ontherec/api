@@ -98,21 +98,24 @@ public class Stage extends BaseEntity {
     private BigDecimal stageHeight;
 
     // business
-    // TODO: timeblocks
-
     @ElementCollection(fetch = EAGER)
     @Column
     @Enumerated(STRING)
     @Builder.Default
     private Set<HolidayType> holidays = new HashSet<>();
 
-    // TODO: booking slots
+    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+    @JoinColumn
+    @Builder.Default
+    private Set<TimeBlock> timeBlocks = new HashSet<>();
 
     @Column(nullable = false)
     private Duration bookingFrom;
 
     @Column(nullable = false)
     private Duration bookingUntil;
+
+    // TODO: booking slots
 
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn

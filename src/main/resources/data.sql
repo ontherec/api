@@ -23,8 +23,11 @@ VALUES (1, 'https://www.ontherec.kr');
 INSERT INTO stage_holidays (stage_id, holidays)
 VALUES (1, '설날');
 
+INSERT INTO time_block (id, dow, start_time, end_time, standard_time, standard_price, extra_per_unit)
+VALUES (1, 'MON', '09:00:00', '18:00:00', 10800000000000, 300000, 20000);
+
 INSERT INTO refund_policy (id, refund_policies_id, day_before, percent)
-VALUES (1, 1, 7, 100);
+VALUES (1, 1, 604800000000000, 100);
 
 INSERT INTO stage_liked_usernames (stage_id, liked_usernames)
 VALUES (1, 'test');
