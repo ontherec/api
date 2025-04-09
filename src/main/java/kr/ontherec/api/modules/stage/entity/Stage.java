@@ -107,7 +107,7 @@ public class Stage extends BaseEntity {
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
     @Builder.Default
-    private Set<TimeBlock> timeBlocks = new HashSet<>();
+    private Set<StageTimeBlock> stageTimeBlocks = new HashSet<>();
 
     @Column(nullable = false)
     private Duration bookingFrom;

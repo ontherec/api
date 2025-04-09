@@ -4,8 +4,8 @@ import kr.ontherec.api.modules.host.dto.HostResponseDto;
 import kr.ontherec.api.modules.item.entity.Address;
 import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
+import kr.ontherec.api.modules.stage.entity.StageTimeBlock;
 import kr.ontherec.api.modules.stage.entity.StageType;
-import kr.ontherec.api.modules.stage.entity.TimeBlock;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,7 +54,7 @@ public class StageResponseDto {
 
     public record Business (
             Set<HolidayType> holidays,
-            Set<TimeBlock> timeBlocks,
+            Set<StageTimeBlock> timeBlocks,
             Duration bookingFrom,
             Duration bookingUntil,
             Set<RefundPolicy> refundPolicies

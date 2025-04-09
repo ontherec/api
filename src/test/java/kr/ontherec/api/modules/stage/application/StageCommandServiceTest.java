@@ -496,7 +496,7 @@ class StageCommandServiceTest {
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
                 Set.of(new TimeBlockUpdateRequestDto(
-                        stage.getTimeBlocks().stream().toList().get(0).getId(),
+                        stage.getStageTimeBlocks().stream().toList().get(0).getId(),
                         MON,
                         LocalTime.MIDNIGHT,
                         LocalTime.MAX,
@@ -530,7 +530,7 @@ class StageCommandServiceTest {
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
                 Set.of(new TimeBlockUpdateRequestDto(
-                        stage.getTimeBlocks().stream().toList().get(0).getId(),
+                        stage.getStageTimeBlocks().stream().toList().get(0).getId(),
                         MON,
                         LocalTime.MIDNIGHT,
                         LocalTime.MAX,

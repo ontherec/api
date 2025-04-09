@@ -16,7 +16,7 @@ import static lombok.AccessLevel.PROTECTED;
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @Builder @AllArgsConstructor(access = PRIVATE)
 @Getter @Setter @EqualsAndHashCode(of = { "dow", "startTime", "endTime" })
-public class TimeBlock {
+public class StageTimeBlock {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
