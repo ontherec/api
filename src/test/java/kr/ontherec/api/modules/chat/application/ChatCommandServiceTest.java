@@ -1,9 +1,9 @@
 package kr.ontherec.api.modules.chat.application;
 
-import kr.ontherec.api.modules.chat.entity.Chat;
-import kr.ontherec.api.modules.chat.dto.ChatCreateRequestDto;
 import kr.ontherec.api.infra.UnitTest;
 import kr.ontherec.api.infra.fixture.ChatFactory;
+import kr.ontherec.api.modules.chat.dto.ChatCreateRequestDto;
+import kr.ontherec.api.modules.chat.entity.Chat;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

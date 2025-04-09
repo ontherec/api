@@ -66,6 +66,7 @@ public interface StageMapper {
     @Mapping(source = "stage.stageWidth", target = "area.stageWidth")
     @Mapping(source = "stage.stageHeight", target = "area.stageHeight")
     @Mapping(source = "stage.holidays", target = "business.holidays")
+    @Mapping(source = "stage.timeBlocks", target = "business.timeBlocks")
     @Mapping(source = "stage.bookingFrom", target = "business.bookingFrom")
     @Mapping(source = "stage.bookingUntil", target = "business.bookingUntil")
     @Mapping(source = "stage.refundPolicies", target = "business.refundPolicies")

@@ -75,15 +75,16 @@ public record StageRegisterRequestDto (
 
         public record Business (
                 Set<HolidayType> holidays,
+                @NotNull(message = "영업 시간을 입력해주세요.")
+                Set<@Valid TimeBlockCreateRequestDto> timeBlocks,
                 @NotNull(message = "예약 시작 기간을 입력해주세요")
                 @DurationMax(days = 90L, message = "예약 기간은 최대 90일 전까지 설정 가능합니다")
                 Duration bookingFrom,
                 @DurationMax(days = 90L, message = "예약 기간은 최대 90일 전까지 설정 가능합니다")
                 @NotNull(message = "예약 마감 기간을 입력해주세요")
                 Duration bookingUntil,
-                @Valid
                 @NotNull(message = "환불 정책을 입력해주세요.")
-                Set<RefundPolicyRegisterRequestDto> refundPolicies
+                Set<@Valid RefundPolicyRegisterRequestDto> refundPolicies
         ) {}
 
         public record Engineering (

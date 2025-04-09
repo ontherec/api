@@ -11,6 +11,7 @@ import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
+import kr.ontherec.api.modules.item.entity.DOW;
 import kr.ontherec.api.modules.stage.dto.*;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.entity.StageType;
@@ -24,6 +25,7 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.*;
 
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
@@ -34,6 +36,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static kr.ontherec.api.infra.config.SecurityConfig.API_KEY_HEADER;
 import static kr.ontherec.api.infra.entity.Regex.BUSINESS_REGISTRATION_NUMBER;
+import static kr.ontherec.api.modules.item.entity.DOW.MON;
 import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
 import static kr.ontherec.api.modules.item.entity.HolidayType.추석;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
@@ -316,6 +319,30 @@ class StageControllerTest {
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional(),
+                                        fieldWithPath("[].business.timeBlocks[]")
+                                                .type(ARRAY)
+                                                .description("예약 블록 목록"),
+                                        fieldWithPath("[].business.timeBlocks[].id")
+                                                .type(NUMBER)
+                                                .description("블록 식별자"),
+                                        fieldWithPath("[].business.timeBlocks[].dow")
+                                                .type(STRING)
+                                                .description("블록 요일 - " + Arrays.toString(DOW.values())),
+                                        fieldWithPath("[].business.timeBlocks[].startTime")
+                                                .type(STRING)
+                                                .description("블록 시작 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("[].business.timeBlocks[].endTime")
+                                                .type(STRING)
+                                                .description("블록 종료 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("[].business.timeBlocks[].standardTime")
+                                                .type(STRING)
+                                                .description("블록 기본 이용 시간 (ISO 8601 Duration)"),
+                                        fieldWithPath("[].business.timeBlocks[].standardPrice")
+                                                .type(NUMBER)
+                                                .description("블록 기본 이용 요금"),
+                                        fieldWithPath("[].business.timeBlocks[].extraPerUnit")
+                                                .type(NUMBER)
+                                                .description("블록 단위 시간당 추가 이용 요금"),
                                         fieldWithPath("[].business.bookingFrom")
                                                 .type(STRING)
                                                 .description("예약 시작 기간 (ISO 8601 Duration)"),
@@ -598,6 +625,30 @@ class StageControllerTest {
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional(),
+                                        fieldWithPath("business.timeBlocks[]")
+                                                .type(ARRAY)
+                                                .description("예약 블록 목록"),
+                                        fieldWithPath("business.timeBlocks[].id")
+                                                .type(NUMBER)
+                                                .description("블록 식별자"),
+                                        fieldWithPath("business.timeBlocks[].dow")
+                                                .type(STRING)
+                                                .description("블록 요일 - " + Arrays.toString(DOW.values())),
+                                        fieldWithPath("business.timeBlocks[].startTime")
+                                                .type(STRING)
+                                                .description("블록 시작 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("business.timeBlocks[].endTime")
+                                                .type(STRING)
+                                                .description("블록 종료 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("business.timeBlocks[].standardTime")
+                                                .type(STRING)
+                                                .description("블록 기본 이용 시간 (ISO 8601 Duration)"),
+                                        fieldWithPath("business.timeBlocks[].standardPrice")
+                                                .type(NUMBER)
+                                                .description("블록 기본 이용 요금"),
+                                        fieldWithPath("business.timeBlocks[].extraPerUnit")
+                                                .type(NUMBER)
+                                                .description("블록 단위 시간당 추가 이용 요금"),
                                         fieldWithPath("business.bookingFrom")
                                                 .type(STRING)
                                                 .description("예약 시작 기간 (ISO 8601 Duration)"),
@@ -773,6 +824,14 @@ class StageControllerTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
+                        Set.of(new TimeBlockCreateRequestDto(
+                                MON,
+                                LocalTime.NOON,
+                                LocalTime.MAX,
+                                Duration.ofHours(3),
+                                BigDecimal.valueOf(300000),
+                                BigDecimal.valueOf(20000)
+                        )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
                         Set.of(new RefundPolicyRegisterRequestDto(
@@ -913,6 +972,27 @@ class StageControllerTest {
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional(),
+                                        fieldWithPath("business.timeBlocks[]")
+                                                .type(ARRAY)
+                                                .description("일정 블록 목록"),
+                                        fieldWithPath("business.timeBlocks[].dow")
+                                                .type(STRING)
+                                                .description("블록 요일 - " + Arrays.toString(DOW.values())),
+                                        fieldWithPath("business.timeBlocks[].startTime")
+                                                .type(STRING)
+                                                .description("블록 시작 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("business.timeBlocks[].endTime")
+                                                .type(STRING)
+                                                .description("블록 종료 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("business.timeBlocks[].standardTime")
+                                                .type(STRING)
+                                                .description("블록 기본 이용 시간 (ISO 8601 Duration)"),
+                                        fieldWithPath("business.timeBlocks[].standardPrice")
+                                                .type(NUMBER)
+                                                .description("블록 기본 이용 요금"),
+                                        fieldWithPath("business.timeBlocks[].extraPerUnit")
+                                                .type(NUMBER)
+                                                .description("블록 단위 시간당 추가 이용 요금"),
                                         fieldWithPath("business.bookingFrom")
                                                 .type(STRING)
                                                 .description("예약 시작 기간 (ISO 8601 Duration)"),
@@ -1219,6 +1299,15 @@ class StageControllerTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
+                Set.of(new TimeBlockUpdateRequestDto(
+                        stage.getTimeBlocks().stream().toList().get(0).getId(),
+                        MON,
+                        LocalTime.MIDNIGHT,
+                        LocalTime.MAX,
+                        Duration.ofHours(7),
+                        BigDecimal.valueOf(500000),
+                        BigDecimal.valueOf(50000)
+                )),
                 Duration.ofDays(90),
                 Duration.ofDays(7),
                 Set.of(new RefundPolicyUpdateRequestDto(
@@ -1249,6 +1338,30 @@ class StageControllerTest {
                                                 .attributes(key("itemsType").value("enum"))
                                                 .description("공휴일 목록")
                                                 .optional(),
+                                        fieldWithPath("timeBlocks[]")
+                                                .type(ARRAY)
+                                                .description("블록 목록"),
+                                        fieldWithPath("timeBlocks[].id")
+                                                .type(NUMBER)
+                                                .description("블록 식별자"),
+                                        fieldWithPath("timeBlocks[].dow")
+                                                .type(STRING)
+                                                .description("블록 요일 - " + Arrays.toString(DOW.values())),
+                                        fieldWithPath("timeBlocks[].startTime")
+                                                .type(STRING)
+                                                .description("블록 시작 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("timeBlocks[].endTime")
+                                                .type(STRING)
+                                                .description("블록 종료 시간 (HH:mm:ss.SSS)"),
+                                        fieldWithPath("timeBlocks[].standardTime")
+                                                .type(STRING)
+                                                .description("블록 기본 이용 시간 (ISO 8601 Duration)"),
+                                        fieldWithPath("timeBlocks[].standardPrice")
+                                                .type(NUMBER)
+                                                .description("블록 기본 이용 요금"),
+                                        fieldWithPath("timeBlocks[].extraPerUnit")
+                                                .type(NUMBER)
+                                                .description("블록 단위 시간당 추가 이용 요금"),
                                         fieldWithPath("bookingFrom")
                                                 .type(STRING)
                                                 .description("예약 시작 기간 (ISO 8601 Duration)"),

@@ -5,6 +5,7 @@ import kr.ontherec.api.modules.item.entity.Address;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
 import kr.ontherec.api.modules.stage.application.StageCommandService;
 import kr.ontherec.api.modules.stage.entity.Stage;
+import kr.ontherec.api.modules.stage.entity.TimeBlock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.time.LocalTime.MAX;
+import static java.time.LocalTime.NOON;
+import static kr.ontherec.api.modules.item.entity.DOW.MON;
 import static kr.ontherec.api.modules.item.entity.HolidayType.설날;
 import static kr.ontherec.api.modules.stage.entity.StageType.RECTANGLE;
 
@@ -50,13 +54,20 @@ public class StageFactory {
                 .stageHeight(BigDecimal.valueOf(5))
                 // business
                 .holidays(new HashSet<>(Set.of(설날)))
+                .timeBlocks(new HashSet<>(Set.of(TimeBlock.builder()
+                        .dow(MON)
+                        .startTime(NOON)
+                        .endTime(MAX)
+                        .standardTime(Duration.ofHours(3))
+                        .standardPrice(BigDecimal.valueOf(300000))
+                        .extraPerUnit(BigDecimal.valueOf(20000))
+                        .build())))
                 .bookingFrom(Duration.ofDays(30))
                 .bookingUntil(Duration.ofDays(1))
-                .refundPolicies(
-                        new HashSet<>(Set.of(RefundPolicy.builder()
-                                .dayBefore(Duration.ofDays(30))
-                                .percent(BigDecimal.valueOf(33.3))
-                                .build())))
+                .refundPolicies(new HashSet<>(Set.of(RefundPolicy.builder()
+                        .dayBefore(Duration.ofDays(30))
+                        .percent(BigDecimal.valueOf(33.3))
+                        .build())))
                 // engineering
                 .stageManagingAvailable(false)
                 .stageManagingFee(null)
