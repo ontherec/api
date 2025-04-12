@@ -54,7 +54,7 @@ public interface PracticeRoomMapper {
     @Mapping(source = "practiceRoom.content", target = "introduction.content")
     @Mapping(source = "practiceRoom.tags", target = "introduction.tags")
     @Mapping(source = "practiceRoom.links", target = "introduction.links")
-    @Mapping(source = "practiceRoom.minCapacity", target = "area.minCapacity")
+    @Mapping(source = "practiceRoom.standardCapacity", target = "area.standardCapacity")
     @Mapping(source = "practiceRoom.maxCapacity", target = "area.maxCapacity")
     @Mapping(source = "practiceRoom.extraPerPerson", target = "area.extraPerPerson")
     @Mapping(source = "practiceRoom.holidays", target = "business.holidays")

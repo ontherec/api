@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import kr.ontherec.api.modules.item.entity.DOW;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalTime;
 
@@ -35,8 +34,8 @@ public class StageTimeBlock {
     private Duration standardTime;
 
     @Column(nullable = false)
-    private BigDecimal standardPrice;
+    private long standardPrice;
 
     @Column(nullable = false)
-    private BigDecimal extraPerUnit;
+    private long extraPerUnit;
 }

@@ -81,8 +81,8 @@ class StageCommandServiceTest {
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
@@ -179,8 +179,8 @@ class StageCommandServiceTest {
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
@@ -276,8 +276,8 @@ class StageCommandServiceTest {
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(30),
@@ -372,8 +372,8 @@ class StageCommandServiceTest {
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
@@ -506,8 +506,8 @@ class StageCommandServiceTest {
                         LocalTime.MIDNIGHT,
                         LocalTime.MAX,
                         Duration.ofHours(7),
-                        BigDecimal.valueOf(500000),
-                        BigDecimal.valueOf(50000)
+                        500000L,
+                        50000L
                 )),
                 Duration.ofDays(90),
                 Duration.ofDays(7),
@@ -540,8 +540,8 @@ class StageCommandServiceTest {
                         LocalTime.MIDNIGHT,
                         LocalTime.MAX,
                         Duration.ofHours(7),
-                        BigDecimal.valueOf(500000),
-                        BigDecimal.valueOf(50000)
+                        500000L,
+                        50000L
                 )),
                 Duration.ofDays(30),
                 Duration.ofDays(30),

@@ -831,8 +831,8 @@ class StageControllerTest {
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
@@ -1302,13 +1302,13 @@ class StageControllerTest {
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
                 Set.of(new StageTimeBlockUpdateRequestDto(
-                        stage.getStageTimeBlocks().stream().toList().get(0).getId(),
+                        stage.getTimeBlocks().stream().toList().get(0).getId(),
                         MON,
                         LocalTime.MIDNIGHT,
                         LocalTime.MAX,
                         Duration.ofHours(7),
-                        BigDecimal.valueOf(500000),
-                        BigDecimal.valueOf(50000)
+                        500000L,
+                        50000L
                 )),
                 Duration.ofDays(90),
                 Duration.ofDays(7),

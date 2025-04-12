@@ -7,7 +7,6 @@ import kr.ontherec.api.modules.item.entity.HolidayType;
 import org.hibernate.validator.constraints.URL;
 import org.hibernate.validator.constraints.time.DurationMax;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 import java.util.Set;
@@ -27,9 +26,16 @@ public class PracticeRoomUpdateRequestDto {
     ) {}
 
     public record Area (
+            @NotNull(message = "기준 이용인원을 입력해주세요.")
+            @DecimalMax(value = "100", message = "기존 이용인원은 최대 100명까지 설정 가능합니다.")
+            @Positive(message = "이용인원은 최소 1명까지 설정 가능합니다.")
             int standardCapacity,
+            @NotNull(message = "최대 이용인원을 입력해주세요.")
+            @DecimalMax(value = "100", message = "기존 이용인원은 최대 100명까지 설정 가능합니다.")
+            @Positive(message = "이용인원은 최소 1명까지 설정 가능합니다.")
             int maxCapacity,
-            BigDecimal extraPerPerson
+            @NotNull(message = "초과인원당 추가 비용을 입력해주세요")
+            long extraPerPerson
     ) {}
 
     public record Business (
