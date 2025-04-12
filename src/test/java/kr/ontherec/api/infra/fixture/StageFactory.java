@@ -54,7 +54,7 @@ public class StageFactory {
                 .stageHeight(BigDecimal.valueOf(5))
                 // business
                 .holidays(new HashSet<>(Set.of(설날)))
-                .stageTimeBlocks(new HashSet<>(Set.of(StageTimeBlock.builder()
+                .timeBlocks(new HashSet<>(Set.of(StageTimeBlock.builder()
                         .dow(MON)
                         .startTime(NOON)
                         .endTime(MAX)
