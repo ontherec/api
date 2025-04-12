@@ -1,9 +1,9 @@
 package kr.ontherec.api.modules.stage.dao;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.JPQLQuery;
+import kr.ontherec.api.infra.util.StopWatch;
 import kr.ontherec.api.modules.post.exception.PostException;
 import kr.ontherec.api.modules.stage.entity.QStage;
 import kr.ontherec.api.modules.stage.entity.Stage;
@@ -22,27 +22,18 @@ import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.NOT_SUP
 import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.NOT_VALID_FILTER;
 
 public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport implements StageRepositoryExtension {
+
     public StageRepositoryExtensionImpl() {
         super(Stage.class);
     }
 
     @Override
+    @StopWatch
     public List<Stage> search(Map<String, String> params, Pageable pageable, String username) {
         QStage stage = QStage.stage;
         BooleanBuilder booleanBuilder = new BooleanBuilder();
         PathBuilder<Stage> pathBuilder = new PathBuilder<>(stage.getType(), stage.getMetadata(), PROPERTIES);
         Map<String, Class<?>> fieldTypes = getFieldTypeMap(Stage.class);
-
-        // select
-        JPQLQuery<Stage> jpqlQuery = from(stage)
-                .join(stage.host).fetchJoin()
-                .join(stage.images).fetchJoin()
-                .join(stage.address).fetchJoin()
-                .leftJoin(stage.tags).fetchJoin()
-                .leftJoin(stage.links).fetchJoin()
-                .leftJoin(stage.holidays).fetchJoin()
-                .leftJoin(stage.refundPolicies).fetchJoin()
-                .leftJoin(stage.likedUsernames);
 
         // query
         if (params.containsKey("q")) {
@@ -80,13 +71,10 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
                             throw new PostException(UNAUTHORIZED);
                         if(!value.equalsIgnoreCase("true") && !value.equalsIgnoreCase("false"))
                             throw new StageException(NOT_VALID_FILTER);
-                        if(Boolean.parseBoolean(value)) {
-                            jpqlQuery.on(stage.likedUsernames.any().eq(username));
+                        if(Boolean.parseBoolean(value))
                             booleanBuilder.and(stage.likedUsernames.contains(username));
-                        } else {
-                            jpqlQuery.on(stage.likedUsernames.any().eq(username));
+                        else
                             booleanBuilder.andNot(stage.likedUsernames.contains(username));
-                        }
                         break;
                     default:
                         if(!fieldTypes.containsKey(key) || !fieldTypes.get(key).getSimpleName().equalsIgnoreCase("boolean"))
@@ -102,8 +90,26 @@ public class StageRepositoryExtensionImpl extends QuerydslRepositorySupport impl
 
         // pagination
         Assert.notNull(getQuerydsl(), "QueryDSL must not be null");
-        SubQueryExpression<Stage> subQuery = getQuerydsl().applyPagination(pageable, from(stage).where(booleanBuilder));
+        List<Long> ids = getQuerydsl().applyPagination(
+                        pageable,
+                        getQuerydsl().createQuery()
+                                .select(stage.id)
+                                .from(stage)
+                                .where(booleanBuilder))
+                .fetch();
 
-        return jpqlQuery.where(stage.in(subQuery)).fetch();
+        // select
+        JPQLQuery<Stage> jpqlQuery = from(stage)
+                .join(stage.host).fetchJoin()
+                .join(stage.images).fetchJoin()
+                .join(stage.address).fetchJoin()
+                .leftJoin(stage.tags).fetchJoin()
+                .leftJoin(stage.links).fetchJoin()
+                .leftJoin(stage.holidays).fetchJoin()
+                .leftJoin(stage.timeBlocks).fetchJoin()
+                .leftJoin(stage.refundPolicies).fetchJoin()
+                .leftJoin(stage.likedUsernames).fetchJoin();
+
+        return jpqlQuery.where(stage.id.in(ids)).fetch();
     }
 }

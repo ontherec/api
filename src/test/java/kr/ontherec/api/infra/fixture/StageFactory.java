@@ -5,7 +5,7 @@ import kr.ontherec.api.modules.item.entity.Address;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
 import kr.ontherec.api.modules.stage.application.StageCommandService;
 import kr.ontherec.api.modules.stage.entity.Stage;
-import kr.ontherec.api.modules.stage.entity.TimeBlock;
+import kr.ontherec.api.modules.stage.entity.StageTimeBlock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -54,13 +54,13 @@ public class StageFactory {
                 .stageHeight(BigDecimal.valueOf(5))
                 // business
                 .holidays(new HashSet<>(Set.of(설날)))
-                .timeBlocks(new HashSet<>(Set.of(TimeBlock.builder()
+                .timeBlocks(new HashSet<>(Set.of(StageTimeBlock.builder()
                         .dow(MON)
                         .startTime(NOON)
                         .endTime(MAX)
                         .standardTime(Duration.ofHours(3))
-                        .standardPrice(BigDecimal.valueOf(300000))
-                        .extraPerUnit(BigDecimal.valueOf(20000))
+                        .standardPrice(300000L)
+                        .extraPerUnit(20000L)
                         .build())))
                 .bookingFrom(Duration.ofDays(30))
                 .bookingUntil(Duration.ofDays(1))

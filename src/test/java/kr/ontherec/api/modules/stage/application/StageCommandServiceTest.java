@@ -5,7 +5,12 @@ import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
-import kr.ontherec.api.modules.stage.dto.*;
+import kr.ontherec.api.modules.item.dto.RefundPolicyRegisterRequestDto;
+import kr.ontherec.api.modules.item.dto.RefundPolicyUpdateRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageRegisterRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageTimeBlockCreateRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageTimeBlockUpdateRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
 import org.junit.jupiter.api.DisplayName;
@@ -71,13 +76,13 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
@@ -169,13 +174,13 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
@@ -266,13 +271,13 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(30),
@@ -362,13 +367,13 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
                                 Duration.ofHours(3),
-                                BigDecimal.valueOf(300000),
-                                BigDecimal.valueOf(20000)
+                                300000L,
+                                20000L
                         )),
                         Duration.ofDays(30),
                         Duration.ofDays(1),
@@ -495,14 +500,14 @@ class StageCommandServiceTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
-                Set.of(new TimeBlockUpdateRequestDto(
+                Set.of(new StageTimeBlockUpdateRequestDto(
                         stage.getTimeBlocks().stream().toList().get(0).getId(),
                         MON,
                         LocalTime.MIDNIGHT,
                         LocalTime.MAX,
                         Duration.ofHours(7),
-                        BigDecimal.valueOf(500000),
-                        BigDecimal.valueOf(50000)
+                        500000L,
+                        50000L
                 )),
                 Duration.ofDays(90),
                 Duration.ofDays(7),
@@ -529,14 +534,14 @@ class StageCommandServiceTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
-                Set.of(new TimeBlockUpdateRequestDto(
+                Set.of(new StageTimeBlockUpdateRequestDto(
                         stage.getTimeBlocks().stream().toList().get(0).getId(),
                         MON,
                         LocalTime.MIDNIGHT,
                         LocalTime.MAX,
                         Duration.ofHours(7),
-                        BigDecimal.valueOf(500000),
-                        BigDecimal.valueOf(50000)
+                        500000L,
+                        50000L
                 )),
                 Duration.ofDays(30),
                 Duration.ofDays(30),

@@ -2,6 +2,7 @@ package kr.ontherec.api.modules.stage.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import kr.ontherec.api.modules.item.dto.RefundPolicyUpdateRequestDto;
 import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.stage.entity.StageType;
 import org.hibernate.validator.constraints.URL;
@@ -50,7 +51,7 @@ public class StageUpdateRequestDto {
         public record Business(
                 Set<HolidayType> holidays,
                 @NotNull(message = "영업 시간을 입력해주세요.")
-                Set<@Valid TimeBlockUpdateRequestDto> timeBlocks,
+                Set<@Valid StageTimeBlockUpdateRequestDto> timeBlocks,
                 @NotNull(message = "예약 시작 기간을 입력해주세요")
                 @DurationMax(days = 90L, message = "예약 기간은 최대 90일 전까지 설정 가능합니다")
                 Duration bookingFrom,

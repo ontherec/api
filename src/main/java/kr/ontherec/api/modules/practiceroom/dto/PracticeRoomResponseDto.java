@@ -1,11 +1,10 @@
-package kr.ontherec.api.modules.stage.dto;
+package kr.ontherec.api.modules.practiceroom.dto;
 
 import kr.ontherec.api.modules.host.dto.HostResponseDto;
 import kr.ontherec.api.modules.item.entity.Address;
 import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
-import kr.ontherec.api.modules.stage.entity.StageTimeBlock;
-import kr.ontherec.api.modules.stage.entity.StageType;
+import kr.ontherec.api.modules.practiceroom.entity.PracticeRoomTimeBlock;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +16,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class StageResponseDto {
+public class PracticeRoomResponseDto {
     Long id;
     HostResponseDto host;
     List<String> images;
@@ -30,8 +29,6 @@ public class StageResponseDto {
     Introduction introduction;
     Area area;
     Business business;
-    Engineering engineering;
-    Documents documents;
     Parking parking;
     Facilities facilities;
     FnbPolicies fnbPolicies;
@@ -45,36 +42,17 @@ public class StageResponseDto {
     ) {}
 
     public record Area (
-            int minCapacity,
+            int standardCapacity,
             int maxCapacity,
-            StageType stageType,
-            BigDecimal stageWidth,
-            BigDecimal stageHeight
+            BigDecimal extraPerPerson
     ) {}
 
     public record Business (
             Set<HolidayType> holidays,
-            Set<StageTimeBlock> timeBlocks,
+            Set<PracticeRoomTimeBlock> timeBlocks,
             Duration bookingFrom,
             Duration bookingUntil,
             Set<RefundPolicy> refundPolicies
-    ) {}
-
-    public record Engineering (
-            boolean stageManagingAvailable,
-            Long stageManagingFee,
-            boolean soundEngineeringAvailable,
-            Long soundEngineeringFee,
-            boolean lightEngineeringAvailable,
-            Long lightEngineeringFee,
-            boolean photographingAvailable,
-            Long photographingFee
-    ) {}
-
-    public record Documents (
-            String applicationForm,
-            String cueSheetTemplate,
-            Duration cueSheetDue
     ) {}
 
     public record Parking (
@@ -87,19 +65,13 @@ public class StageResponseDto {
             boolean hasElevator,
             boolean hasRestroom,
             boolean hasWifi,
-            boolean hasCameraStanding,
-            boolean hasWaitingRoom,
-            boolean hasProjector,
-            boolean hasLocker
+            boolean hasCameraStanding
     ) {}
 
     public record FnbPolicies (
             boolean allowsWater,
             boolean allowsDrink,
             boolean allowsFood,
-            boolean allowsFoodDelivery,
-            boolean allowsAlcohol,
-            boolean sellDrink,
-            boolean sellAlcohol
+            boolean sellDrink
     ) {}
 }

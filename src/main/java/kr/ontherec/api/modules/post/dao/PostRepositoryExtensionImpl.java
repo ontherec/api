@@ -1,7 +1,6 @@
 package kr.ontherec.api.modules.post.dao;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.jpa.JPQLQuery;
 import kr.ontherec.api.modules.post.entity.Post;
 import kr.ontherec.api.modules.post.entity.QPost;
@@ -24,11 +23,6 @@ public class PostRepositoryExtensionImpl extends QuerydslRepositorySupport imple
         QPost post = QPost.post;
         BooleanBuilder booleanBuilder = new BooleanBuilder();
 
-        // select
-        JPQLQuery<Post> jpqlQuery = from(post)
-                .join(post.images).fetchJoin()
-                .leftJoin(post.likedUsernames);
-
         // query
         if(query != null) {
             booleanBuilder.or(post.title.containsIgnoreCase(query))
@@ -39,19 +33,26 @@ public class PostRepositoryExtensionImpl extends QuerydslRepositorySupport imple
         // like
         if(liked != null && username == null)
             throw new PostException(UNAUTHORIZED);
-        if(liked != null && liked) {
-            jpqlQuery.on(post.likedUsernames.any().eq(username));
+        if(liked != null && liked)
             booleanBuilder.and(post.likedUsernames.contains(username));
-        }
-        if(liked != null && !liked){
-            jpqlQuery.on(post.likedUsernames.any().eq(username));
+        if(liked != null && !liked)
             booleanBuilder.andNot(post.likedUsernames.contains(username));
-        }
 
         // pagination
         Assert.notNull(getQuerydsl(), "QueryDSL must not be null");
-        SubQueryExpression<Post> subQuery = getQuerydsl().applyPagination(pageable, from(post).where(booleanBuilder));
+        List<Long> ids = getQuerydsl().applyPagination(
+                        pageable,
+                        getQuerydsl().createQuery()
+                                .select(post.id)
+                                .from(post)
+                                .where(booleanBuilder))
+                .fetch();
 
-        return jpqlQuery.where(post.in(subQuery)).fetch();
+        // select
+        JPQLQuery<Post> jpqlQuery = from(post)
+                .join(post.images).fetchJoin()
+                .leftJoin(post.likedUsernames).fetchJoin();
+
+        return jpqlQuery.where(post.id.in(ids)).fetch();
     }
 }
