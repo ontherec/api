@@ -1,4 +1,4 @@
-package kr.ontherec.api.modules.stage.entity;
+package kr.ontherec.api.modules.practiceroom.entity;
 
 import jakarta.persistence.*;
 import kr.ontherec.api.infra.entity.BaseEntity;
@@ -6,7 +6,6 @@ import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.entity.Address;
 import kr.ontherec.api.modules.item.entity.HolidayType;
 import kr.ontherec.api.modules.item.entity.RefundPolicy;
-import kr.ontherec.api.modules.stage.exception.StageException;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -21,15 +20,13 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
-import static kr.ontherec.api.modules.stage.exception.StageExceptionCode.*;
 import static lombok.AccessLevel.PRIVATE;
 import static lombok.AccessLevel.PROTECTED;
 
 @Entity @RequiredArgsConstructor(access = PROTECTED)
 @SuperBuilder @AllArgsConstructor(access = PRIVATE)
 @Getter @Setter @EqualsAndHashCode(of = "id", callSuper = false)
-public class Stage extends BaseEntity {
-    private static final int BOOKING_PERIOD_MIN = 7;
+public class PracticeRoom extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -80,22 +77,15 @@ public class Stage extends BaseEntity {
     @Builder.Default
     private Set<String> links = new HashSet<>();
 
-    // area
+    // capacity
     @Column(nullable = false)
-    private int minCapacity;
+    private int standardCapacity;
 
     @Column(nullable = false)
     private int maxCapacity;
 
     @Column(nullable = false)
-    @Enumerated(STRING)
-    private StageType stageType;
-
-    @Column(nullable = false)
-    private BigDecimal stageWidth;
-
-    @Column(nullable = false)
-    private BigDecimal stageHeight;
+    private BigDecimal extraPerPerson;
 
     // business
     @ElementCollection(fetch = EAGER)
@@ -107,7 +97,7 @@ public class Stage extends BaseEntity {
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     @JoinColumn
     @Builder.Default
-    private Set<StageTimeBlock> timeBlocks = new HashSet<>();
+    private Set<PracticeRoomTimeBlock> timeBlocks = new HashSet<>();
 
     @Column(nullable = false)
     private Duration bookingFrom;
@@ -121,41 +111,6 @@ public class Stage extends BaseEntity {
     @JoinColumn
     @Builder.Default
     private Set<RefundPolicy> refundPolicies = new HashSet<>();
-
-    // engineering
-    @Column(nullable = false)
-    private boolean stageManagingAvailable;
-
-    @Column
-    private Long stageManagingFee;
-
-    @Column(nullable = false)
-    private boolean soundEngineeringAvailable;
-
-    @Column
-    private Long soundEngineeringFee;
-
-    @Column(nullable = false)
-    private boolean lightEngineeringAvailable;
-
-    @Column
-    private Long lightEngineeringFee;
-
-    @Column(nullable = false)
-    private boolean photographingAvailable;
-
-    @Column
-    private Long photographingFee;
-
-    // documents
-    @Column
-    private String applicationForm;
-
-    @Column(nullable = false)
-    private String cueSheetTemplate;
-
-    @Column(nullable = false)
-    private Duration cueSheetDue;
 
     // TODO: equipments
 
@@ -182,15 +137,6 @@ public class Stage extends BaseEntity {
     @Column(nullable = false)
     private boolean hasCameraStanding;
 
-    @Column(nullable = false)
-    private boolean hasWaitingRoom;
-
-    @Column(nullable = false)
-    private boolean hasProjector;
-
-    @Column(nullable = false)
-    private boolean hasLocker;
-
     // fnb policies
     @Column(nullable = false)
     private boolean allowsWater;
@@ -202,44 +148,5 @@ public class Stage extends BaseEntity {
     private boolean allowsFood;
 
     @Column(nullable = false)
-    private boolean allowsFoodDelivery;
-
-    @Column(nullable = false)
-    private boolean allowsAlcohol;
-
-    @Column(nullable = false)
     private boolean sellDrink;
-
-    @Column(nullable = false)
-    private boolean sellAlcohol;
-
-    public void validateBookingPeriod() {
-        if(bookingFrom == null || bookingUntil == null)
-            return;
-
-        if(bookingFrom.minus(bookingUntil).minusDays(BOOKING_PERIOD_MIN).isNegative()) {
-            throw new StageException(NOT_VALID_BOOKING_PERIOD);
-        }
-    }
-
-    public void validateParking() {
-        if (parkingCapacity > 0 && (parkingLocation == null || freeParking == null))
-            throw new StageException(NOT_VALID_PARKING);
-        if (parkingCapacity == 0 && (parkingLocation != null || freeParking != null))
-            throw new StageException(NOT_VALID_PARKING);
-    }
-
-    public void validateEngineering() {
-        validateEngineeringFee(stageManagingAvailable, stageManagingFee);
-        validateEngineeringFee(soundEngineeringAvailable, soundEngineeringFee);
-        validateEngineeringFee(lightEngineeringAvailable, lightEngineeringFee);
-        validateEngineeringFee(photographingAvailable, photographingFee);
-    }
-
-    private void validateEngineeringFee(boolean available, Long fee) {
-        if (available && fee == null)
-            throw new StageException(NOT_VALID_ENGINEERING_FEE);
-        if (!available && fee != null)
-            throw new StageException(NOT_VALID_ENGINEERING_FEE);
-    }
 }
