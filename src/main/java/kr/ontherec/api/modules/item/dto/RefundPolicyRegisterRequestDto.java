@@ -1,4 +1,4 @@
-package kr.ontherec.api.modules.stage.dto;
+package kr.ontherec.api.modules.item.dto;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;

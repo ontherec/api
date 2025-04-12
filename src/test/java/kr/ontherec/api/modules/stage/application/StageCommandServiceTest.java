@@ -5,7 +5,12 @@ import kr.ontherec.api.infra.fixture.HostFactory;
 import kr.ontherec.api.infra.fixture.StageFactory;
 import kr.ontherec.api.modules.host.entity.Host;
 import kr.ontherec.api.modules.item.dto.AddressRegisterRequestDto;
-import kr.ontherec.api.modules.stage.dto.*;
+import kr.ontherec.api.modules.item.dto.RefundPolicyRegisterRequestDto;
+import kr.ontherec.api.modules.item.dto.RefundPolicyUpdateRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageRegisterRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageTimeBlockCreateRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageTimeBlockUpdateRequestDto;
+import kr.ontherec.api.modules.stage.dto.StageUpdateRequestDto;
 import kr.ontherec.api.modules.stage.entity.Stage;
 import kr.ontherec.api.modules.stage.exception.StageException;
 import org.junit.jupiter.api.DisplayName;
@@ -71,7 +76,7 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
@@ -169,7 +174,7 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
@@ -266,7 +271,7 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
@@ -362,7 +367,7 @@ class StageCommandServiceTest {
                 ),
                 new StageRegisterRequestDto.Business(
                         Set.of(설날),
-                        Set.of(new TimeBlockCreateRequestDto(
+                        Set.of(new StageTimeBlockCreateRequestDto(
                                 MON,
                                 LocalTime.NOON,
                                 LocalTime.MAX,
@@ -495,7 +500,7 @@ class StageCommandServiceTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
-                Set.of(new TimeBlockUpdateRequestDto(
+                Set.of(new StageTimeBlockUpdateRequestDto(
                         stage.getStageTimeBlocks().stream().toList().get(0).getId(),
                         MON,
                         LocalTime.MIDNIGHT,
@@ -529,7 +534,7 @@ class StageCommandServiceTest {
         Stage stage = stageFactory.create(host, "stage", "0000000000");
         StageUpdateRequestDto.Business dto = new StageUpdateRequestDto.Business(
                 Set.of(추석),
-                Set.of(new TimeBlockUpdateRequestDto(
+                Set.of(new StageTimeBlockUpdateRequestDto(
                         stage.getStageTimeBlocks().stream().toList().get(0).getId(),
                         MON,
                         LocalTime.MIDNIGHT,

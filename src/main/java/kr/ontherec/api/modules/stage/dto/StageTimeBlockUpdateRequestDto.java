@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalTime;
 
-public record TimeBlockUpdateRequestDto(
+public record StageTimeBlockUpdateRequestDto(
         Long id,
         @NotNull(message = "요일을 입력해주세요")
         DOW dow,
